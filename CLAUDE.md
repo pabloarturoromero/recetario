@@ -14,6 +14,8 @@ Cloudflare Pages (proyecto `recetario-intercambiable`) está conectado a este re
 4. Subir `meta.version` y `meta.fecha`.
 5. Validar antes de subir:
    - que el JSON de `datos` sea válido y los id no se repitan;
+   - que pasen las pruebas: `node --test tests/motor.test.mjs tests/ui.test.mjs` (cubren catálogo de compras, preparaciones, alertas, dulce, búsqueda, persistencia y anchos móviles);
+   - si se añade una receta con un ingrediente nuevo, asignar su forma en `compras_catalogo.formas` (la prueba de catálogo falla si falta);
    - abrir la página en un navegador (Playwright) y comprobar que carga sin errores, que la cabecera muestra el total correcto de recetas y que la lista de compras se genera.
 6. Commit en `main` con mensaje descriptivo en español y push: `git push origin main`.
 7. Si existe el artifact de Claude del recetario (https://claude.ai/artifact/LRsQg1oJpf6PTJMVcASPGr), republicarlo con el mismo `index.html` para que ambas versiones coincidan.
@@ -26,4 +28,4 @@ Cloudflare Pages (proyecto `recetario-intercambiable`) está conectado a este re
 
 ## Datos del usuario
 
-Fuera de Claude, el plan semanal y las compras se guardan en el `localStorage` del navegador de cada persona. No cambiar la clave `recetario.menu` ni la estructura de `S.semana` sin migrar los datos existentes.
+Fuera de Claude, el plan semanal y las compras se guardan en el `localStorage` del navegador de cada persona. No cambiar la clave `recetario.menu` ni la estructura de `S.semana` sin migrar los datos existentes. El estado guardado lleva `v: 3`; la función `migrarEstado` del motor convierte las versiones anteriores y conserva las marcas antiguas en `comprasLegado`.

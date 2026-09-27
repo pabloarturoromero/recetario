@@ -1,6 +1,6 @@
 # Recetario Intercambiable
 
-Plan nutricional de cuatro semanas con 100 recetas intercambiables de 48 cocinas, organizadas en desayunos, almuerzos, cenas y guarniciones. Incluye armado de la semana con validación de proteína, fibra, energía y pescado marino, lista de compras generada automáticamente y preparaciones base.
+Plan nutricional de cuatro semanas con 100 recetas intercambiables de 48 cocinas, con fotografía de referencia en 97 de ellas, organizadas en desayunos, almuerzos, cenas y guarniciones. Incluye armado de la semana con validación de proteína, fibra, energía y pescado marino, lista de compras generada automáticamente y preparaciones base.
 
 Toda la aplicación vive en un solo archivo, `index.html`, sin dependencias ni paso de compilación.
 
@@ -20,4 +20,16 @@ Si el proyecto de Cloudflare Pages se conecta a este repositorio (Workers & Page
 
 Las recetas están en el bloque `<script type="application/json" id="datos">` de `index.html`. Las cantidades son por porción y las kcal son estimación de tabla de composición, con margen de más menos 10 por ciento.
 
-Fuera de Claude, el plan semanal y las marcas de compras se guardan solo en el navegador de cada persona.
+Fuera de Claude, el plan semanal, las marcas de compras y las preparaciones listas se guardan solo en el navegador de cada persona; la cabecera lo indica como «Guardado en este dispositivo». Dentro del artifact de Claude se sincronizan con su base, y la cabecera muestra el estado real: pendiente, sincronizando, sincronizado o error.
+
+La lista de compras y las preparaciones salen del mismo cálculo. El bloque `compras_catalogo` asigna cada forma de ingrediente a un producto de compra, y el campo `modelo` de cada preparación base define su rendimiento o su lote.
+
+## Pruebas
+
+Sin dependencias propias. El motor de cálculo (`<script id="motor">` en `index.html`) se prueba con Node 20 o superior; la interfaz, con Playwright si está instalado (local o global):
+
+```
+node --test tests/motor.test.mjs tests/ui.test.mjs
+```
+
+Si Playwright no está disponible, las pruebas de interfaz se omiten y lo indican.
