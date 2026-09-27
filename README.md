@@ -1,6 +1,6 @@
 # Recetario Intercambiable
 
-Plan nutricional de cuatro semanas con 100 recetas intercambiables de 48 cocinas, organizadas en desayunos, almuerzos, cenas y guarniciones. Incluye armado de la semana con validación de proteína, fibra, energía y pescado marino, lista de compras generada automáticamente y preparaciones base.
+Plan nutricional de cuatro semanas con 100 recetas intercambiables de 48 cocinas, con fotografía de referencia en 97 de ellas, organizadas en desayunos, almuerzos, cenas y guarniciones. Incluye armado de la semana con validación de proteína, fibra, energía y pescado marino, lista de compras generada automáticamente y preparaciones base.
 
 Toda la aplicación vive en un solo archivo, `index.html`, sin dependencias ni paso de compilación.
 

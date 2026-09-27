@@ -318,3 +318,15 @@ test('semana de preparación: el domingo prepara la semana siguiente', () => {
   assert.equal(M.semanaPrep(new Date(2026, 8, 28)), '2026-09-28');
   assert.equal(M.semanaPrep(new Date(2026, 9, 3)), '2026-09-28');
 });
+
+test('fotos: cada foto corresponde a una receta y trae crédito y enlace', async () => {
+  const { readFileSync } = await import('node:fs');
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const F = JSON.parse(/<script type="application\/json" id="fotos">([\s\S]*?)<\/script>/.exec(html)[1]);
+  const ids = new Set(D.recetas.map((r) => r.id));
+  for (const [k, f] of Object.entries(F)) {
+    assert.ok(ids.has(k), 'foto sin receta: ' + k);
+    assert.ok(f.s.startsWith('/9j/'), 'JPEG en base64: ' + k);
+    assert.ok(f.c && /^https:\/\//.test(f.u), 'crédito y enlace: ' + k);
+  }
+});

@@ -183,3 +183,16 @@ for (const ancho of [375, 390, 1280]) {
     await ctx.close();
   });
 }
+
+test('fotos: la ficha muestra la foto con su crédito y la lista usa miniaturas', { skip: saltar }, async () => {
+  const { page, ctx, errores } = await abrir();
+  await page.click('nav.main button[data-v="recetas"]');
+  const img = page.locator('#ficha .ficha-foto img');
+  assert.equal(await img.count(), 1);
+  assert.ok(await img.evaluate((i) => i.complete && i.naturalWidth > 0), 'la imagen carga');
+  assert.equal(await img.getAttribute('alt'), (await page.textContent('#ficha h2')).trim());
+  assert.match(await page.getAttribute('#ficha .cred a', 'href'), /^https:\/\//);
+  assert.ok(await page.locator('.reclist img.th').count() > 50);
+  assert.deepEqual(errores, []);
+  await ctx.close();
+});
