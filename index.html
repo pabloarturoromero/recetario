@@ -941,7 +941,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -17795,12 +17795,86 @@ function conectarSalud(db){
     if(S.vista === 'salud' || S.vista === 'inicio') render();
   }, function(){ marcaSync('error'); });
 }
-if(window.claude && window.claude.use){
+/* ---------- nube propia (Cloudflare Pages Functions + KV, con candado de Cloudflare Access) ---------- */
+/* Fuera de Claude, si el sitio tiene la nube configurada, los mismos documentos menu/actual y salud/actual
+   se guardan en /api/doc/... con la misma interfaz que la base del artifact (doc, set, onSnapshot).
+   NUBE.estado: 'no' (sin nube), 'login' (hay nube pero falta iniciar sesión), 'ok'. */
+var NUBE = {estado:'no', email:'', db:null};
+function nubeDb(){
+  var refs = [];
+  function doc(ruta){
+    var ver = null, cbs = [], errs = [], vista = false;
+    var url = '/api/doc/' + ruta;
+    function emitir(o){
+      cbs.forEach(function(cb){ cb({exists:o.exists, metadata:{}, data:function(){ return o.data; }}); });
+    }
+    function fallo(e){ errs.forEach(function(f){ f(e); }); }
+    /* Sesión de Access vencida: Access redirige a su página de inicio de sesión. */
+    function vencida(r){
+      if(r.type !== 'opaqueredirect' && r.status !== 401) return false;
+      if(NUBE.estado !== 'login'){ NUBE.estado = 'login'; render(); }
+      return true;
+    }
+    function refrescar(){
+      return fetch(url, {credentials:'same-origin', cache:'no-store', redirect:'manual'}).then(function(r){
+        if(r.status === 404){ if(!vista && ver === null){ vista = true; emitir({exists:false}); } return; }
+        if(vencida(r)) throw new Error('sesión vencida');
+        if(!r.ok) throw new Error('nube ' + (r.status || r.type));
+        return r.json().then(function(j){
+          /* Solo avanza: una lectura atrasada de otra región no deshace lo ya guardado. */
+          if(ver !== null && !(j.version > ver)) return;
+          ver = j.version; vista = true;
+          emitir({exists:true, data:j.data});
+        });
+      }).catch(fallo);
+    }
+    var ref = {
+      set:function(data){
+        return fetch(url, {method:'PUT', credentials:'same-origin', redirect:'manual',
+          headers:{'content-type':'application/json'}, body:JSON.stringify({base:ver, data:data})}).then(function(r){
+          if(r.status === 409) return r.json().then(function(j){
+            /* Otro dispositivo guardó antes: se toma lo suyo en lugar de pisarlo. */
+            ver = j.version; emitir({exists:true, data:j.data});
+            avisar('Había cambios más recientes de otro dispositivo; se cargaron esos.', null);
+          });
+          if(vencida(r)) throw new Error('sesión vencida');
+          if(!r.ok) throw new Error('nube ' + (r.status || r.type));
+          return r.json().then(function(j){ ver = j.version; if(NUBE.estado !== 'ok'){ NUBE.estado = 'ok'; render(); } });
+        });
+      },
+      onSnapshot:function(cb, err){
+        cbs.push(cb); if(err) errs.push(err);
+        refrescar();
+        return function(){};
+      },
+      refrescar:refrescar
+    };
+    refs.push(ref);
+    return ref;
+  }
+  return {doc:doc, refrescar:function(){ refs.forEach(function(r){ r.refrescar(); }); }};
+}
+function probarNube(){
+  return fetch('/api/nube', {credentials:'same-origin', cache:'no-store', redirect:'manual'}).then(function(r){
+    if(r.type === 'opaqueredirect' || r.status === 401 || r.status === 403){ NUBE.estado = 'login'; return null; }
+    if(!r.ok) return null;
+    return r.json().then(function(j){
+      if(!j || j.ok !== true) return null;
+      NUBE.estado = 'ok'; NUBE.email = j.email || ''; NUBE.db = nubeDb();
+      return NUBE.db;
+    });
+  }).catch(function(){ return null; }).then(function(db){ if(!db && NUBE.estado === 'login') render(); return db; });
+}
+var fuenteDb = null;
+if(window.claude && window.claude.use) fuenteDb = window.claude.use('db');
+else if(/^https?:$/.test(location.protocol)) fuenteDb = probarNube();
+if(fuenteDb){
   S.sync = 'conectando';
-  window.claude.use('db').then(function(db){
+  fuenteDb.then(function(db){
     if(!db){ marcaSync('local'); return; }
     dbRef = db.doc('menu/actual');
     conectarSalud(db);
+    if(db === NUBE.db) render();   /* muestra «Conectada» y el correo en cuanto la nube responde */
     var primera = true;
     dbRef.onSnapshot(function(sn){
       if(sn.metadata && sn.metadata.hasPendingWrites) return;
@@ -17932,6 +18006,7 @@ function vInicio(){
     '<button data-goto="compras"><span class="ic">' + ico('bag') + '</span>Compras</button>' +
     '<button data-goto="prep"><span class="ic">' + ico('pot') + '</span>Preparar</button></div>';
   h += aguaInicio();
+  h += avisoNubeInicio();
 
   h += '<div class="sec-head"><h2>Menú de hoy</h2><button data-goto="semana">Ver semana</button></div>';
   h += '<div class="carousel">';
@@ -19271,7 +19346,7 @@ function formExamen(ex){
 function vSalud(){
   var hoy = SA.hoyISO(), t = SA.totalDia(SS, hoy), av = SA.avisos(SS, hoy), U = S.salud;
   var h = '<div class="page-h"><h1>Salud</h1><div class="sub">Agua del día, peso y exámenes. Se guarda aparte del menú' +
-    (dbSalud ? ' y se sincroniza con la copia compartida' : ', solo en este dispositivo') + '.</div></div>';
+    (dbSalud ? (NUBE.db ? ' y se sincroniza con tu nube' : ' y se sincroniza con la copia compartida') : ', solo en este dispositivo') + '.</div></div>';
 
   /* ----- agua ----- */
   h += '<section class="sa-sec" id="sa-agua" aria-labelledby="saAguaT"><h2 id="saAguaT">Agua de hoy</h2>';
@@ -19373,6 +19448,7 @@ function vSalud(){
 
   /* ----- respaldo ----- */
   var wa = 'https://wa.me/?text=' + encodeURIComponent(SA.textoResumen(SS, hoy));
+  h += panelNube();
   h += '<section class="sa-sec" aria-labelledby="saRespT"><h2 id="saRespT">Compartir y respaldo</h2><div class="panel">' +
     '<div class="agua-acts" style="margin-top:0"><button class="btn sec" data-sa="copiar">Copiar resumen para el médico</button>' +
     '<a class="btn sec" href="' + esc(wa) + '" target="_blank" rel="noopener">Enviar por WhatsApp</a>' +
@@ -19381,6 +19457,24 @@ function vSalud(){
     '<p class="sa-ok" id="saOk" role="status" aria-live="polite">' + esc(U.msg || '') + '</p></div></section>';
   U.msg = '';
   return h;
+}
+/* Estado de la nube propia, en Salud y como aviso en Inicio mientras falte iniciar sesión. */
+function panelNube(){
+  if(window.claude && window.claude.use) return '';   /* dentro del artifact de Claude ya se sincroniza con su base */
+  var h = '<section class="sa-sec" id="sa-nube" aria-labelledby="saNubeT"><h2 id="saNubeT">Tus datos en la nube</h2><div class="panel">';
+  if(NUBE.estado === 'ok') h += '<p class="txt2"><span class="chip-s ok">Conectada</span> El menú, las compras y Salud se guardan en tu nube como <b>' + esc(NUBE.email) +
+    '</b> y aparecen en cualquier teléfono o computador donde entres con ese correo.</p>' +
+    '<div class="agua-acts"><a class="btn gh sm" href="/cdn-cgi/access/logout">Cerrar sesión en este dispositivo</a></div>';
+  else if(NUBE.estado === 'login') h += '<p class="txt2">Inicia sesión con tu correo para guardar el menú, las compras y Salud en tu nube. Lo que ya tienes en este dispositivo se sube la primera vez.</p>' +
+    '<div class="agua-acts"><a class="btn pri" href="/api/entrar" id="nubeEntrar">Conectar mi nube</a></div>';
+  else h += '<p class="txt2">Por ahora los datos quedan solo en este dispositivo. Usa el respaldo de abajo para no perderlos.</p>';
+  return h + '</div></section>';
+}
+function avisoNubeInicio(){
+  if(NUBE.estado !== 'login') return '';
+  return '<div class="panel agua-mini" style="display:block"><b>Guarda tus datos en la nube</b>' +
+    '<p class="txt2" style="margin:4px 0 10px">Entra con tu correo una vez y tu menú y Salud quedan en todos tus dispositivos.</p>' +
+    '<a class="btn pri sm" href="/api/entrar">Conectar mi nube</a></div>';
 }
 function accionSalud(t){
   var p = t.dataset.sa.split('|'), a = p[0], hoy = SA.hoyISO(), U = S.salud;
@@ -19504,6 +19598,11 @@ function render(){
 var hoyPintado = null;
 function alVolver(){
   var cambio = false, hoy = hoyKey();
+  /* Con la nube propia no hay aviso en vivo: se consulta al volver a la app y, si falló una subida, se reintenta. */
+  if(NUBE.db){
+    if(S.sync === 'error'){ subir(); if(saludConDatos(SS)) subirSalud(); }
+    NUBE.db.refrescar();
+  }
   if(hoyPintado && hoyPintado !== hoy){
     if(S.diaSel === hoyPintado) S.diaSel = hoy;
     cambio = true;
@@ -19531,7 +19630,7 @@ document.addEventListener('visibilitychange', function(){ if(!document.hidden) a
 window.addEventListener('pageshow', function(e){ if(e.persisted) alVolver(); });
 window.addEventListener('focus', alVolver);
 window.addEventListener('storage', function(e){ if(e.key === 'recetario.menu' || e.key === 'recetario.salud') alVolver(); });
-setInterval(function(){ if(!document.hidden && (hoyPintado !== hoyKey() || saludHoy !== SA.hoyISO())) alVolver(); }, 60000);
+setInterval(function(){ if(!document.hidden && (NUBE.db || hoyPintado !== hoyKey() || saludHoy !== SA.hoyISO())) alVolver(); }, 60000);
 /* #salud abre la sección directamente; al salir de ella el enlace se limpia sin tocar el historial. */
 function hashSalud(){
   try{
