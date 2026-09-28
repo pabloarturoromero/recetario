@@ -1,5 +1,7 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Recetario Intercambiable</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
@@ -170,6 +172,18 @@ main{max-width:var(--maxw); margin:0 auto; padding:var(--s4) var(--s5) var(--s8)
 .plus{width:30px; height:30px; border-radius:8px; background:var(--brand); color:var(--on-brand);
   display:grid; place-items:center; flex:none; box-shadow:var(--sh-brand)}
 .plus svg.i{width:16px; height:16px; stroke-width:2.4}
+
+/* ============ COCINERA ============ */
+.page-h, .hello{display:flow-root}
+.gal-h .page-h{flex:1 1 auto}
+.coci{float:right; height:132px; width:auto; margin:-6px 0 -10px var(--s4); pointer-events:none; user-select:none}
+.hello .coci{height:168px}
+.empty .coci, .gal-empty .coci{float:none; display:block; height:170px; width:auto; margin:0 auto var(--s4)}
+@media (max-width:640px){
+  .coci{height:104px; margin-left:var(--s3)}
+  .hello .coci{height:128px}
+  .empty .coci, .gal-empty .coci{height:140px}
+}
 
 /* ============ INICIO ============ */
 .hello h1{font-size:30px; font-weight:700; letter-spacing:-.025em; line-height:1.15}
@@ -809,7 +823,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Recetario intercambiable, plan nutricional 4 semanas",
-    "version": "2.5.1",
+    "version": "2.6",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -17126,6 +17140,14 @@ function emoji(r){
   for(var i=0;i<EMOJI.length;i++) if(EMOJI[i][0].test(r.nombre)) return EMOJI[i][1];
   return '🍽️';
 }
+/* Ilustraciones de la cocinera: decorativas, sin texto alternativo. */
+var COCI = {bienvenida:[476,720], base:[453,720], plato:[256,720], ingredientes:[303,720],
+  cocinando:[371,720], consejo:[315,720], vacio:[335,720]};
+function cocinera(pose){
+  var d = COCI[pose];
+  return '<img class="coci" src="img/cocinera-' + pose + '.webp" width="' + d[0] + '" height="' + d[1] +
+    '" alt="" aria-hidden="true" decoding="async">';
+}
 function pic(r, cls, alt){
   var f = r && FOTOS[r.id];
   return '<div class="pic ' + (r ? 'c-' + r.categoria : 'c-vacio') + (f ? ' foto' : '') + (cls ? ' ' + cls : '') + '"' +
@@ -17383,7 +17405,7 @@ function vInicio(){
   var s = S.semana[k] || vacio(), t = M.totalesDia(S.semana, k);
   var h = '';
 
-  h += '<div class="hello"><h1>Hola, Pablo</h1><p>¿Qué cocinamos hoy?</p>' +
+  h += '<div class="hello">' + cocinera('bienvenida') + '<h1>Hola, Pablo</h1><p>¿Qué cocinamos hoy?</p>' +
        '<div class="sub2">' + esc(fechaLarga()) +
        (dia.vent ? ' · ventana de contención' : '') + '</div>' +
        '<div class="sub2"><span class="fase-chip">Fase activa: ' + esc(O.fase.nombre.toLowerCase()) + '</span></div></div>';
@@ -17534,7 +17556,7 @@ function sugerirGuarn(k){
 /* ================= SEMANA ================= */
 function vSemana(){
   var O = obj();
-  var h = '<div class="page-h"><h1>Semana</h1><div class="sub">De lunes a domingo. ' +
+  var h = '<div class="page-h">' + cocinera('plato') + '<h1>Semana</h1><div class="sub">De lunes a domingo. ' +
     'Los tres últimos días llevan la ventana de contención. <span class="fase-chip">Fase activa: ' + esc(O.fase.nombre.toLowerCase()) +
     ' · energía ' + O.kcal.lo + '–' + O.kcal.hi + ' kcal · fibra ' + O.fib.lo + '–' + O.fib.hi + ' g</span></div></div>';
   h += '<div class="daysel" role="group" aria-label="Elegir día">';
@@ -17737,7 +17759,7 @@ function vRecetas(){
   } else {
     var nc = {};
     R.forEach(function(x){ nc[x.cocina] = 1; });
-    h += '<div class="gal-h"><div class="page-h"><h1>Recetas</h1><div class="sub">' + R.length + ' recetas · ' +
+    h += '<div class="gal-h"><div class="page-h">' + cocinera('base') + '<h1>Recetas</h1><div class="sub">' + R.length + ' recetas · ' +
       Object.keys(nc).length + ' cocinas</div></div></div>';
   }
 
@@ -17776,7 +17798,7 @@ function vRecetas(){
 
   h += '<div class="gal" id="gal">';
   if(!lista.length){
-    h += '<div class="gal-empty"><b>Ninguna receta coincide</b>Prueba con otra palabra o quita algún filtro.' +
+    h += '<div class="gal-empty">' + cocinera('vacio') + '<b>Ninguna receta coincide</b>Prueba con otra palabra o quita algún filtro.' +
       (activos ? '<br><button class="btn sec sm" data-limpiar="1">Limpiar filtros</button>' : '') + '</div>';
   } else if(cx){
     var evs = {};
@@ -18043,7 +18065,7 @@ function vCompras(){
     total++; if(e.s && !e.parcial) hechos++;
     (por[l.seccion] = por[l.seccion] || []).push(l);
   });
-  var h = '<div class="page-h"><h1>Compras</h1><div class="sub">Generada desde el menú de la semana, para ' +
+  var h = '<div class="page-h">' + cocinera('ingredientes') + '<h1>Compras</h1><div class="sub">Generada desde el menú de la semana, para ' +
     S.comensales + ' porción' + (S.comensales > 1 ? 'es' : '') + ' por plato. Incluye las materias primas de las preparaciones previas.</div></div>';
   h += '<div class="shopbar"><div class="pr"><div class="lab"><span>Resuelto</span><b>' +
     hechos + ' / ' + total + '</b></div><div class="track"><div class="fill ok" style="width:' +
@@ -18058,7 +18080,7 @@ function vCompras(){
       return '<div class="alert bad"><span class="tag">Datos</span><span>' + esc(e) + '</span></div>'; }).join('') + '</div>';
   }
   if(!total){
-    h += '<div class="empty"><b>Nada que comprar todavía</b>Asigna platos en la semana y la lista se genera sola.</div>';
+    h += '<div class="empty">' + cocinera('vacio') + '<b>Nada que comprar todavía</b>Asigna platos en la semana y la lista se genera sola.</div>';
     return h;
   }
   h += '<div class="shopcols">';
@@ -18117,7 +18139,7 @@ function itemCompra(l){
 /* ================= PREPARACIONES ================= */
 function vPrep(){
   var pl = planActual(), sp = M.semanaPrep(new Date());
-  var h = '<div class="page-h"><h1>Preparaciones</h1><div class="sub">Lo que hay que dejar hecho para la semana del ' + esc(fechaCorta(sp)) +
+  var h = '<div class="page-h">' + cocinera('cocinando') + '<h1>Preparaciones</h1><div class="sub">Lo que hay que dejar hecho para la semana del ' + esc(fechaCorta(sp)) +
     '. Las cantidades salen del menú actual y coinciden con Compras.</div></div>';
   if(pl.errores.length){
     h += '<div class="alerts" style="margin-bottom:var(--s4)">' + pl.errores.map(function(e){
@@ -18274,7 +18296,7 @@ function textoRegla(k, v){
 }
 function vReglas(){
   var e = D.equivalencias, b = D.bebidas, m = D.meta.reglas_de_armado, O = obj();
-  var h = '<div class="page-h"><h1>Reglas</h1><div class="sub">Parámetros del plan, avisos, dulce diario, bebidas, equivalencias y conversiones</div></div>';
+  var h = '<div class="page-h">' + cocinera('consejo') + '<h1>Reglas</h1><div class="sub">Parámetros del plan, avisos, dulce diario, bebidas, equivalencias y conversiones</div></div>';
   h += '<h2 class="eyebrow" style="margin-bottom:var(--s3)">Parámetros diarios y de armado</h2><div class="tw"><table><tbody>';
   Object.keys(m).forEach(function(k){
     var et = ETIQ_REGLA[k] || (k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' '));
