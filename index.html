@@ -809,7 +809,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Recetario intercambiable, plan nutricional 4 semanas",
-    "version": "2.5",
+    "version": "2.5.1",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -17205,6 +17205,7 @@ var S = {
 /* Sin la base del artifact de Claude solo existe el guardado local. El estado «sincronizado» se muestra
    únicamente después de que la escritura remota se confirma. */
 var dbRef = null, tmr = null, localOk = true;
+var ultimoRaw = null;   /* último estado leído o escrito en este dispositivo, para detectar cambios de otra pestaña */
 var SYNC_TXT = {
   local:'Guardado en este dispositivo',
   conectando:'Conectando con la copia compartida',
@@ -17240,6 +17241,7 @@ try{
     var migrado = aplicar(JSON.parse(raw));
     /* Tras migrar se guarda de inmediato, conservando las marcas antiguas en comprasLegado. */
     if(migrado) localStorage.setItem('recetario.menu', JSON.stringify(cuerpo()));
+    ultimoRaw = localStorage.getItem('recetario.menu');
   }
 }catch(e){}
 function subir(){
@@ -17249,7 +17251,7 @@ function subir(){
     .catch(function(){ marcaSync('error'); });
 }
 function guardar(){
-  try{ localStorage.setItem('recetario.menu', JSON.stringify(cuerpo())); localOk = true; }
+  try{ ultimoRaw = JSON.stringify(cuerpo()); localStorage.setItem('recetario.menu', ultimoRaw); localOk = true; }
   catch(e){ localOk = false; }
   if(!dbRef){ marcaSync('local'); return; }
   marcaSync('pendiente');
@@ -17273,7 +17275,7 @@ if(window.claude && window.claude.use){
       var d2 = sn.data();
       if(!d2) return;
       var migrado = aplicar(d2);
-      try{ localStorage.setItem('recetario.menu', JSON.stringify(cuerpo())); localOk = true; }catch(e){ localOk = false; }
+      try{ ultimoRaw = JSON.stringify(cuerpo()); localStorage.setItem('recetario.menu', ultimoRaw); localOk = true; }catch(e){ localOk = false; }
       var sel = document.getElementById('comensales');
       if(sel) sel.value = String(S.comensales);
       var fs = document.getElementById('fase');
@@ -18632,8 +18634,37 @@ function render(){
     b.setAttribute('aria-selected', String(b.dataset.v === S.vista));
   });
   pintarSync();
+  hoyPintado = hoyKey();
   if(S.swap || S.asig) pintarCapa();
 }
+
+/* «Hoy» al volver a la página. Los navegadores móviles reanudan la pestaña sin recargarla: sin esto,
+   Inicio seguía mostrando el día en que se abrió y el menú que había en ese momento. */
+var hoyPintado = null;
+function alVolver(){
+  var cambio = false, hoy = hoyKey();
+  if(hoyPintado && hoyPintado !== hoy){
+    if(S.diaSel === hoyPintado) S.diaSel = hoy;
+    cambio = true;
+  }
+  try{
+    var raw = localStorage.getItem('recetario.menu');
+    if(raw && raw !== ultimoRaw){
+      aplicar(JSON.parse(raw)); ultimoRaw = raw; cambio = true;
+      document.getElementById('comensales').value = String(S.comensales);
+      document.getElementById('fase').value = String(S.fase);
+    }
+  }catch(e){}
+  if(!cambio) return;
+  var q = document.activeElement && document.activeElement.id === 'q';
+  render();
+  if(q){ var n = document.getElementById('q'); if(n) n.focus(); }
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) alVolver(); });
+window.addEventListener('pageshow', function(e){ if(e.persisted) alVolver(); });
+window.addEventListener('focus', alVolver);
+window.addEventListener('storage', function(e){ if(e.key === 'recetario.menu') alVolver(); });
+setInterval(function(){ if(!document.hidden && hoyPintado !== hoyKey()) alVolver(); }, 60000);
 function ir(v, sinScroll){
   if(S.cambio) salirCambio(false, true);
   if(S.verFicha){ S.verFicha = false; quitarHash(); }

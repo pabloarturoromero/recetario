@@ -311,6 +311,39 @@ await prueba('teclado: tabular a una tarjeta y abrir con Enter; Escape vuelve', 
   assert.equal(await p.evaluate(() => document.activeElement.classList.contains('gopen')), true);
 });
 
+await prueba('Hoy se actualiza al cambiar de día con la pestaña abierta', async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+  const p = await ctx.newPage();
+  await p.clock.install({ time: new Date(2026, 8, 27, 23, 58) }); // domingo 23:58, hora local
+  await p.goto(BASE);
+  assert.match(await p.textContent('.hello .sub2'), /domingo/i);
+  const nombreDe = id => R.find(r => r.id === id).nombre;
+  assert.match(await p.textContent('.carousel'), new RegExp(nombreDe('L14')));
+  await p.clock.runFor(3 * 60 * 1000); // pasa la medianoche sin recargar
+  await p.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+  assert.match(await p.textContent('.hello .sub2'), /lunes/i);
+  assert.match(await p.textContent('.carousel'), new RegExp(nombreDe('L13')));
+  await ctx.close();
+});
+
+await prueba('un cambio hecho en otra pestaña aparece al volver', async () => {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await ctx.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+  const a = await ctx.newPage(), b = await ctx.newPage();
+  await a.goto(BASE);
+  await b.goto(BASE);
+  const hoy = await a.evaluate(() => ['dom','lun','mar','mie','jue','vie','sab'][new Date().getDay()]);
+  const r = R.find(x => x.categoria === 'cena' && x.apto_ventana_contencion && !a.isClosed());
+  await b.goto(BASE + '#receta/' + r.id); await b.reload();
+  await b.click('[data-anadir]');
+  await b.click(`[data-adia="${hoy}"]`);
+  const conf = b.locator('[data-aconf]');
+  if (await conf.count()) await conf.click();
+  await a.waitForFunction(n => document.querySelector('.carousel').textContent.includes(n), r.nombre, { timeout: 5000 });
+  await ctx.close();
+});
+
 for (const ancho of [375, 390]) {
   await prueba(`sin desbordamiento horizontal a ${ancho} px`, async () => {
     const p = await nueva(ancho, 812);
