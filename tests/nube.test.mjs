@@ -1,5 +1,5 @@
-// Pruebas de la nube propia: las funciones de Cloudflare Pages (functions/api) con un KV en memoria
-// y claves de Access generadas aquí, y la app en dos navegadores que comparten datos a través de ellas.
+// Pruebas de la nube propia: las funciones de Cloudflare Pages (functions/api) con un KV en memoria,
+// y la app en varios navegadores que comparten datos a través de esas mismas funciones.
 // Uso: node --test tests/nube.test.mjs   (la parte de navegador requiere Playwright)
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -11,97 +11,67 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import * as mw from '../functions/api/_middleware.js';
 import * as nube from '../functions/api/nube.js';
-import * as entrar from '../functions/api/entrar.js';
 import * as doc from '../functions/api/doc/[col]/[id].js';
 
-const EQUIPO = 'amor.cloudflareaccess.com', AUD = 'aud-prueba';
-
-/* ---------- claves y tokens de Access simulados ---------- */
-const par = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']);
-const otro = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify']);
-const jwk = { ...(await crypto.subtle.exportKey('jwk', par.publicKey)), kid: 'k1', alg: 'RS256' };
-const b64 = (u8) => Buffer.from(u8).toString('base64url');
-async function token(carga, clave = par.privateKey, kid = 'k1') {
-  const c = b64(Buffer.from(JSON.stringify({ alg: 'RS256', kid })));
-  const p = b64(Buffer.from(JSON.stringify(carga)));
-  const f = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', clave, new TextEncoder().encode(c + '.' + p));
-  return c + '.' + p + '.' + b64(new Uint8Array(f));
-}
-const ahora = () => Math.floor(Date.now() / 1000);
-const valido = (email = 'Arturo@Ejemplo.com', extra = {}) => token({ aud: [AUD], iss: `https://${EQUIPO}`, exp: ahora() + 3600, email, ...extra });
-
-const fetchReal = globalThis.fetch;
-globalThis.fetch = async (u, o) => {
-  if (String(u) === `https://${EQUIPO}/cdn-cgi/access/certs`) return new Response(JSON.stringify({ keys: [jwk] }), { headers: { 'content-type': 'application/json' } });
-  return fetchReal(u, o);
-};
+const CLAVE = 'abcde-fghjk-mnpqr-stuvw';
 
 function kv() {
   const m = new Map();
   return { m, async get(k, t) { const v = m.get(k); return v === undefined ? null : (t === 'json' ? JSON.parse(v) : v); }, async put(k, v) { m.set(k, v); } };
 }
-const envCon = (DATOS = kv(), extra = {}) => ({ DATOS, ACCESS_TEAM_DOMAIN: EQUIPO, ACCESS_AUD: AUD, ...extra });
+const envCon = (DATOS = kv(), extra = {}) => ({ DATOS, CLAVE_NUBE: CLAVE, ...extra });
 
 /* Ejecuta middleware + ruta como lo haría Pages. */
-async function llamar(env, metodo, ruta, { jwt, cuerpo } = {}) {
+async function llamar(env, metodo, ruta, { clave, auth, cuerpo } = {}) {
   const headers = new Headers();
-  if (jwt) headers.set('Cf-Access-Jwt-Assertion', jwt);
+  if (auth !== undefined) headers.set('Authorization', auth);
+  else if (clave !== undefined) headers.set('Authorization', 'Bearer ' + clave);
   if (cuerpo !== undefined) headers.set('content-type', 'application/json');
-  const request = new Request('https://recetario-intercambiable.pages.dev' + ruta, { method: metodo, headers, body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo) });
-  let handler, params = {};
+  const request = new Request('https://recetario-intercambiable.pages.dev' + ruta, { method: metodo, headers, body: cuerpo === undefined ? undefined : (typeof cuerpo === 'string' ? cuerpo : JSON.stringify(cuerpo)) });
+  let handler = () => new Response('no', { status: 404 }), params = {};
   const m = /^\/api\/doc\/([^/]+)\/([^/]+)$/.exec(ruta);
   if (ruta === '/api/nube') handler = nube.onRequestGet;
-  else if (ruta === '/api/entrar') handler = entrar.onRequestGet;
   else if (m) { params = { col: m[1], id: m[2] }; handler = metodo === 'PUT' ? doc.onRequestPut : doc.onRequestGet; }
   const context = { request, env, params, data: {}, next: () => handler(context) };
   return mw.onRequest(context);
 }
 
-test('sin configuración la nube responde 503 y no lee nada', async () => {
-  const r = await llamar({}, 'GET', '/api/nube', { jwt: await valido() });
-  assert.equal(r.status, 503);
+test('sin KV o sin clave configurada (o demasiado corta) la nube responde 503', async () => {
+  assert.equal((await llamar({ CLAVE_NUBE: CLAVE }, 'GET', '/api/nube', { clave: CLAVE })).status, 503);
+  assert.equal((await llamar({ DATOS: kv() }, 'GET', '/api/nube', { clave: CLAVE })).status, 503);
+  assert.equal((await llamar({ DATOS: kv(), CLAVE_NUBE: 'corta' }, 'GET', '/api/nube', { clave: 'corta' })).status, 503);
 });
 
-test('el candado rechaza sin token, con firma ajena, vencido, de otra audiencia o de otro correo', async () => {
+test('el candado exige la clave exacta', async () => {
   const env = envCon();
   assert.equal((await llamar(env, 'GET', '/api/nube')).status, 401);
-  assert.equal((await llamar(env, 'GET', '/api/nube', { jwt: await token({ aud: [AUD], iss: `https://${EQUIPO}`, exp: ahora() + 60, email: 'a@b.c' }, otro.privateKey) })).status, 401);
-  assert.equal((await llamar(env, 'GET', '/api/nube', { jwt: await valido('a@b.c', { exp: ahora() - 10 }) })).status, 401);
-  assert.equal((await llamar(env, 'GET', '/api/nube', { jwt: await valido('a@b.c', { aud: ['otra'] }) })).status, 401);
-  assert.equal((await llamar(env, 'GET', '/api/nube', { jwt: await valido('a@b.c', { iss: 'https://otro.cloudflareaccess.com' }) })).status, 401);
-  assert.equal((await llamar(env, 'GET', '/api/nube', { jwt: 'x.y' })).status, 401);
-  const lista = envCon(kv(), { CORREOS_PERMITIDOS: 'arturo@ejemplo.com' });
-  assert.equal((await llamar(lista, 'GET', '/api/nube', { jwt: await valido('intruso@ejemplo.com') })).status, 403);
-  const ok = await llamar(lista, 'GET', '/api/nube', { jwt: await valido() });
+  assert.equal((await llamar(env, 'GET', '/api/nube', { clave: CLAVE + 'x' })).status, 401);
+  assert.equal((await llamar(env, 'GET', '/api/nube', { auth: CLAVE })).status, 401, 'sin Bearer');
+  assert.equal((await llamar(env, 'GET', '/api/doc/salud/actual', { clave: 'otra-clave-de-veinte-car' })).status, 401);
+  const ok = await llamar(env, 'GET', '/api/nube', { clave: CLAVE });
   assert.equal(ok.status, 200);
-  assert.deepEqual(await ok.json(), { ok: true, email: 'arturo@ejemplo.com' });
+  assert.deepEqual(await ok.json(), { ok: true });
+  assert.equal(ok.headers.get('cache-control'), 'no-store');
 });
 
-test('documentos por persona, con versión y conflicto', async () => {
-  const env = envCon(), jwt = await valido();
-  let r = await llamar(env, 'GET', '/api/doc/salud/actual', { jwt });
+test('documentos con versión y conflicto; rutas y cuerpos inválidos rechazados', async () => {
+  const env = envCon(), clave = CLAVE;
+  let r = await llamar(env, 'GET', '/api/doc/salud/actual', { clave });
   assert.equal(r.status, 404);
-  r = await llamar(env, 'PUT', '/api/doc/salud/actual', { jwt, cuerpo: { base: null, data: { v: 1, agua: {} } } });
+  r = await llamar(env, 'PUT', '/api/doc/salud/actual', { clave, cuerpo: { base: null, data: { v: 1, agua: {} } } });
   assert.equal(r.status, 200); assert.equal((await r.json()).version, 1);
-  r = await llamar(env, 'PUT', '/api/doc/salud/actual', { jwt, cuerpo: { base: 1, data: { v: 1, agua: { x: 1 } } } });
+  r = await llamar(env, 'PUT', '/api/doc/salud/actual', { clave, cuerpo: { base: 1, data: { v: 1, agua: { x: 1 } } } });
   assert.equal((await r.json()).version, 2);
-  r = await llamar(env, 'PUT', '/api/doc/salud/actual', { jwt, cuerpo: { base: 1, data: { v: 1, pisado: true } } });
+  r = await llamar(env, 'PUT', '/api/doc/salud/actual', { clave, cuerpo: { base: 1, data: { v: 1, pisado: true } } });
   assert.equal(r.status, 409, 'una versión vieja no pisa lo guardado');
   const c = await r.json();
   assert.equal(c.version, 2); assert.deepEqual(c.data, { v: 1, agua: { x: 1 } });
-  r = await llamar(env, 'GET', '/api/doc/salud/actual', { jwt });
+  r = await llamar(env, 'GET', '/api/doc/salud/actual', { clave });
   assert.deepEqual((await r.json()).data, { v: 1, agua: { x: 1 } });
-  const ajeno = await llamar(env, 'GET', '/api/doc/salud/actual', { jwt: await valido('otra@ejemplo.com') });
-  assert.equal(ajeno.status, 404, 'otra persona no ve estos datos');
-  assert.equal((await llamar(env, 'GET', '/api/doc/secreto/x', { jwt })).status, 404);
-  assert.equal((await llamar(env, 'PUT', '/api/doc/menu/actual', { jwt, cuerpo: { base: null, data: [1] } })).status, 400);
-  assert.ok([...env.DATOS.m.keys()].every((k) => k.startsWith('u:arturo@ejemplo.com:')));
-});
-
-test('entrar vuelve a la app en Salud', async () => {
-  const r = await llamar(envCon(), 'GET', '/api/entrar', { jwt: await valido() });
-  assert.equal(r.status, 302);
-  assert.equal(r.headers.get('location'), 'https://recetario-intercambiable.pages.dev/#salud');
+  assert.equal((await llamar(env, 'GET', '/api/doc/secreto/x', { clave })).status, 404);
+  assert.equal((await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: { base: null, data: [1] } })).status, 400);
+  assert.equal((await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: '{roto' })).status, 400);
+  assert.deepEqual([...env.DATOS.m.keys()], ['u:principal:salud/actual']);
 });
 
 /* ---------- la app con la nube, en el navegador ---------- */
@@ -115,17 +85,14 @@ const pw = cargarPlaywright();
 const saltar = pw ? false : 'Playwright no está disponible';
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/* Servidor local: archivos estáticos y /api/* por las funciones reales. El correo lo decide la cookie
-   «quien» (así se simula Access); sin ella, /api responde como Access sin sesión. */
-function servidor(env) {
+/* Servidor local: archivos estáticos y /api/* por las funciones reales, con el env que diga la prueba. */
+function servidor(estado) {
   return http.createServer(async (req, res) => {
     const u = new URL(req.url, 'http://x');
     if (u.pathname.startsWith('/api/')) {
-      const quien = /(?:^|; )quien=([^;]+)/.exec(req.headers.cookie || '');
-      if (!quien) { res.writeHead(302, { location: 'https://amor.cloudflareaccess.com/cdn-cgi/access/login' }); return res.end(); }
       let cuerpo;
-      if (req.method === 'PUT') { const b = []; for await (const c of req) b.push(c); cuerpo = JSON.parse(Buffer.concat(b).toString()); }
-      const r = await llamar(env, req.method, u.pathname, { jwt: await valido(decodeURIComponent(quien[1])), cuerpo });
+      if (req.method === 'PUT') { const b = []; for await (const c of req) b.push(c); cuerpo = Buffer.concat(b).toString(); }
+      const r = await llamar(estado.env, req.method, u.pathname, { auth: req.headers.authorization || '', cuerpo });
       res.writeHead(r.status, Object.fromEntries(r.headers)); return res.end(await r.text());
     }
     const f = path.join(raiz, decodeURIComponent(u.pathname === '/' ? 'index.html' : u.pathname));
@@ -135,80 +102,107 @@ function servidor(env) {
   });
 }
 
-let browser, srv, BASE, env;
+let browser, srv, BASE;
+const estado = { env: envCon() };
 test.before(async () => {
   if (!pw) return;
   browser = await pw.chromium.launch();
-  env = envCon();
-  srv = servidor(env);
+  srv = servidor(estado);
   await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
   BASE = `http://127.0.0.1:${srv.address().port}/`;
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) srv.close(); });
 
-async function dispositivo(email, ancho = 390) {
-  const ctx = await browser.newContext({ viewport: { width: ancho, height: 844 } });
+async function dispositivo(clave, ancho = 390) {
+  const ctx = await browser.newContext({ viewport: { width: ancho, height: 844 }, permissions: ['clipboard-read', 'clipboard-write'] });
   await ctx.route(/fonts\.(googleapis|gstatic)/, (r) => r.abort());
-  if (email) await ctx.addCookies([{ name: 'quien', value: encodeURIComponent(email), url: BASE }]);
+  /* Solo en la primera carga: así «Desconectar» puede borrarla de verdad. */
+  if (clave) await ctx.addInitScript((c) => { if (sessionStorage.getItem('clave-puesta')) return; sessionStorage.setItem('clave-puesta', '1'); localStorage.setItem('recetario.clave', c); }, clave);
   const page = await ctx.newPage();
   const errores = [];
   page.on('pageerror', (e) => errores.push(e.message));
   return { ctx, page, errores };
 }
 const sincronizado = (p) => p.waitForFunction(() => document.getElementById('syncTxt').textContent === 'Sincronizado', null, { timeout: 8000 });
+const agua = (p, re) => p.waitForFunction((s) => new RegExp(s).test(document.getElementById('aguaTot').textContent), re, { timeout: 8000 });
 
-test('sin sesión: la app funciona y ofrece conectar la nube', { skip: saltar }, async () => {
+test('nube sin configurar: la app genera una clave localmente y sigue guardando en el dispositivo', { skip: saltar }, async () => {
+  estado.env = { DATOS: kv() };
   const { ctx, page, errores } = await dispositivo(null);
-  await page.goto(BASE);
-  await page.waitForSelector('a[href="/api/entrar"]');
+  await page.goto(BASE + '#salud');
+  await page.waitForSelector('[data-nube="generar"]');
   assert.equal(await page.textContent('#syncTxt'), 'Guardado en este dispositivo');
-  await page.click('nav.main button[data-v="salud"]');
-  assert.match(await page.textContent('#sa-nube'), /Conectar mi nube/);
+  await page.click('[data-nube="generar"]');
+  const c = (await page.textContent('#nubeGenerada')).trim();
+  assert.match(c, /^[a-z2-9]{5}(-[a-z2-9]{5}){3}$/);
+  await page.click('[data-nube="copiar"]');
+  assert.equal(await page.evaluate(() => navigator.clipboard.readText()), c);
+  assert.equal(await page.evaluate(() => localStorage.getItem('recetario.clave')), null, 'generar no la guarda ni la envía');
+  assert.deepEqual(errores, []);
+  await ctx.close();
+  estado.env = envCon();
+});
+
+test('sin clave: aviso en Inicio; clave incorrecta se rechaza; la correcta conecta y sube lo local', { skip: saltar }, async () => {
+  estado.env = envCon();
+  const { ctx, page, errores } = await dispositivo(null);
+  await page.addInitScript(() => {
+    if (sessionStorage.getItem('s')) return; sessionStorage.setItem('s', '1');
+    localStorage.setItem('recetario.salud', JSON.stringify({ v: 1, agua: {}, medidas: [{ f: '2026-09-20', kg: 83.5 }], examenes: [] }));
+  });
+  await page.goto(BASE);
+  await page.waitForSelector('.agua-mini [data-goto="salud"] >> text=Conectar mi nube');
+  await page.click('text=Conectar mi nube');
+  await page.fill('#nubeClave', 'clave-equivocada-de-prueba');
+  await page.click('#nubeForm [type=submit]');
+  await page.waitForSelector('#sa-nube [role=alert]');
+  assert.match(await page.textContent('#sa-nube'), /Clave incorrecta/);
+  await page.fill('#nubeClave', CLAVE);
+  await Promise.all([page.waitForEvent('load'), page.click('#nubeForm [type=submit]')]);
+  await sincronizado(page);
+  assert.match(await page.textContent('#sa-nube'), /Conectada/);
+  assert.match(await page.textContent('#sa-peso'), /83,5/);
+  const guardado = JSON.parse(estado.env.DATOS.m.get('u:principal:salud/actual'));
+  assert.equal(guardado.data.medidas[0].kg, 83.5, 'lo local se subió a la nube');
   assert.deepEqual(errores, []);
   await ctx.close();
 });
 
-test('dos dispositivos con el mismo correo comparten menú y Salud; lo local se sube la primera vez', { skip: saltar }, async () => {
-  const tel = await dispositivo('arturo@ejemplo.com');
-  await tel.page.addInitScript(() => {
-    if (sessionStorage.getItem('s')) return; sessionStorage.setItem('s', '1');
-    localStorage.setItem('recetario.salud', JSON.stringify({ v: 1, agua: {}, medidas: [{ f: '2026-09-20', kg: 83.5 }], examenes: [] }));
-  });
+test('dos dispositivos con la misma clave comparten menú y Salud; el enlace conecta otro dispositivo', { skip: saltar }, async () => {
+  estado.env = envCon();
+  const tel = await dispositivo(CLAVE);
   await tel.page.goto(BASE + '#salud');
   await sincronizado(tel.page);
-  assert.match(await tel.page.textContent('#sa-nube'), /arturo@ejemplo\.com/);
-  assert.match(await tel.page.textContent('#sa-peso'), /83,5/);
   await tel.page.click('[data-sa="agua|agua|500"]');
   await sincronizado(tel.page);
   await tel.page.selectOption('#comensales', '2');
   await sincronizado(tel.page);
-  await tel.page.waitForFunction(() => true);
+  await tel.page.click('[data-nube="enlace"]');
+  const enlace = await tel.page.evaluate(() => navigator.clipboard.readText());
+  assert.match(enlace, /#nube=abcde-fghjk-mnpqr-stuvw$/);
 
-  const pc = await dispositivo('arturo@ejemplo.com', 1280);
-  await pc.page.goto(BASE + '#salud');
-  await pc.page.waitForFunction(() => /^0,5 /.test(document.getElementById('aguaTot').textContent), null, { timeout: 8000 });
-  assert.match(await pc.page.textContent('#sa-peso'), /83,5/, 'el peso del teléfono llegó al computador');
+  const pc = await dispositivo(null, 1280);
+  await pc.page.goto(enlace);
+  await agua(pc.page, '^0,5 ');
+  assert.equal(await pc.page.evaluate(() => location.hash), '#salud', 'la clave no queda en la barra de direcciones');
+  assert.equal(await pc.page.evaluate(() => localStorage.getItem('recetario.clave')), CLAVE);
   assert.equal(await pc.page.inputValue('#comensales'), '2', 'el menú también se comparte');
 
   await pc.page.click('[data-sa="agua|agua|250"]');
   await sincronizado(pc.page);
   await tel.page.evaluate(() => window.dispatchEvent(new Event('focus')));
-  await tel.page.waitForFunction(() => /^0,75 /.test(document.getElementById('aguaTot').textContent), null, { timeout: 8000 });
-
-  const otra = await dispositivo('otra@ejemplo.com');
-  await otra.page.goto(BASE + '#salud');
-  await sincronizado(otra.page);
-  assert.match(await otra.page.textContent('#aguaTot'), /^0,0 /, 'otra persona empieza vacía');
-  assert.deepEqual([...tel.errores, ...pc.errores, ...otra.errores], []);
-  await Promise.all([tel.ctx.close(), pc.ctx.close(), otra.ctx.close()]);
+  await agua(tel.page, '^0,75 ');
+  assert.deepEqual([...tel.errores, ...pc.errores], []);
+  await Promise.all([tel.ctx.close(), pc.ctx.close()]);
 });
 
 test('conflicto: si otro dispositivo guardó antes, se cargan sus datos y se avisa', { skip: saltar }, async () => {
-  const a = await dispositivo('conflicto@ejemplo.com'), b = await dispositivo('conflicto@ejemplo.com');
+  estado.env = envCon();
+  const a = await dispositivo(CLAVE), b = await dispositivo(CLAVE);
   await a.page.goto(BASE + '#salud'); await sincronizado(a.page);
   await a.page.click('[data-sa="agua|agua|250"]'); await sincronizado(a.page);
   await b.page.goto(BASE + '#salud');
-  await b.page.waitForFunction(() => /^0,25 /.test(document.getElementById('aguaTot').textContent), null, { timeout: 8000 });
+  await agua(b.page, '^0,25 ');
   await a.page.click('[data-sa="agua|agua|500"]'); await sincronizado(a.page);
   await b.page.click('[data-sa="agua|infusion|250"]');
   await b.page.waitForFunction(() => /otro dispositivo/.test(document.getElementById('aviso').textContent), null, { timeout: 8000 });
@@ -216,14 +210,28 @@ test('conflicto: si otro dispositivo guardó antes, se cargan sus datos y se avi
   await Promise.all([a.ctx.close(), b.ctx.close()]);
 });
 
-test('si la sesión vence, la app vuelve a ofrecer conectar la nube', { skip: saltar }, async () => {
-  const d = await dispositivo('vence@ejemplo.com');
+test('si cambias la clave en Cloudflare, la app la vuelve a pedir sin perder lo local', { skip: saltar }, async () => {
+  estado.env = envCon();
+  const d = await dispositivo(CLAVE);
   await d.page.goto(BASE + '#salud'); await sincronizado(d.page);
-  await d.ctx.clearCookies();
+  estado.env = { ...estado.env, CLAVE_NUBE: 'nueva-clave-distinta-xyz' };
   await d.page.click('[data-sa="agua|agua|250"]');
-  await d.page.waitForSelector('#nubeEntrar', { timeout: 8000 });
+  await d.page.waitForSelector('#nubeClave', { timeout: 8000 });
   assert.match(await d.page.textContent('#syncTxt'), /Error al sincronizar/);
   assert.match(await d.page.textContent('#aguaTot'), /^0,25 /, 'lo local no se pierde');
+  await d.page.click('[data-sa="deshacer"]');
   assert.deepEqual(d.errores, []);
+  await d.ctx.close();
+  estado.env = envCon();
+});
+
+test('desconectar olvida la clave en este dispositivo', { skip: saltar }, async () => {
+  estado.env = envCon();
+  const d = await dispositivo(CLAVE);
+  d.page.on('dialog', (x) => x.accept());
+  await d.page.goto(BASE + '#salud'); await sincronizado(d.page);
+  await Promise.all([d.page.waitForEvent('load'), d.page.click('[data-nube="olvidar"]')]);
+  await d.page.waitForSelector('#nubeClave');
+  assert.equal(await d.page.evaluate(() => localStorage.getItem('recetario.clave')), null);
   await d.ctx.close();
 });

@@ -941,7 +941,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.8.0",
+    "version": "2.9.0",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -17795,11 +17795,33 @@ function conectarSalud(db){
     if(S.vista === 'salud' || S.vista === 'inicio') render();
   }, function(){ marcaSync('error'); });
 }
-/* ---------- nube propia (Cloudflare Pages Functions + KV, con candado de Cloudflare Access) ---------- */
+/* ---------- nube propia (Cloudflare Pages Functions + KV, con clave personal) ---------- */
 /* Fuera de Claude, si el sitio tiene la nube configurada, los mismos documentos menu/actual y salud/actual
    se guardan en /api/doc/... con la misma interfaz que la base del artifact (doc, set, onSnapshot).
-   NUBE.estado: 'no' (sin nube), 'login' (hay nube pero falta iniciar sesión), 'ok'. */
-var NUBE = {estado:'no', email:'', db:null};
+   La clave de sincronización se guarda en este dispositivo (recetario.clave) y viaja en Authorization.
+   NUBE.estado: 'no' (sin nube o sin configurar), 'clave' (falta la clave o es incorrecta), 'ok'. */
+var NUBE = {estado:'no', db:null, error:'', generada:''};
+var MIN_CLAVE = 20;
+function leerClave(){ try{ return localStorage.getItem('recetario.clave') || ''; }catch(e){ return ''; } }
+function guardarClave(c){ try{ if(c) localStorage.setItem('recetario.clave', c); else localStorage.removeItem('recetario.clave'); }catch(e){} }
+/* Enlace para conectar otro dispositivo: #nube=<clave>. El fragmento no llega al servidor y se borra al leerlo. */
+(function(){
+  var m = /^#nube=([^&]+)$/.exec(location.hash || '');
+  if(!m) return;
+  try{ guardarClave(decodeURIComponent(m[1]).trim()); }catch(e){}
+  try{ history.replaceState(null, '', location.pathname + location.search + '#salud'); }catch(e){}
+})();
+function generarClave(){
+  var abc = 'abcdefghjkmnpqrstuvwxyz23456789', b = new Uint8Array(20), c = '';
+  crypto.getRandomValues(b);
+  for(var i=0;i<20;i++){ if(i && i % 5 === 0) c += '-'; c += abc[b[i] % abc.length]; }
+  return c;
+}
+function opcionesNube(extra){
+  var o = {credentials:'same-origin', cache:'no-store', headers:{'Authorization':'Bearer ' + leerClave()}};
+  if(extra){ for(var k in extra) if(k === 'headers'){ for(var h in extra.headers) o.headers[h] = extra.headers[h]; } else o[k] = extra[k]; }
+  return o;
+}
 function nubeDb(){
   var refs = [];
   function doc(ruta){
@@ -17809,17 +17831,17 @@ function nubeDb(){
       cbs.forEach(function(cb){ cb({exists:o.exists, metadata:{}, data:function(){ return o.data; }}); });
     }
     function fallo(e){ errs.forEach(function(f){ f(e); }); }
-    /* Sesión de Access vencida: Access redirige a su página de inicio de sesión. */
-    function vencida(r){
-      if(r.type !== 'opaqueredirect' && r.status !== 401) return false;
-      if(NUBE.estado !== 'login'){ NUBE.estado = 'login'; render(); }
+    /* Clave cambiada en el servidor u olvidada: se vuelve a pedir. */
+    function rechazada(r){
+      if(r.status !== 401) return false;
+      if(NUBE.estado !== 'clave'){ NUBE.estado = 'clave'; NUBE.error = 'La nube ya no acepta la clave de este dispositivo.'; render(); }
       return true;
     }
     function refrescar(){
-      return fetch(url, {credentials:'same-origin', cache:'no-store', redirect:'manual'}).then(function(r){
+      return fetch(url, opcionesNube()).then(function(r){
         if(r.status === 404){ if(!vista && ver === null){ vista = true; emitir({exists:false}); } return; }
-        if(vencida(r)) throw new Error('sesión vencida');
-        if(!r.ok) throw new Error('nube ' + (r.status || r.type));
+        if(rechazada(r)) throw new Error('clave rechazada');
+        if(!r.ok) throw new Error('nube ' + r.status);
         return r.json().then(function(j){
           /* Solo avanza: una lectura atrasada de otra región no deshace lo ya guardado. */
           if(ver !== null && !(j.version > ver)) return;
@@ -17830,16 +17852,16 @@ function nubeDb(){
     }
     var ref = {
       set:function(data){
-        return fetch(url, {method:'PUT', credentials:'same-origin', redirect:'manual',
-          headers:{'content-type':'application/json'}, body:JSON.stringify({base:ver, data:data})}).then(function(r){
+        return fetch(url, opcionesNube({method:'PUT', headers:{'content-type':'application/json'},
+          body:JSON.stringify({base:ver, data:data})})).then(function(r){
           if(r.status === 409) return r.json().then(function(j){
             /* Otro dispositivo guardó antes: se toma lo suyo en lugar de pisarlo. */
             ver = j.version; emitir({exists:true, data:j.data});
             avisar('Había cambios más recientes de otro dispositivo; se cargaron esos.', null);
           });
-          if(vencida(r)) throw new Error('sesión vencida');
-          if(!r.ok) throw new Error('nube ' + (r.status || r.type));
-          return r.json().then(function(j){ ver = j.version; if(NUBE.estado !== 'ok'){ NUBE.estado = 'ok'; render(); } });
+          if(rechazada(r)) throw new Error('clave rechazada');
+          if(!r.ok) throw new Error('nube ' + r.status);
+          return r.json().then(function(j){ ver = j.version; });
         });
       },
       onSnapshot:function(cb, err){
@@ -17854,16 +17876,30 @@ function nubeDb(){
   }
   return {doc:doc, refrescar:function(){ refs.forEach(function(r){ r.refrescar(); }); }};
 }
+/* 200: clave correcta. 401: hay nube y falta la clave o es incorrecta. 503, 404 u otra cosa: sin nube. */
 function probarNube(){
-  return fetch('/api/nube', {credentials:'same-origin', cache:'no-store', redirect:'manual'}).then(function(r){
-    if(r.type === 'opaqueredirect' || r.status === 401 || r.status === 403){ NUBE.estado = 'login'; return null; }
+  return fetch('/api/nube', opcionesNube()).then(function(r){
+    if(r.status === 401){ NUBE.estado = 'clave'; NUBE.error = leerClave() ? 'Clave incorrecta.' : ''; return null; }
+    if(r.status === 503){ NUBE.estado = 'no'; NUBE.sinConfigurar = true; return null; }
     if(!r.ok) return null;
     return r.json().then(function(j){
       if(!j || j.ok !== true) return null;
-      NUBE.estado = 'ok'; NUBE.email = j.email || ''; NUBE.db = nubeDb();
+      NUBE.estado = 'ok'; NUBE.error = ''; NUBE.db = nubeDb();
       return NUBE.db;
     });
-  }).catch(function(){ return null; }).then(function(db){ if(!db && NUBE.estado === 'login') render(); return db; });
+  }).catch(function(){ return null; }).then(function(db){ if(!db && (NUBE.estado === 'clave' || NUBE.sinConfigurar)) render(); return db; });
+}
+/* Conectar con una clave recién escrita: si la acepta, se recarga la página para empezar limpio con la nube. */
+function conectarConClave(c){
+  c = String(c || '').trim();
+  if(c.length < MIN_CLAVE){ NUBE.error = 'La clave tiene al menos ' + MIN_CLAVE + ' caracteres.'; render(); return; }
+  guardarClave(c);
+  fetch('/api/nube', opcionesNube()).then(function(r){
+    if(r.ok){ location.hash = 'salud'; location.reload(); return; }
+    guardarClave('');
+    NUBE.error = r.status === 401 ? 'Clave incorrecta.' : 'La nube no respondió. Intenta de nuevo.';
+    render();
+  }).catch(function(){ guardarClave(''); NUBE.error = 'Sin conexión. Intenta de nuevo.'; render(); });
 }
 var fuenteDb = null;
 if(window.claude && window.claude.use) fuenteDb = window.claude.use('db');
@@ -19224,6 +19260,7 @@ function volver(){
   quitarHash(); cerrarFicha();
 }
 window.addEventListener('hashchange', function(){
+  if(/^#nube=/.test(location.hash)){ location.reload(); return; }   /* enlace de conexión abierto con la app ya abierta */
   if(location.hash === '#salud'){ if(S.vista !== 'salud' || S.verFicha) ir('salud'); return; }
   var id = idDeHash();
   if(id){
@@ -19458,23 +19495,50 @@ function vSalud(){
   U.msg = '';
   return h;
 }
-/* Estado de la nube propia, en Salud y como aviso en Inicio mientras falte iniciar sesión. */
+/* Estado de la nube propia, en Salud, y aviso en Inicio mientras falte la clave. */
 function panelNube(){
   if(window.claude && window.claude.use) return '';   /* dentro del artifact de Claude ya se sincroniza con su base */
+  if(!/^https?:$/.test(location.protocol)) return '';
   var h = '<section class="sa-sec" id="sa-nube" aria-labelledby="saNubeT"><h2 id="saNubeT">Tus datos en la nube</h2><div class="panel">';
-  if(NUBE.estado === 'ok') h += '<p class="txt2"><span class="chip-s ok">Conectada</span> El menú, las compras y Salud se guardan en tu nube como <b>' + esc(NUBE.email) +
-    '</b> y aparecen en cualquier teléfono o computador donde entres con ese correo.</p>' +
-    '<div class="agua-acts"><a class="btn gh sm" href="/cdn-cgi/access/logout">Cerrar sesión en este dispositivo</a></div>';
-  else if(NUBE.estado === 'login') h += '<p class="txt2">Inicia sesión con tu correo para guardar el menú, las compras y Salud en tu nube. Lo que ya tienes en este dispositivo se sube la primera vez.</p>' +
-    '<div class="agua-acts"><a class="btn pri" href="/api/entrar" id="nubeEntrar">Conectar mi nube</a></div>';
-  else h += '<p class="txt2">Por ahora los datos quedan solo en este dispositivo. Usa el respaldo de abajo para no perderlos.</p>';
+  if(NUBE.estado === 'ok'){
+    h += '<p class="txt2"><span class="chip-s ok">Conectada</span> El menú, las compras y Salud de este dispositivo se guardan en tu nube y aparecen en cualquier otro donde uses la misma clave.</p>' +
+      '<div class="agua-acts"><button class="btn sec sm" data-nube="enlace">Copiar enlace para conectar otro dispositivo</button>' +
+      '<button class="btn gh sm" data-nube="olvidar">Desconectar este dispositivo</button></div>' +
+      '<p class="sa-nota">El enlace lleva tu clave: ábrelo solo en tus dispositivos y no lo compartas.</p>';
+  } else if(NUBE.estado === 'clave'){
+    h += '<p class="txt2">Escribe tu clave de sincronización para guardar aquí y en la nube. Lo que ya tienes en este dispositivo se sube si la nube está vacía; si no, se carga lo de la nube.</p>' +
+      '<form class="agua-libre" id="nubeForm"><input type="password" name="clave" id="nubeClave" autocomplete="current-password" placeholder="xxxxx-xxxxx-xxxxx-xxxxx" aria-label="Clave de sincronización" style="flex:1 1 220px;width:auto">' +
+      '<button class="btn pri sm" type="submit">Conectar</button></form>' +
+      (NUBE.error ? '<p class="sa-ok" role="alert" style="color:var(--bad)">' + esc(NUBE.error) + '</p>' : '');
+  } else if(NUBE.sinConfigurar){
+    h += '<p class="txt2">La nube está lista pero aún no tiene clave. Genera una aquí, cópiala en Cloudflare como secreto <b>CLAVE_NUBE</b> del proyecto y vuelve a desplegar; después escríbela en este mismo recuadro.</p>';
+    if(NUBE.generada) h += '<p class="agua-tot" style="font-size:20px;letter-spacing:.02em;word-break:break-all" id="nubeGenerada">' + esc(NUBE.generada) + '</p>' +
+      '<div class="agua-acts"><button class="btn sec sm" data-nube="copiar">Copiar clave</button></div>' +
+      '<p class="sa-nota">Guárdala también en un lugar seguro, como tu gestor de contraseñas. La app no la envía a ningún lado hasta que la escribas para conectar.</p>';
+    else h += '<div class="agua-acts"><button class="btn pri sm" data-nube="generar">Generar una clave</button></div>';
+    h += (NUBE.error ? '<p class="sa-ok">' + esc(NUBE.error) + '</p>' : '');
+  } else h += '<p class="txt2">Por ahora los datos quedan solo en este dispositivo. Usa el respaldo de abajo para no perderlos.</p>';
   return h + '</div></section>';
 }
 function avisoNubeInicio(){
-  if(NUBE.estado !== 'login') return '';
+  if(NUBE.estado !== 'clave') return '';
   return '<div class="panel agua-mini" style="display:block"><b>Guarda tus datos en la nube</b>' +
-    '<p class="txt2" style="margin:4px 0 10px">Entra con tu correo una vez y tu menú y Salud quedan en todos tus dispositivos.</p>' +
-    '<a class="btn pri sm" href="/api/entrar">Conectar mi nube</a></div>';
+    '<p class="txt2" style="margin:4px 0 10px">Escribe tu clave de sincronización una vez y tu menú y Salud quedan en todos tus dispositivos.</p>' +
+    '<button class="btn pri sm" data-goto="salud">Conectar mi nube</button></div>';
+}
+function accionNube(t){
+  var a = t.dataset.nube;
+  if(a === 'generar'){ NUBE.generada = generarClave(); render(); var g = document.getElementById('sa-nube'); if(g) g.scrollIntoView({block:'center'}); return; }
+  if(a === 'copiar'){ copiarTexto(NUBE.generada, function(ok){ avisar(ok ? 'Clave copiada.' : 'No se pudo copiar; selecciónala a mano.', null); }); return; }
+  if(a === 'enlace'){
+    var u = location.origin + location.pathname + '#nube=' + encodeURIComponent(leerClave());
+    copiarTexto(u, function(ok){ avisar(ok ? 'Enlace copiado. Ábrelo en tu otro dispositivo.' : 'No se pudo copiar.', null); });
+    return;
+  }
+  if(a === 'olvidar'){
+    if(window.confirm && !window.confirm('¿Desconectar este dispositivo? Tus datos siguen en la nube y en este dispositivo, pero dejarán de sincronizarse aquí.')) return;
+    guardarClave(''); location.hash = 'salud'; location.reload();
+  }
 }
 function accionSalud(t){
   var p = t.dataset.sa.split('|'), a = p[0], hoy = SA.hoyISO(), U = S.salud;
@@ -19713,10 +19777,12 @@ document.getElementById('marca').addEventListener('click', function(){ ir('inici
 document.getElementById('main').addEventListener('submit', function(e){
   var f = e.target;
   if(f.id === 'aguaLibre' || f.id === 'medForm' || f.id === 'exForm'){ e.preventDefault(); enviarSalud(f); }
+  if(f.id === 'nubeForm'){ e.preventDefault(); conectarConClave(f.clave.value); }
 });
 document.getElementById('main').addEventListener('click', function(e){
   var t;
   if((t = e.target.closest('[data-sa]'))){ accionSalud(t); return; }
+  if((t = e.target.closest('[data-nube]'))){ accionNube(t); return; }
   if((t = e.target.closest('[data-swap]'))){ var p = t.dataset.swap.split('|'); entrarCambio(p[0], p[1]); return; }
   if((t = e.target.closest('[data-elegir]'))){ abrirPrevia(t.dataset.elegir); return; }
   if(e.target.closest('[data-cancelar]')){ salirCambio(true); return; }

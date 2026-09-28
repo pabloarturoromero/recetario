@@ -40,16 +40,14 @@ Si Playwright no está disponible, las pruebas de interfaz se omiten y lo indica
 
 ## Nube propia (Cloudflare)
 
-Fuera de Claude, la app puede guardar el menú, las compras y Salud en una nube propia, para verlos igual en el teléfono y en el computador. Son funciones de Cloudflare Pages (`functions/api/`) que guardan en Cloudflare KV un documento por persona, identificada por su correo; un candado de Cloudflare Access protege solo `/api/*`, así que la app y los enlaces de recetas compartidos siguen abiertos para todos. Mientras no se configure, la API responde 503 y la app sigue guardando en el dispositivo.
+Fuera de Claude, la app puede guardar el menú, las compras y Salud en una nube propia, para verlos igual en el teléfono y en el computador. Son funciones de Cloudflare Pages (`functions/api/`) que guardan en Cloudflare KV, protegidas por una clave personal de sincronización. Solo `/api/*` exige la clave: la app y los enlaces de recetas compartidos siguen abiertos para todos. No usa Cloudflare Access ni requiere método de pago. Mientras no haya clave configurada, la API responde 503 y la app sigue guardando en el dispositivo.
 
-Configuración, una sola vez, en el panel de Cloudflare:
+Configuración, una sola vez:
 
-1. **Almacén.** Storage & Databases › KV › Create: nombre `amor-de-mama-datos`.
-2. **Enlace.** Workers & Pages › `recetario-intercambiable` › Settings › Bindings › Add › KV namespace: nombre de variable `DATOS`, espacio `amor-de-mama-datos` (en Production).
-3. **Candado.** En el mismo proyecto, Settings › General › Access policy › Enable. Luego Manage (abre Zero Trust) y edita la aplicación creada: en Public hostname borra el `*` del subdominio, para que quede `recetario-intercambiable.pages.dev`, y escribe `api` en Path. En Policies deja una regla Allow con Include › Emails › el correo autorizado. En Login methods, One-time PIN. Session duration: 1 month. Guarda.
-4. **Datos del candado.** De esa aplicación copia el Application Audience (AUD) Tag (Configure › Additional settings). El dominio del equipo tiene la forma `<equipo>.cloudflareaccess.com` (Zero Trust › Settings, o la dirección de la página de inicio de sesión de Access).
-5. **Variables.** Workers & Pages › `recetario-intercambiable` › Settings › Variables and Secrets › Add, en Production: `ACCESS_TEAM_DOMAIN` = `<equipo>.cloudflareaccess.com`, `ACCESS_AUD` = el AUD copiado, `CORREOS_PERMITIDOS` = el correo autorizado (varios, separados por comas).
-6. **Redesplegar.** Deployments › el último despliegue › Retry deployment (los enlaces y variables se aplican en el siguiente despliegue).
+1. **Almacén y enlace.** Storage & Databases › KV › Create (`amor-de-mama-datos`). Luego Workers & Pages › `recetario-intercambiable` › Settings › Bindings › Add › KV namespace: nombre de variable `DATOS`, espacio `amor-de-mama-datos`.
+2. **Clave.** En la app publicada, Salud › Tus datos en la nube › Generar una clave. La clave se genera en el propio dispositivo (20 caracteres al azar) y no se envía a ningún lado. Cópiala y guárdala también en un gestor de contraseñas.
+3. **Secreto.** Workers & Pages › `recetario-intercambiable` › Settings › Variables and Secrets › Add, en Production: tipo Secret, nombre `CLAVE_NUBE`, valor la clave generada.
+4. **Redesplegar.** Deployments › el último despliegue › Retry deployment.
+5. **Conectar.** En la app, Salud › Tus datos en la nube: escribe la clave y pulsa Conectar. Lo que ya estaba en ese dispositivo se sube si la nube está vacía; si no, se carga lo de la nube. Para otro dispositivo, usa «Copiar enlace para conectar otro dispositivo» y ábrelo allí: el enlace lleva la clave en el fragmento (`#nube=…`), que no llega al servidor y se borra de la barra al abrirlo.
 
-Luego, en la app, Salud › Tus datos en la nube › Conectar mi nube: Access pide el correo y envía un código. Lo que ya estaba en ese dispositivo se sube la primera vez; en los demás dispositivos se carga desde la nube. Si dos dispositivos guardan a la vez, el segundo recibe lo del primero en vez de pisarlo y lo avisa.
-
+Si dos dispositivos guardan a la vez, el segundo recibe lo del primero en vez de pisarlo y lo avisa. Para cambiar la clave, reemplaza el secreto y redespliega: los dispositivos la volverán a pedir sin perder lo que tengan guardado.
