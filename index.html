@@ -1,5 +1,8 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Recetario Intercambiable</title>
+<title>Amor de Mamá</title>
+<meta name="theme-color" content="#EB4D4B">
+<meta name="application-name" content="Amor de Mamá">
+<meta name="apple-mobile-web-app-title" content="Amor de Mamá">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -795,10 +798,115 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
   *,*::before,*::after{animation-duration:.001ms!important; animation-iteration-count:1!important;
     transition-duration:.001ms!important}
 }
+
+/* ============ MARCA ============ */
+.marca{display:inline-flex; align-items:center; gap:10px; flex:none; border-radius:99px}
+.marca img{width:48px; height:48px; border-radius:50%; display:block; box-shadow:var(--sh1); background:#FBF3E6}
+.marca-n{font-size:17px; font-weight:700; letter-spacing:-.01em; color:var(--brand-ink); white-space:nowrap}
+@media (max-width:1040px){ .marca-n{display:none} }
+@media (max-width:760px){ .marca img{width:40px; height:40px} .top-in{gap:var(--s3)} }
+
+/* ============ SALUD ============ */
+.sa-sec{margin-top:var(--s6)}
+.sa-sec:first-of-type{margin-top:0}
+.sa-sec > h2{font-size:19px; font-weight:700; letter-spacing:-.01em; margin-bottom:var(--s3)}
+.agua{display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-rows:auto 1fr; gap:0 var(--s5); align-items:start}
+.agua-img{grid-row:1 / span 2}
+.agua-ctrl{grid-column:2}
+.agua-img{height:240px; width:auto; display:block; transition:opacity .2s ease}
+.agua-img.vacio{opacity:.45; filter:saturate(.6)}
+.agua-tot{font-size:40px; font-weight:700; letter-spacing:-.03em; line-height:1.05; font-variant-numeric:tabular-nums}
+.agua-tot small{font-size:16px; font-weight:500; color:var(--ink-3); letter-spacing:0}
+.agua-msg{color:var(--ink-2); font-size:13.5px; margin:var(--s2) 0 var(--s3)}
+.agua .track{height:12px; margin-top:var(--s3)}
+.agua .track .goal{width:3px}
+.agua-escala{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-3); margin-top:4px; font-variant-numeric:tabular-nums}
+.agua-acts{display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:var(--s4)}
+.agua-otras{display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:var(--s2)}
+.agua-libre{display:flex; flex-wrap:wrap; gap:var(--s2); align-items:center; margin-top:var(--s3)}
+.agua-libre input{width:96px}
+.sa-in, .sa-form input, .sa-form select, .sa-form textarea, .agua-libre input, .agua-libre select{
+  border:1px solid var(--line-2); background:var(--surface); border-radius:var(--r2); padding:8px 10px; font-size:14px;
+  min-width:0; font-variant-numeric:tabular-nums}
+.sa-form textarea{width:100%; min-height:72px; resize:vertical; font:inherit}
+.sa-in:focus, .sa-form :is(input,select,textarea):focus, .agua-libre :is(input,select):focus{outline:2px solid var(--brand); outline-offset:0; border-color:var(--brand)}
+.chip-s.warn{background:var(--warn-bg); color:var(--warn)}
+.sa-reg{list-style:none; margin:var(--s2) 0 0; padding:0; font-size:13px; color:var(--ink-2)}
+.sa-reg li{display:flex; justify-content:space-between; gap:var(--s3); padding:5px 0; border-bottom:1px solid var(--line)}
+.sa-reg li:last-child{border-bottom:0}
+.sa-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s4)}
+@media (min-width:1041px){ .sa-grid.tres{grid-template-columns:repeat(4,minmax(0,1fr))} }
+.sa-stat{background:var(--surface); border-radius:var(--r3); box-shadow:var(--sh1); padding:var(--s4)}
+.sa-stat .k{font-size:12px; color:var(--ink-3)}
+.sa-stat .v{font-size:24px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; margin-top:2px}
+.sa-stat .v small{font-size:13px; font-weight:500; color:var(--ink-3)}
+.sa-stat .d{font-size:12px; color:var(--ink-3); margin-top:2px}
+.sa-stat .chip-s, .ex-row .chip-s{white-space:nowrap}
+.sa-chart{width:100%; max-width:560px; height:auto; display:block; overflow:visible}
+.sa-chart .ax{stroke:var(--line-2); stroke-width:1}
+.sa-chart .gl{stroke:var(--ink-3); stroke-width:1; stroke-dasharray:3 3}
+.sa-chart .br{fill:var(--brand)}
+.sa-chart .br.ok{fill:var(--ok)}
+.sa-chart .ln{stroke:var(--brand); stroke-width:2; fill:none}
+.sa-chart .pt{fill:var(--brand); stroke:var(--surface); stroke-width:2}
+.sa-chart .hit{fill:transparent}
+.sa-chart .hit:hover + .br, .sa-chart .hit:hover + .pt{opacity:.75}
+.sa-chart text{font-size:11px; fill:var(--ink-3); font-family:var(--f-ui)}
+.sa-chart text.val{fill:var(--ink-2); font-weight:600}
+.sa-form{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:var(--s3) var(--s4)}
+.sa-form label{display:flex; flex-direction:column; gap:4px; font-size:12.5px; color:var(--ink-2); min-width:0}
+.sa-form label span.u{color:var(--ink-3); font-size:11.5px}
+.sa-form .full{grid-column:1 / -1}
+.sa-form fieldset{grid-column:1 / -1; border:0; padding:0; margin:0; display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:var(--s3) var(--s4)}
+.sa-form legend{font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); padding:0; margin-bottom:var(--s2)}
+.sa-form .otro{grid-column:1 / -1; display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr); gap:var(--s2)}
+.sa-form .acts{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:var(--s2)}
+.ex-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--s2)}
+.ex-row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px var(--s3); align-items:center;
+  background:var(--surface); border-radius:var(--r3); box-shadow:var(--sh1); padding:12px 14px}
+.ex-row .n{font-size:13.5px; font-weight:500}
+.ex-row .v{font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap}
+.ex-row .v small{font-size:12px; font-weight:500; color:var(--ink-3)}
+.ex-row .m{font-size:12px; color:var(--ink-3)}
+.ex-row .t{font-size:12px; color:var(--ink-2); text-align:right; white-space:nowrap}
+.ex-g{font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin:var(--s4) 0 var(--s2)}
+.sa-tomas{list-style:none; margin:0; padding:0}
+.sa-tomas li{display:flex; align-items:center; justify-content:space-between; gap:var(--s3); flex-wrap:wrap; padding:8px 0; border-bottom:1px solid var(--line); font-size:13.5px}
+.sa-tomas li:last-child{border-bottom:0}
+.sa-tomas .acts{display:flex; gap:var(--s1)}
+.sa-nota{font-size:12.5px; color:var(--ink-3); margin-top:var(--s3); line-height:1.5}
+.sa-ok{color:var(--ok); font-size:12.5px; min-height:1.2em; margin-top:var(--s2)}
+@media (max-width:640px){
+  .agua{grid-template-columns:88px minmax(0,1fr); gap:0 var(--s4)}
+  .agua-img{height:auto; width:88px; grid-row:1}
+  .agua-ctrl{grid-column:1 / -1}
+  .agua-acts .btn{flex:1 1 auto}
+  .agua-otras .btn{flex:1 1 auto}
+  .agua-libre input{flex:1 1 80px}
+  .agua-libre select{flex:2 1 140px}
+  .agua-tot{font-size:32px}
+  .sa-grid{gap:var(--s3)}
+  .sa-form, .sa-form fieldset{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sa-form .otro{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .sa-form .otro input:first-child{grid-column:1 / -1}
+}
+/* Agua en Inicio */
+.agua-mini{display:flex; align-items:center; gap:var(--s4); margin-top:var(--s5); max-width:560px; padding:var(--s3) var(--s4)}
+.agua-mini img{height:76px; width:auto; flex:none}
+.agua-mini .tx{flex:1; min-width:0}
+.agua-mini .tx b{display:block; font-size:14px}
+.agua-mini .tx span{font-size:12.5px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.agua-mini .track{margin-top:6px}
+.agua-mini .acts{display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex:none}
 </style>
 
 <div class="top">
   <div class="top-in">
+    <button class="marca" id="marca" aria-label="Amor de Mamá, ir a Inicio">
+      <img src="img/logo-128.webp" srcset="img/logo-128.webp 1x, img/logo.webp 4x" width="48" height="48" alt="Amor de Mamá">
+      <span class="marca-n" aria-hidden="true">Amor de Mamá</span>
+    </button>
     <label class="loc">
       <svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px;color:var(--brand)" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
       <b id="sub">Recetario</b>
@@ -821,6 +929,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
     <button role="tab" data-v="recetas" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/></svg><span>Recetas</span></button>
     <button role="tab" data-v="compras" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span>Compras</span></button>
     <button role="tab" data-v="prep" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v2a7 7 0 0 1-7 7h-2a7 7 0 0 1-7-7z"/><path d="M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/></svg><span>Preparar</span></button>
+    <button role="tab" data-v="salud" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2s-6.5 7.1-6.5 11.6a6.5 6.5 0 0 0 13 0C18.5 10.3 12 3.2 12 3.2z"/><path d="M9 15a3 3 0 0 0 3 3"/></svg><span>Salud</span></button>
     <span class="sep"></span>
     <button role="tab" data-v="reglas" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M9 12h6M9 16h6M9 8h3"/></svg><span>Reglas</span></button>
   </nav>
@@ -831,8 +940,8 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <div id="aviso" role="status" aria-live="polite" hidden></div>
 <script type="application/json" id="datos">{
   "meta": {
-    "titulo": "Recetario intercambiable, plan nutricional 4 semanas",
-    "version": "2.6.2",
+    "titulo": "Amor de Mamá, plan nutricional 4 semanas",
+    "version": "2.7.0",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -17098,6 +17207,345 @@ function crear(D){
 root.RecetarioMotor = {crear:crear, semanaPrep:semanaPrep};
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
+<script id="salud">
+/* Motor de Salud: agua, peso y exámenes. Funciones puras, sin DOM: la interfaz y las pruebas usan las mismas.
+   Se guarda aparte del menú, en la clave recetario.salud, con su propia versión. */
+(function(root){
+"use strict";
+
+var VERSION_SALUD = 1;
+var DIAS_AGUA = 30;
+var TZ = 'America/Guayaquil';
+var DIA_MS = 86400000;
+var TIPOS = {
+  agua:{n:'Agua', suma:true},
+  infusion:{n:'Té o infusión', suma:true},
+  cafe:{n:'Café', suma:true, taza:240},
+  gaseosa:{n:'Gaseosa light sin cafeína', suma:true, lata:355}
+};
+/* Rangos generales de adultos, solo orientativos. El laboratorio imprime los suyos y el médico los interpreta. */
+var EXAMENES = [
+  {k:'glucosa', n:'Glucosa en ayunas', u:'mg/dL', min:70, max:99, g:'Glucosa'},
+  {k:'hba1c', n:'Hemoglobina glicosilada (HbA1c)', u:'%', max:5.6, g:'Glucosa'},
+  {k:'col_total', n:'Colesterol total', u:'mg/dL', max:199, g:'Lípidos'},
+  {k:'ldl', n:'Colesterol LDL', u:'mg/dL', max:99, g:'Lípidos'},
+  {k:'hdl', n:'Colesterol HDL', u:'mg/dL', min:40, g:'Lípidos'},
+  {k:'tg', n:'Triglicéridos', u:'mg/dL', max:149, g:'Lípidos'},
+  {k:'acido_urico', n:'Ácido úrico', u:'mg/dL', min:2.5, max:7, g:'Riñón'},
+  {k:'creatinina', n:'Creatinina', u:'mg/dL', min:0.6, max:1.3, g:'Riñón'},
+  {k:'tfg', n:'Tasa de filtración glomerular (TFG)', u:'mL/min/1,73 m²', min:90, g:'Riñón'},
+  {k:'tgo', n:'TGO (AST)', u:'U/L', max:40, g:'Hígado'},
+  {k:'tgp', n:'TGP (ALT)', u:'U/L', max:40, g:'Hígado'},
+  {k:'ggt', n:'GGT', u:'U/L', max:61, g:'Hígado'},
+  {k:'tsh', n:'TSH', u:'µUI/mL', min:0.4, max:4, g:'Tiroides'},
+  {k:'vit_d', n:'Vitamina D (25-OH)', u:'ng/mL', min:30, max:100, g:'Vitaminas y hierro'},
+  {k:'b12', n:'Vitamina B12', u:'pg/mL', min:200, max:900, g:'Vitaminas y hierro'},
+  {k:'ferritina', n:'Ferritina', u:'ng/mL', min:20, max:400, g:'Vitaminas y hierro'},
+  {k:'hemoglobina', n:'Hemoglobina', u:'g/dL', min:12, max:17.5, g:'Sangre y electrolitos'},
+  {k:'sodio', n:'Sodio', u:'mmol/L', min:135, max:145, g:'Sangre y electrolitos'},
+  {k:'potasio', n:'Potasio', u:'mmol/L', min:3.5, max:5, g:'Sangre y electrolitos'}
+];
+var EX = {};
+EXAMENES.forEach(function(e){ EX[e.k] = e; });
+
+function num(v){
+  if(v === null || v === undefined || v === '') return null;
+  var n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
+  return isFinite(n) ? n : null;
+}
+function esISO(s){ return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s); }
+function msISO(s){ var p = s.split('-'); return Date.UTC(+p[0], +p[1]-1, +p[2]); }
+function isoMs(ms){ return new Date(ms).toISOString().slice(0, 10); }
+function sumarDias(s, n){ return isoMs(msISO(s) + n * DIA_MS); }
+function difDias(a, b){ return Math.round((msISO(a) - msISO(b)) / DIA_MS); }
+/* Día de la semana de una fecha ISO: 0 domingo ... 6 sábado. */
+function diaSemana(s){ return new Date(msISO(s)).getUTCDay(); }
+
+/* Fecha y hora de Guayaquil (UTC−5, sin horario de verano), sea cual sea la zona del dispositivo. */
+function partesGYE(d){
+  d = d || new Date();
+  try{
+    var f = new Intl.DateTimeFormat('en-CA', {timeZone:TZ, year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', hourCycle:'h23'}).formatToParts(d);
+    var o = {};
+    f.forEach(function(p){ o[p.type] = p.value; });
+    return {f:o.year + '-' + o.month + '-' + o.day, h:o.hour + ':' + o.minute};
+  }catch(e){
+    var g = new Date(d.getTime() - 5 * 3600000).toISOString();
+    return {f:g.slice(0, 10), h:g.slice(11, 16)};
+  }
+}
+function hoyISO(d){ return partesGYE(d).f; }
+function horaGYE(d){ return partesGYE(d).h; }
+
+function crear(D){
+  var liq = (D && D.meta && D.meta.reglas_de_armado && D.meta.reglas_de_armado.liquido_dia) || '';
+  var nums = (String(liq).match(/\d+(?:[.,]\d+)?/g) || []).map(function(x){ return parseFloat(x.replace(',', '.')); });
+  var ml = /m\s*l/i.test(liq) ? 1 : 1000;
+  var META = {
+    min: Math.round((nums[0] || 2.5) * ml),
+    max: Math.round((nums.length > 1 ? nums[1] : (nums[0] || 3)) * ml),
+    texto: liq
+  };
+  var PASO = META.min / 5;
+
+  /* Ilustración 1 a 6: cinco tramos iguales hasta el mínimo; la sexta desde el mínimo. */
+  function tramo(v){
+    v = Math.max(0, num(v) || 0);
+    return Math.min(6, Math.floor(v / PASO + 1e-9) + 1);
+  }
+  function mensaje(v){
+    var t = tramo(v);
+    if(v >= META.max) return 'Meta del día cumplida.';
+    if(t === 6) return 'Mínimo cumplido. Faltan ' + fmtL(META.max - v) + ' para la meta.';
+    if(t === 5) return 'Casi en el mínimo: faltan ' + fmtL(META.min - v) + '.';
+    if(t >= 3) return 'Vas a mitad de camino. Un vaso con cada comida ayuda.';
+    if(t === 2) return 'Buen comienzo. Sigue con un vaso cada hora u hora y media.';
+    return 'Todavía no hay agua registrada hoy.';
+  }
+  function fmtL(v){ return (Math.round(v / 100) / 10).toFixed(1).replace('.', ',') + ' L'; }
+
+  function vacio(){ return {v:VERSION_SALUD, agua:{}, medidas:[], examenes:[]}; }
+
+  function normalizar(o){
+    var st = vacio();
+    if(!o || typeof o !== 'object') return st;
+    var ag = o.agua && typeof o.agua === 'object' ? o.agua : {};
+    Object.keys(ag).forEach(function(f){
+      if(!esISO(f) || !Array.isArray(ag[f])) return;
+      var l = ag[f].map(function(r){
+        var m = num(r && r.ml);
+        if(!r || !TIPOS[r.t] || !m || m <= 0 || m > 5000) return null;
+        return {t:r.t, ml:Math.round(m), h:typeof r.h === 'string' && /^\d{2}:\d{2}$/.test(r.h) ? r.h : ''};
+      }).filter(Boolean);
+      if(l.length) st.agua[f] = l;
+    });
+    (Array.isArray(o.medidas) ? o.medidas : []).forEach(function(m){ if(m && esISO(m.f)) guardarMedida(st, m); });
+    (Array.isArray(o.examenes) ? o.examenes : []).forEach(function(e){ if(e && esISO(e.f)) guardarExamen(st, e); });
+    if(typeof o.actualizado === 'string') st.actualizado = o.actualizado;
+    return st;
+  }
+
+  /* ---------- agua ---------- */
+  function podar(st, hoy){
+    var desde = sumarDias(hoy, -(DIAS_AGUA - 1));
+    Object.keys(st.agua).forEach(function(f){ if(f < desde || f > hoy) delete st.agua[f]; });
+    return st;
+  }
+  function registrar(st, f, t, ml, h){
+    if(!TIPOS[t]) return false;
+    ml = Math.round(num(ml) || 0);
+    if(ml <= 0 || ml > 5000) return false;
+    (st.agua[f] = st.agua[f] || []).push({t:t, ml:ml, h:h || ''});
+    return true;
+  }
+  function deshacer(st, f){
+    var l = st.agua[f];
+    if(!l || !l.length) return null;
+    var r = l.pop();
+    if(!l.length) delete st.agua[f];
+    return r;
+  }
+  function totalDia(st, f){
+    var o = {ml:0, porTipo:{agua:0, infusion:0, cafe:0, gaseosa:0}, cafeTazas:0, registros:(st.agua[f] || []).length};
+    (st.agua[f] || []).forEach(function(r){
+      o.porTipo[r.t] += r.ml;
+      if(TIPOS[r.t].suma) o.ml += r.ml;
+      if(r.t === 'cafe') o.cafeTazas++;
+    });
+    o.tramo = tramo(o.ml);
+    o.pct = Math.min(100, o.ml / META.max * 100);
+    o.minimo = o.ml >= META.min;
+    o.meta = o.ml >= META.max;
+    return o;
+  }
+  /* Lunes a domingo de la semana que contiene f. */
+  function semanaDe(f){
+    var lun = sumarDias(f, -((diaSemana(f) + 6) % 7));
+    var r = [];
+    for(var i=0;i<7;i++) r.push(sumarDias(lun, i));
+    return r;
+  }
+  /* Topes de datos.bebidas: dos tazas de café antes de las 11:00; gaseosa light sin cafeína, una lata al día,
+     máximo cuatro días por semana y nunca de viernes a domingo. */
+  function avisos(st, f){
+    var a = [], l = st.agua[f] || [], t = totalDia(st, f), ds = diaSemana(f);
+    if(t.cafeTazas > 2) a.push({k:'cafe', nivel:'bad', txt:'Van ' + t.cafeTazas + ' tazas de café. La regla son dos, las mismas todos los días.'});
+    if(l.some(function(r){ return r.t === 'cafe' && r.h && r.h >= '11:00'; }))
+      a.push({k:'cafe_hora', nivel:'warn', txt:'Hay café registrado después de las 11:00. Las dos tazas van antes de esa hora.'});
+    if(t.porTipo.gaseosa > 0){
+      if(ds === 5 || ds === 6 || ds === 0)
+        a.push({k:'gaseosa_finde', nivel:'bad', txt:'La gaseosa light no va de viernes a domingo.'});
+      if(t.porTipo.gaseosa > TIPOS.gaseosa.lata)
+        a.push({k:'gaseosa_tope', nivel:'bad', txt:'Pasaste la lata diaria de gaseosa light (' + TIPOS.gaseosa.lata + ' ml).'});
+      var dias = semanaDe(f).filter(function(d){ return d <= f && (st.agua[d] || []).some(function(r){ return r.t === 'gaseosa'; }); }).length;
+      if(dias > 4) a.push({k:'gaseosa_semana', nivel:'bad', txt:'Gaseosa light en ' + dias + ' días de esta semana. El máximo son cuatro.'});
+    }
+    return a;
+  }
+  function historial(st, hoy, n){
+    var r = [];
+    for(var i=n-1;i>=0;i--){ var f = sumarDias(hoy, -i); r.push({f:f, ml:totalDia(st, f).ml}); }
+    return r;
+  }
+
+  /* ---------- peso y medidas ---------- */
+  function guardarMedida(st, m){
+    if(!m || !esISO(m.f)) return false;
+    var n = {f:m.f, kg:num(m.kg), cintura:num(m.cintura), pas:num(m.pas), pad:num(m.pad)};
+    if(n.kg !== null && (n.kg < 20 || n.kg > 350)) n.kg = null;
+    if(n.kg !== null) n.kg = Math.round(n.kg * 10) / 10;
+    if(n.cintura !== null && (n.cintura < 30 || n.cintura > 250)) n.cintura = null;
+    if(n.pas !== null && (n.pas < 50 || n.pas > 260)) n.pas = null;
+    if(n.pad !== null && (n.pad < 30 || n.pad > 180)) n.pad = null;
+    if(n.kg === null && n.cintura === null && n.pas === null && n.pad === null) return false;
+    st.medidas = st.medidas.filter(function(x){ return x.f !== n.f; });
+    st.medidas.push(n);
+    st.medidas.sort(function(a, b){ return a.f < b.f ? -1 : a.f > b.f ? 1 : 0; });
+    return true;
+  }
+  function borrarMedida(st, f){
+    var n = st.medidas.length;
+    st.medidas = st.medidas.filter(function(x){ return x.f !== f; });
+    return st.medidas.length < n;
+  }
+  function conValor(lista, campo){ return lista.filter(function(x){ return x[campo] !== null && x[campo] !== undefined; }); }
+  function ultimaMedida(st, campo){ var l = conValor(st.medidas, campo); return l.length ? l[l.length - 1] : null; }
+  /* Variación semanal del peso: último registro frente al más reciente que tenga al menos siete días menos. */
+  function variacionSemanal(st){
+    var l = conValor(st.medidas, 'kg');
+    if(l.length < 2) return null;
+    var u = l[l.length - 1], ref = null;
+    for(var i=l.length-2;i>=0;i--) if(difDias(u.f, l[i].f) >= 7){ ref = l[i]; break; }
+    if(!ref) return null;
+    var dias = difDias(u.f, ref.f);
+    return {kg:Math.round((u.kg - ref.kg) * 10) / 10, porSemana:Math.round((u.kg - ref.kg) / dias * 7 * 10) / 10, desde:ref.f, dias:dias};
+  }
+  function seriePeso(st, hoy, dias){
+    var desde = sumarDias(hoy, -(dias - 1));
+    return conValor(st.medidas, 'kg').filter(function(x){ return x.f >= desde && x.f <= hoy; });
+  }
+  function estadoPresion(pas, pad){
+    if(pas === null || pad === null || pas === undefined || pad === undefined) return null;
+    return pas < 130 && pad < 80 ? 'ok' : 'aviso';
+  }
+
+  /* ---------- exámenes ---------- */
+  function nuevoId(){ return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function guardarExamen(st, e){
+    if(!e || !esISO(e.f)) return null;
+    var vals = {}, src = e.valores || {};
+    Object.keys(src).forEach(function(k){ var v = num(src[k]); if(EX[k] && v !== null && v >= 0) vals[k] = v; });
+    var otros = (Array.isArray(e.otros) ? e.otros : []).map(function(o){
+      var n = o && String(o.n || '').trim().slice(0, 60), v = o && num(o.v);
+      return n && v !== null ? {n:n, v:v, u:String(o.u || '').trim().slice(0, 20)} : null;
+    }).filter(Boolean);
+    var notas = String(e.notas || '').slice(0, 2000);
+    if(!Object.keys(vals).length && !otros.length && !notas.trim()) return null;
+    var id = typeof e.id === 'string' && e.id ? e.id : nuevoId();
+    var n = {id:id, f:e.f, valores:vals, otros:otros, notas:notas};
+    st.examenes = st.examenes.filter(function(x){ return x.id !== id; });
+    st.examenes.push(n);
+    st.examenes.sort(function(a, b){ return a.f < b.f ? -1 : a.f > b.f ? 1 : (a.id < b.id ? -1 : 1); });
+    return n;
+  }
+  function borrarExamen(st, id){
+    var n = st.examenes.length;
+    st.examenes = st.examenes.filter(function(x){ return x.id !== id; });
+    return st.examenes.length < n;
+  }
+  /* Últimos dos resultados de un valor, del más reciente al anterior. */
+  function historiaValor(st, k){
+    var r = [];
+    st.examenes.forEach(function(e){
+      if(k.indexOf('otro:') === 0){
+        var nm = k.slice(5).toLowerCase();
+        e.otros.forEach(function(o){ if(o.n.toLowerCase() === nm) r.push({f:e.f, v:o.v, u:o.u}); });
+      } else if(e.valores[k] !== undefined) r.push({f:e.f, v:e.valores[k]});
+    });
+    return r.reverse();
+  }
+  function estadoValor(k, v){
+    var e = EX[k];
+    if(!e || v === null || v === undefined) return null;
+    if(e.min !== undefined && v < e.min) return 'aviso';
+    if(e.max !== undefined && v > e.max) return 'aviso';
+    return 'ok';
+  }
+  function textoRango(k){
+    var e = EX[k];
+    if(!e) return '';
+    var f = function(x){ return String(x).replace('.', ','); };
+    if(e.min !== undefined && e.max !== undefined) return f(e.min) + ' a ' + f(e.max) + ' ' + e.u;
+    if(e.max !== undefined) return 'hasta ' + f(e.max) + ' ' + e.u;
+    return 'desde ' + f(e.min) + ' ' + e.u;
+  }
+  function otrosNombres(st){
+    var s = {};
+    st.examenes.forEach(function(e){ e.otros.forEach(function(o){ var k = o.n.toLowerCase(); if(!s[k]) s[k] = o.n; }); });
+    return Object.keys(s).map(function(k){ return s[k]; });
+  }
+
+  /* ---------- respaldo ---------- */
+  function exportar(st){
+    return JSON.stringify({app:'amor-de-mama', tipo:'salud', v:VERSION_SALUD, exportado:new Date().toISOString(),
+      agua:st.agua, medidas:st.medidas, examenes:st.examenes}, null, 2);
+  }
+  function importar(txt){
+    var o = typeof txt === 'string' ? JSON.parse(txt) : txt;
+    if(!o || typeof o !== 'object' || (o.tipo && o.tipo !== 'salud') || (o.v || 1) > VERSION_SALUD)
+      throw new Error('El archivo no es un respaldo de Salud de esta versión.');
+    return normalizar(o);
+  }
+
+  function f2(v){ return String(Math.round(v * 100) / 100).replace('.', ','); }
+  function fechaTxt(s){ var p = s.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function textoResumen(st, hoy){
+    var l = ['Resumen de salud (' + fechaTxt(hoy) + ')'];
+    var p = ultimaMedida(st, 'kg'), c = ultimaMedida(st, 'cintura'), pa = ultimaMedida(st, 'pas');
+    if(p){
+      var vs = variacionSemanal(st);
+      l.push('Peso: ' + f2(p.kg) + ' kg (' + fechaTxt(p.f) + ')' + (vs ? ', ' + (vs.porSemana > 0 ? '+' : '') + f2(vs.porSemana) + ' kg por semana' : ''));
+    }
+    if(c) l.push('Cintura: ' + f2(c.cintura) + ' cm (' + fechaTxt(c.f) + ')');
+    if(pa && pa.pad !== null) l.push('Presión arterial: ' + pa.pas + '/' + pa.pad + ' mmHg (' + fechaTxt(pa.f) + ')');
+    var h = historial(st, hoy, 7), dm = h.filter(function(x){ return x.ml > 0; });
+    if(dm.length) l.push('Líquidos, promedio de los días registrados de la última semana: ' +
+      fmtL(dm.reduce(function(a, x){ return a + x.ml; }, 0) / dm.length) + ' (meta ' + fmtL(META.min) + ' a ' + fmtL(META.max) + ')');
+    var cab = false;
+    EXAMENES.forEach(function(e){
+      var hv = historiaValor(st, e.k);
+      if(!hv.length) return;
+      if(!cab){ l.push(''); l.push('Exámenes (último resultado):'); cab = true; }
+      l.push('- ' + e.n + ': ' + f2(hv[0].v) + ' ' + e.u + ' (' + fechaTxt(hv[0].f) + ')' + (hv[1] ? ', antes ' + f2(hv[1].v) : ''));
+    });
+    otrosNombres(st).forEach(function(n){
+      var hv = historiaValor(st, 'otro:' + n);
+      if(!cab){ l.push(''); l.push('Exámenes (último resultado):'); cab = true; }
+      l.push('- ' + n + ': ' + f2(hv[0].v) + (hv[0].u ? ' ' + hv[0].u : '') + ' (' + fechaTxt(hv[0].f) + ')');
+    });
+    var ult = st.examenes.length ? st.examenes[st.examenes.length - 1] : null;
+    if(ult && ult.notas.trim()) l.push('Notas: ' + ult.notas.trim());
+    if(l.length === 1) l.push('Sin registros todavía.');
+    return l.join('\n');
+  }
+
+  return {
+    VERSION:VERSION_SALUD, META:META, PASO:PASO, TIPOS:TIPOS, EXAMENES:EXAMENES, EX:EX, DIAS_AGUA:DIAS_AGUA,
+    vacio:vacio, normalizar:normalizar, tramo:tramo, mensaje:mensaje, fmtL:fmtL,
+    podar:podar, registrar:registrar, deshacer:deshacer, totalDia:totalDia, avisos:avisos, historial:historial, semanaDe:semanaDe,
+    guardarMedida:guardarMedida, borrarMedida:borrarMedida, ultimaMedida:ultimaMedida, variacionSemanal:variacionSemanal,
+    seriePeso:seriePeso, estadoPresion:estadoPresion,
+    guardarExamen:guardarExamen, borrarExamen:borrarExamen, historiaValor:historiaValor, estadoValor:estadoValor,
+    textoRango:textoRango, otrosNombres:otrosNombres,
+    exportar:exportar, importar:importar, textoResumen:textoResumen,
+    hoyISO:hoyISO, horaGYE:horaGYE, sumarDias:sumarDias, difDias:difDias, diaSemana:diaSemana
+  };
+}
+
+root.RecetarioSalud = {crear:crear, hoyISO:hoyISO, horaGYE:horaGYE};
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script>
 (function(){
 "use strict";
@@ -17241,7 +17689,8 @@ var S = {
   origenFicha:'recetas',
   galScroll:0,
   pushed:false,
-  fichaTab:'ing'
+  fichaTab:'ing',
+  salud:{fm:'', rango:30, ex:null, msg:''}   /* estado de pantalla de Salud, no se guarda */
 };
 
 /* ---------- persistencia ---------- */
@@ -17301,11 +17750,57 @@ function guardar(){
   clearTimeout(tmr);
   tmr = setTimeout(subir, 500);
 }
+/* ---------- persistencia de Salud ---------- */
+/* Clave propia, recetario.salud, con su versión: no toca recetario.menu ni su migración. */
+var SA = window.RecetarioSalud.crear(D);
+var SS = SA.vacio();
+var dbSalud = null, tmrSalud = null, ultimoRawSalud = null, saludHoy = null;
+function cuerpoSalud(){
+  return {v:SA.VERSION, agua:SS.agua, medidas:SS.medidas, examenes:SS.examenes, actualizado:new Date().toISOString()};
+}
+function saludConDatos(o){ return !!o && (Object.keys(o.agua).length || o.medidas.length || o.examenes.length); }
+function leerSalud(raw){ SS = SA.podar(SA.normalizar(JSON.parse(raw)), SA.hoyISO()); ultimoRawSalud = raw; }
+try{
+  var rawS = localStorage.getItem('recetario.salud');
+  if(rawS) leerSalud(rawS);
+}catch(e){}
+function subirSalud(){
+  if(!dbSalud) return;
+  marcaSync('sincronizando');
+  dbSalud.set(cuerpoSalud()).then(function(){ marcaSync('sincronizado'); })
+    .catch(function(){ marcaSync('error'); });
+}
+function guardarSalud(){
+  SA.podar(SS, SA.hoyISO());
+  try{ ultimoRawSalud = JSON.stringify(cuerpoSalud()); localStorage.setItem('recetario.salud', ultimoRawSalud); localOk = true; }
+  catch(e){ localOk = false; }
+  if(!dbSalud){ pintarSync(); return; }
+  marcaSync('pendiente');
+  clearTimeout(tmrSalud);
+  tmrSalud = setTimeout(subirSalud, 500);
+}
+function conectarSalud(db){
+  dbSalud = db.doc('salud/actual');
+  dbSalud.onSnapshot(function(sn){
+    if(sn.metadata && sn.metadata.hasPendingWrites) return;
+    if(!sn.exists){
+      /* Sin copia compartida: se sube la local solo si tiene algo. */
+      if(saludConDatos(SS)) subirSalud();
+      return;
+    }
+    var d2 = sn.data();
+    if(!d2) return;
+    SS = SA.podar(SA.normalizar(d2), SA.hoyISO());
+    try{ ultimoRawSalud = JSON.stringify(cuerpoSalud()); localStorage.setItem('recetario.salud', ultimoRawSalud); }catch(e){}
+    if(S.vista === 'salud' || S.vista === 'inicio') render();
+  }, function(){ marcaSync('error'); });
+}
 if(window.claude && window.claude.use){
   S.sync = 'conectando';
   window.claude.use('db').then(function(db){
     if(!db){ marcaSync('local'); return; }
     dbRef = db.doc('menu/actual');
+    conectarSalud(db);
     var primera = true;
     dbRef.onSnapshot(function(sn){
       if(sn.metadata && sn.metadata.hasPendingWrites) return;
@@ -17436,6 +17931,7 @@ function vInicio(){
     '<button data-goto="recetas"><span class="ic">' + ico('book') + '</span>Recetas</button>' +
     '<button data-goto="compras"><span class="ic">' + ico('bag') + '</span>Compras</button>' +
     '<button data-goto="prep"><span class="ic">' + ico('pot') + '</span>Preparar</button></div>';
+  h += aguaInicio();
 
   h += '<div class="sec-head"><h2>Menú de hoy</h2><button data-goto="semana">Ver semana</button></div>';
   h += '<div class="carousel">';
@@ -17649,7 +18145,7 @@ function vSemana(){
   return h;
 }
 function textoSemana(){
-  var L = ['MENÚ DE LA SEMANA', ''];
+  var L = ['MENÚ DE LA SEMANA · AMOR DE MAMÁ', ''];
   DIAS.forEach(function(d){
     var s = S.semana[d.k] || {};
     L.push(d.n.toUpperCase() + (d.vent ? '  (menos grasa, picante contenido)' : ''));
@@ -17874,7 +18370,7 @@ function textoReceta(r, corto){
     L.push('*Preparación*');
     (r.pasos || []).forEach(function(p, n){ L.push((n + 1) + '. ' + p); });
   }
-  L.push('', 'Ver receta: ' + enlace(r.id));
+  L.push('', 'Ver receta en Amor de Mamá: ' + enlace(r.id));
   return L.join('\n');
 }
 function compartir(r){
@@ -18653,6 +19149,7 @@ function volver(){
   quitarHash(); cerrarFicha();
 }
 window.addEventListener('hashchange', function(){
+  if(location.hash === '#salud'){ if(S.vista !== 'salud' || S.verFicha) ir('salud'); return; }
   var id = idDeHash();
   if(id){
     if(S.verFicha && S.abierta === id && S.vista === 'recetas') return;
@@ -18662,6 +19159,305 @@ window.addEventListener('hashchange', function(){
     cerrarFicha();
   }
 });
+
+/* ================= SALUD ================= */
+var TIPO_BTN = [['infusion', 250, 'Té o infusión 250 ml'], ['cafe', 240, 'Café, 1 taza'], ['gaseosa', 355, 'Gaseosa light, lata 355 ml']];
+function litros(ml){ return (Math.round(ml / 10) / 100).toFixed(2).replace('.', ',').replace(/0$/, ''); }
+function n1(v){ return String(Math.round(v * 10) / 10).replace('.', ','); }
+function nv(v){ return String(Math.round(v * 100) / 100).replace('.', ','); }
+function fechaSa(iso){ return fechaCorta(iso) + (iso.slice(0, 4) !== SA.hoyISO().slice(0, 4) ? ' de ' + iso.slice(0, 4) : ''); }
+function imgAgua(t, cls, vacioImg){
+  return '<img class="' + cls + (vacioImg ? ' vacio' : '') + '" src="img/agua-' + t + '.webp" width="206" height="400" ' +
+    'alt="Medidor de agua, nivel ' + t + ' de 6" decoding="async">';
+}
+function barraAgua(ml){
+  var M_ = SA.META, tope = M_.max;
+  return '<div class="track" role="progressbar" aria-label="Líquido del día" aria-valuemin="0" aria-valuemax="' + tope +
+    '" aria-valuenow="' + Math.min(ml, tope) + '"><div class="fill' + (ml >= M_.min ? ' ok' : '') + '" style="width:' +
+    Math.min(100, ml / tope * 100).toFixed(1) + '%"></div><div class="goal" style="left:' + (M_.min / tope * 100).toFixed(1) + '%"></div></div>';
+}
+function aguaInicio(){
+  var hoy = SA.hoyISO(), t = SA.totalDia(SS, hoy);
+  return '<div class="agua-mini panel">' + imgAgua(t.tramo, 'agua-mini-img', t.ml === 0) +
+    '<div class="tx"><b>Agua de hoy</b><span id="aguaMiniTot">' + litros(t.ml) + ' de ' + litros(SA.META.max) + ' L' +
+    (t.meta ? ' · meta cumplida' : (t.minimo ? ' · mínimo cumplido' : '')) + '</span>' + barraAgua(t.ml) + '</div>' +
+    '<div class="acts"><button class="btn pri sm" data-sa="agua|agua|250">+250 ml</button>' +
+    '<button class="link" data-goto="salud">Ver salud</button></div></div>';
+}
+/* Barras de los últimos siete días, con el mínimo marcado. Una sola serie: sin leyenda; el título la nombra. */
+function graficoAgua(hoy){
+  var h = SA.historial(SS, hoy, 7), W = 320, H = 150, top = 18, base = 124, max = Math.max(SA.META.max, Math.max.apply(null, h.map(function(x){ return x.ml; })));
+  var esc_ = function(v){ return base - (v / max) * (base - top); }, bw = 26, paso = W / 7;
+  var s = '<svg class="sa-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Líquido de los últimos siete días">';
+  var ym = esc_(SA.META.min);
+  s += '<line class="gl" x1="0" x2="' + W + '" y1="' + ym.toFixed(1) + '" y2="' + ym.toFixed(1) + '"/>';
+  s += '<text x="' + W + '" y="' + (ym - 4).toFixed(1) + '" text-anchor="end">mínimo ' + litros(SA.META.min) + ' L</text>';
+  h.forEach(function(d, i){
+    var x = i * paso + (paso - bw) / 2, y = esc_(d.ml), dd = SA.diaSemana(d.f);
+    var nom = ['D','L','M','X','J','V','S'][dd];
+    var tt = fechaSa(d.f) + ': ' + litros(d.ml) + ' L';
+    s += '<g><title>' + esc(tt) + '</title><rect class="hit" x="' + (i * paso).toFixed(1) + '" y="0" width="' + paso.toFixed(1) + '" height="' + H + '"/>';
+    if(d.ml > 0) s += '<path class="br' + (d.ml >= SA.META.min ? ' ok' : '') + '" d="M' + x.toFixed(1) + ' ' + base + 'V' + (y + 4).toFixed(1) +
+      'a4 4 0 0 1 4 -4h' + (bw - 8) + 'a4 4 0 0 1 4 4V' + base + 'z"/>';
+    s += '</g>';
+    if(d.ml > 0) s += '<text class="val" x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 4).toFixed(1) + '" text-anchor="middle">' + litros(d.ml) + '</text>';
+    s += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (base + 16) + '" text-anchor="middle"' + (d.f === hoy ? ' style="font-weight:600;fill:var(--brand-ink)"' : '') + '>' + nom + '</text>';
+  });
+  s += '<line class="ax" x1="0" x2="' + W + '" y1="' + base + '" y2="' + base + '"/></svg>';
+  return s;
+}
+function graficoPeso(hoy, dias){
+  var l = SA.seriePeso(SS, hoy, dias);
+  if(l.length < 2) return '<p class="sa-nota">Con dos registros de peso en los últimos ' + dias + ' días aparece la gráfica.</p>';
+  var W = 320, H = 150, top = 16, base = 124, izq = 34;
+  var vs = l.map(function(x){ return x.kg; }), lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
+  if(hi - lo < 2){ var c = (hi + lo) / 2; lo = c - 1; hi = c + 1; }
+  var ini = SA.sumarDias(hoy, -(dias - 1));
+  var X = function(f){ return izq + (SA.difDias(f, ini) / (dias - 1)) * (W - izq - 8); };
+  var Y = function(v){ return base - ((v - lo) / (hi - lo)) * (base - top); };
+  var s = '<svg class="sa-chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Peso de los últimos ' + dias + ' días">';
+  [hi, lo].forEach(function(v){ s += '<text x="' + (izq - 6) + '" y="' + (Y(v) + 4).toFixed(1) + '" text-anchor="end">' + n1(v) + '</text>'; });
+  s += '<line class="ax" x1="' + izq + '" x2="' + W + '" y1="' + base + '" y2="' + base + '"/>';
+  s += '<path class="ln" d="' + l.map(function(x, i){ return (i ? 'L' : 'M') + X(x.f).toFixed(1) + ' ' + Y(x.kg).toFixed(1); }).join('') + '"/>';
+  l.forEach(function(x){
+    s += '<g><title>' + esc(fechaSa(x.f) + ': ' + n1(x.kg) + ' kg') + '</title><circle class="hit" cx="' + X(x.f).toFixed(1) + '" cy="' + Y(x.kg).toFixed(1) + '" r="12"/>' +
+      '<circle class="pt" cx="' + X(x.f).toFixed(1) + '" cy="' + Y(x.kg).toFixed(1) + '" r="4.5"/></g>';
+  });
+  var u = l[l.length - 1];
+  s += '<text x="' + izq + '" y="' + (base + 16) + '">' + esc(fechaCorta(ini)) + '</text>';
+  s += '<text x="' + W + '" y="' + (base + 16) + '" text-anchor="end">' + esc(fechaCorta(hoy)) + '</text>';
+  s += '<text class="val" x="' + Math.min(X(u.f), W - 4).toFixed(1) + '" y="' + (Y(u.kg) - 9).toFixed(1) + '" text-anchor="end">' + n1(u.kg) + ' kg</text>';
+  return s + '</svg>';
+}
+function tendencia(h, dec){
+  if(h.length < 2) return '<span class="t">primer registro</span>';
+  var d = h[0].v - h[1].v, r = Math.round(d * 100) / 100;
+  var fl = r > 0 ? '↑' : (r < 0 ? '↓' : '=');
+  return '<span class="t">' + fl + ' ' + (r > 0 ? '+' : (r < 0 ? '−' : '')) + nv(Math.abs(r)) + ' frente a ' + esc(fechaSa(h[1].f)) + '</span>';
+}
+function filaExamen(nombre, h, unidad, k){
+  var e = k ? SA.EX[k] : null, est = e ? SA.estadoValor(k, h[0].v) : null;
+  return '<li class="ex-row"><div><div class="n">' + esc(nombre) + '</div><div class="m">' + esc(fechaSa(h[0].f)) +
+    (e ? ' · referencia orientativa ' + esc(SA.textoRango(k)) : '') + '</div></div>' +
+    '<div class="v">' + nv(h[0].v) + ' <small>' + esc(unidad || '') + '</small></div>' +
+    '<div>' + (est ? '<span class="chip-s ' + (est === 'ok' ? 'ok' : 'warn') + '">' + (est === 'ok' ? 'En rango' : 'Fuera del rango') + '</span>' : '') + '</div>' +
+    tendencia(h) + '</li>';
+}
+function formExamen(ex){
+  var v = ex ? ex.valores : {}, h = '<form class="sa-form panel" id="exForm" data-id="' + esc(ex ? ex.id : '') + '">';
+  h += '<label>Fecha de la toma<input type="date" name="f" required value="' + esc(ex ? ex.f : SA.hoyISO()) + '" max="' + SA.hoyISO() + '"></label>';
+  var grupos = [];
+  SA.EXAMENES.forEach(function(e){ if(grupos.indexOf(e.g) < 0) grupos.push(e.g); });
+  grupos.forEach(function(g){
+    h += '<fieldset><legend>' + esc(g) + '</legend>';
+    SA.EXAMENES.filter(function(e){ return e.g === g; }).forEach(function(e){
+      h += '<label>' + esc(e.n) + ' <span class="u">' + esc(e.u) + '</span><input type="text" inputmode="decimal" name="x_' + e.k + '" value="' +
+        (v[e.k] !== undefined ? nv(v[e.k]) : '') + '" autocomplete="off"></label>';
+    });
+    h += '</fieldset>';
+  });
+  h += '<fieldset><legend>Otros valores</legend>';
+  var ot = (ex ? ex.otros : []).slice();
+  while(ot.length < (ex ? ex.otros.length + 2 : 3)) ot.push({n:'', v:'', u:''});
+  ot.forEach(function(o, i){
+    h += '<div class="otro"><input type="text" name="on_' + i + '" placeholder="Nombre del examen" aria-label="Nombre del examen" value="' + esc(o.n) + '">' +
+      '<input type="text" inputmode="decimal" name="ov_' + i + '" placeholder="Valor" aria-label="Valor" value="' + (o.v !== '' ? nv(o.v) : '') + '">' +
+      '<input type="text" name="ou_' + i + '" placeholder="Unidad" aria-label="Unidad" value="' + esc(o.u) + '"></div>';
+  });
+  h += '</fieldset><label class="full">Notas<textarea name="notas" placeholder="Indicaciones del médico, ayuno, laboratorio">' + esc(ex ? ex.notas : '') + '</textarea></label>';
+  h += '<div class="acts"><button class="btn pri" type="submit">Guardar exámenes</button><button class="btn gh" type="button" data-sa="excancelar">Cancelar</button></div></form>';
+  return h;
+}
+function vSalud(){
+  var hoy = SA.hoyISO(), t = SA.totalDia(SS, hoy), av = SA.avisos(SS, hoy), U = S.salud;
+  var h = '<div class="page-h"><h1>Salud</h1><div class="sub">Agua del día, peso y exámenes. Se guarda aparte del menú' +
+    (dbSalud ? ' y se sincroniza con la copia compartida' : ', solo en este dispositivo') + '.</div></div>';
+
+  /* ----- agua ----- */
+  h += '<section class="sa-sec" id="sa-agua" aria-labelledby="saAguaT"><h2 id="saAguaT">Agua de hoy</h2>';
+  h += '<div class="panel agua">' + imgAgua(t.tramo, 'agua-img', t.ml === 0) + '<div>' +
+    '<div class="agua-tot" id="aguaTot">' + litros(t.ml) + ' <small>de ' + litros(SA.META.max) + ' L</small></div>' +
+    (t.meta ? '<span class="chip-s ok">Meta del día cumplida</span>' : (t.minimo ? '<span class="chip-s ok">Mínimo cumplido</span>' : '')) +
+    barraAgua(t.ml) + '<div class="agua-escala"><span>0</span><span>mínimo ' + litros(SA.META.min) + ' L</span><span>' + litros(SA.META.max) + ' L</span></div>' +
+    '<p class="agua-msg" id="aguaMsg">' + esc(SA.mensaje(t.ml)) + '</p></div><div class="agua-ctrl">' +
+    '<div class="agua-acts"><button class="btn pri" data-sa="agua|agua|250">+250 ml, vaso</button>' +
+    '<button class="btn sec" data-sa="agua|agua|500">+500 ml, botella</button>' +
+    '<button class="btn gh" data-sa="deshacer"' + (t.registros ? '' : ' disabled') + '>Deshacer</button></div>' +
+    '<div class="agua-otras">' + TIPO_BTN.map(function(b){
+      return '<button class="btn gh sm" data-sa="agua|' + b[0] + '|' + b[1] + '">+ ' + esc(b[2]) + '</button>';
+    }).join('') + '</div>' +
+    '<form class="agua-libre" id="aguaLibre"><input type="number" name="ml" min="10" max="2000" step="10" placeholder="ml" aria-label="Cantidad en mililitros" required>' +
+    '<select name="t" aria-label="Bebida">' + Object.keys(SA.TIPOS).map(function(k){ return '<option value="' + k + '">' + esc(SA.TIPOS[k].n) + '</option>'; }).join('') + '</select>' +
+    '<button class="btn gh sm" type="submit">Añadir</button></form></div></div>';
+  if(av.length) h += '<div class="alerts" style="margin-top:var(--s3)">' + av.map(function(a){
+    return '<div class="alert ' + a.nivel + '"><span class="tag">Bebidas</span><span>' + esc(a.txt) + '</span></div>';
+  }).join('') + '</div>';
+  var reg = SS.agua[hoy] || [];
+  if(reg.length) h += '<details class="disc"><summary>Registro de hoy (' + reg.length + ')</summary><ul class="sa-reg">' +
+    reg.slice().reverse().map(function(r){ return '<li><span>' + esc(r.h || '') + ' · ' + esc(SA.TIPOS[r.t].n) + '</span><b>' + r.ml + ' ml</b></li>'; }).join('') + '</ul></details>';
+  var h30 = SA.historial(SS, hoy, SA.DIAS_AGUA).filter(function(x){ return x.ml > 0; });
+  h += '<div class="panel" style="margin-top:var(--s3)"><h3>Últimos siete días <em>' +
+    (h30.length ? 'En 30 días: ' + h30.filter(function(x){ return x.ml >= SA.META.min; }).length + ' de ' + h30.length + ' días registrados con el mínimo' : 'Sin días anteriores registrados') +
+    '</em></h3>' + graficoAgua(hoy) + '</div>';
+  h += '<p class="sa-nota">Meta tomada de las reglas del plan: ' + esc(SA.META.texto) + ' de líquido al día. Suman agua, infusiones, las dos tazas de café y la gaseosa light permitida. El contador vuelve a cero a medianoche, hora de Guayaquil.</p></section>';
+
+  /* ----- peso y medidas ----- */
+  var fm = U.fm || hoy, m = SS.medidas.filter(function(x){ return x.f === fm; })[0] || {};
+  var up = SA.ultimaMedida(SS, 'kg'), uc = SA.ultimaMedida(SS, 'cintura'), upa = SA.ultimaMedida(SS, 'pas'), vs = SA.variacionSemanal(SS);
+  var epa = upa ? SA.estadoPresion(upa.pas, upa.pad) : null;
+  h += '<section class="sa-sec" id="sa-peso" aria-labelledby="saPesoT"><h2 id="saPesoT">Peso y medidas</h2>';
+  h += '<div class="sa-grid tres">' +
+    '<div class="sa-stat"><div class="k">Último peso</div><div class="v">' + (up ? n1(up.kg) + ' <small>kg</small>' : '—') + '</div><div class="d">' + (up ? esc(fechaSa(up.f)) : 'sin registro') + '</div></div>' +
+    '<div class="sa-stat"><div class="k">Variación semanal</div><div class="v">' + (vs ? (vs.porSemana > 0 ? '+' : (vs.porSemana < 0 ? '−' : '')) + n1(Math.abs(vs.porSemana)) + ' <small>kg</small>' : '—') + '</div><div class="d">' +
+      (vs ? esc('desde ' + fechaSa(vs.desde) + ', ' + (vs.kg > 0 ? '+' : '') + n1(vs.kg) + ' kg en ' + vs.dias + ' días') : 'hace falta un registro de hace 7 días o más') + '</div></div>' +
+    '<div class="sa-stat"><div class="k">Cintura</div><div class="v">' + (uc ? n1(uc.cintura) + ' <small>cm</small>' : '—') + '</div><div class="d">' + (uc ? esc(fechaSa(uc.f)) : 'opcional') + '</div></div>' +
+    '<div class="sa-stat"><div class="k">Presión arterial</div><div class="v">' + (upa && upa.pad !== null ? upa.pas + '/' + upa.pad + ' <small>mmHg</small>' : '—') + '</div><div class="d">' +
+      (upa && upa.pad !== null ? esc(fechaSa(upa.f)) + (epa ? ' · <span class="chip-s ' + (epa === 'ok' ? 'ok' : 'warn') + '">' + (epa === 'ok' ? 'En rango' : 'Fuera del rango') + '</span>' : '') : 'opcional') + '</div></div></div>';
+  h += '<form class="sa-form panel" id="medForm" style="margin-top:var(--s3)">' +
+    '<label>Fecha<input type="date" name="f" id="medF" required value="' + esc(fm) + '" max="' + hoy + '"></label>' +
+    '<label>Peso <span class="u">kg</span><input type="text" inputmode="decimal" name="kg" value="' + (m.kg != null ? n1(m.kg) : '') + '" placeholder="00,0" autocomplete="off"></label>' +
+    '<label>Cintura <span class="u">cm, opcional</span><input type="text" inputmode="decimal" name="cintura" value="' + (m.cintura != null ? n1(m.cintura) : '') + '" autocomplete="off"></label>' +
+    '<label>Presión sistólica <span class="u">mmHg, opcional</span><input type="text" inputmode="numeric" name="pas" value="' + (m.pas != null ? m.pas : '') + '" autocomplete="off"></label>' +
+    '<label>Presión diastólica <span class="u">mmHg, opcional</span><input type="text" inputmode="numeric" name="pad" value="' + (m.pad != null ? m.pad : '') + '" autocomplete="off"></label>' +
+    '<div class="acts"><button class="btn pri" type="submit">' + (m.f ? 'Actualizar registro' : 'Guardar registro') + '</button>' +
+    (m.f ? '<button class="btn gh" type="button" data-sa="medborrar|' + esc(m.f) + '">Borrar el del ' + esc(fechaCorta(m.f)) + '</button>' : '') + '</div></form>';
+  var dias = U.rango === 90 ? 90 : 30;
+  h += '<div class="panel" style="margin-top:var(--s3)"><h3>Peso <em><span class="seg" style="margin:0;display:inline-flex">' +
+    '<button data-sa="rango|30" aria-pressed="' + (dias === 30) + '">30 días</button><button data-sa="rango|90" aria-pressed="' + (dias === 90) + '">90 días</button></span></em></h3>' +
+    graficoPeso(hoy, dias);
+  var ult = SS.medidas.slice(-8).reverse();
+  if(ult.length) h += '<details class="disc"><summary>Registros recientes (' + SS.medidas.length + ')</summary><ul class="sa-tomas">' + ult.map(function(x){
+    var p = [];
+    if(x.kg !== null) p.push(n1(x.kg) + ' kg');
+    if(x.cintura !== null) p.push(n1(x.cintura) + ' cm');
+    if(x.pas !== null && x.pad !== null) p.push(x.pas + '/' + x.pad + ' mmHg');
+    return '<li><span><b>' + esc(fechaSa(x.f)) + '</b> · ' + esc(p.join(' · ')) + '</span><span class="acts"><button class="btn gh sm" data-sa="mededitar|' + x.f + '">Editar</button>' +
+      '<button class="btn gh sm" data-sa="medborrar|' + x.f + '">Borrar</button></span></li>';
+  }).join('') + '</ul></details>';
+  h += '</div></section>';
+
+  /* ----- exámenes ----- */
+  h += '<section class="sa-sec" id="sa-examenes" aria-labelledby="saExT"><h2 id="saExT">Exámenes de laboratorio</h2>';
+  if(U.ex){
+    h += formExamen(U.ex === 'nuevo' ? null : SS.examenes.filter(function(x){ return x.id === U.ex; })[0]);
+  } else {
+    h += '<button class="btn pri" data-sa="exnuevo">' + ico('plus') + ' Registrar exámenes</button>';
+  }
+  var hay = SA.EXAMENES.filter(function(e){ return SA.historiaValor(SS, e.k).length; });
+  var otros = SA.otrosNombres(SS);
+  if(!hay.length && !otros.length){
+    h += '<p class="sa-nota">Todavía no hay resultados. Registra la última toma con los valores que traiga el informe del laboratorio; los que falten se dejan en blanco.</p>';
+  } else {
+    var g0 = '';
+    hay.forEach(function(e){
+      if(e.g !== g0){ if(g0) h += '</ul>'; h += '<div class="ex-g">' + esc(e.g) + '</div><ul class="ex-list">'; g0 = e.g; }
+      h += filaExamen(e.n, SA.historiaValor(SS, e.k), e.u, e.k);
+    });
+    if(g0) h += '</ul>';
+    if(otros.length){
+      h += '<div class="ex-g">Otros</div><ul class="ex-list">';
+      otros.forEach(function(n){ var hv = SA.historiaValor(SS, 'otro:' + n); h += filaExamen(n, hv, hv[0].u, null); });
+      h += '</ul>';
+    }
+    var sin = SA.EXAMENES.filter(function(e){ return hay.indexOf(e) < 0; });
+    if(sin.length) h += '<p class="sa-nota">Sin registrar: ' + esc(sin.map(function(e){ return e.n; }).join(', ')) + '.</p>';
+  }
+  if(SS.examenes.length){
+    h += '<div class="panel" style="margin-top:var(--s3)"><h3>Tomas registradas</h3><ul class="sa-tomas">' + SS.examenes.slice().reverse().map(function(x){
+      var n = Object.keys(x.valores).length + x.otros.length;
+      return '<li><span><b>' + esc(fechaSa(x.f)) + '</b> · ' + n + (n === 1 ? ' valor' : ' valores') + (x.notas.trim() ? ' · con notas' : '') + '</span>' +
+        '<span class="acts"><button class="btn gh sm" data-sa="exeditar|' + esc(x.id) + '">Editar</button><button class="btn gh sm" data-sa="exborrar|' + esc(x.id) + '">Borrar</button></span></li>';
+    }).join('') + '</ul></div>';
+  }
+  h += '<p class="sa-nota">Los rangos son generales de adultos y solo orientativos: no son un diagnóstico. El laboratorio imprime sus propios rangos y la interpretación corresponde a tu médico tratante.</p></section>';
+
+  /* ----- respaldo ----- */
+  var wa = 'https://wa.me/?text=' + encodeURIComponent(SA.textoResumen(SS, hoy));
+  h += '<section class="sa-sec" aria-labelledby="saRespT"><h2 id="saRespT">Compartir y respaldo</h2><div class="panel">' +
+    '<div class="agua-acts" style="margin-top:0"><button class="btn sec" data-sa="copiar">Copiar resumen para el médico</button>' +
+    '<a class="btn sec" href="' + esc(wa) + '" target="_blank" rel="noopener">Enviar por WhatsApp</a>' +
+    '<button class="btn gh" data-sa="exportar">Exportar respaldo (JSON)</button>' +
+    '<label class="btn gh" style="cursor:pointer">Importar respaldo<input type="file" id="saImport" accept="application/json,.json" class="vh"></label></div>' +
+    '<p class="sa-ok" id="saOk" role="status" aria-live="polite">' + esc(U.msg || '') + '</p></div></section>';
+  U.msg = '';
+  return h;
+}
+function accionSalud(t){
+  var p = t.dataset.sa.split('|'), a = p[0], hoy = SA.hoyISO(), U = S.salud;
+  if(a === 'agua'){
+    SA.registrar(SS, hoy, p[1], +p[2], SA.horaGYE());
+    guardarSalud();
+  } else if(a === 'deshacer'){
+    if(!SA.deshacer(SS, hoy)) return;
+    guardarSalud();
+  } else if(a === 'rango'){ U.rango = +p[1]; }
+  else if(a === 'mededitar'){ U.fm = p[1]; render(); var mf = document.getElementById('medForm'); if(mf) mf.scrollIntoView({block:'center'}); return; }
+  else if(a === 'medborrar'){
+    if(window.confirm && !window.confirm('¿Borrar el registro del ' + fechaSa(p[1]) + '?')) return;
+    SA.borrarMedida(SS, p[1]); U.fm = ''; guardarSalud();
+  } else if(a === 'exnuevo'){ U.ex = 'nuevo'; }
+  else if(a === 'exeditar'){ U.ex = p[1]; }
+  else if(a === 'excancelar'){ U.ex = null; }
+  else if(a === 'exborrar'){
+    var ex = SS.examenes.filter(function(x){ return x.id === p[1]; })[0];
+    if(!ex || (window.confirm && !window.confirm('¿Borrar los exámenes del ' + fechaSa(ex.f) + '?'))) return;
+    SA.borrarExamen(SS, p[1]); if(U.ex === p[1]) U.ex = null; guardarSalud();
+  } else if(a === 'copiar'){
+    copiarTexto(SA.textoResumen(SS, hoy), function(ok){
+      var el = document.getElementById('saOk'); if(el) el.textContent = ok ? 'Resumen copiado al portapapeles' : 'No se pudo copiar';
+    });
+    return;
+  } else if(a === 'exportar'){
+    try{
+      var b = new Blob([SA.exportar(SS)], {type:'application/json'}), u = URL.createObjectURL(b), l = document.createElement('a');
+      l.href = u; l.download = 'amor-de-mama-salud-' + hoy + '.json'; document.body.appendChild(l); l.click(); document.body.removeChild(l);
+      setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
+      U.msg = 'Respaldo descargado.';
+    }catch(e){ U.msg = 'No se pudo exportar en este navegador.'; }
+  }
+  var sel = '[data-sa="' + t.dataset.sa + '"]';
+  render();
+  var n = document.querySelector(a === 'exnuevo' || a === 'exeditar' ? '#exForm input' : sel);
+  if(n) try{ n.focus({preventScroll:a !== 'exnuevo' && a !== 'exeditar'}); }catch(e){}
+}
+function enviarSalud(f){
+  var fd = new FormData(f), U = S.salud, get = function(k){ var v = fd.get(k); return v === null ? '' : String(v).trim(); };
+  if(f.id === 'aguaLibre'){
+    if(SA.registrar(SS, SA.hoyISO(), get('t'), get('ml'), SA.horaGYE())) guardarSalud();
+    render(); var n = document.querySelector('#aguaLibre input'); if(n) n.focus({preventScroll:true});
+    return;
+  }
+  if(f.id === 'medForm'){
+    var ok = SA.guardarMedida(SS, {f:get('f'), kg:get('kg'), cintura:get('cintura'), pas:get('pas'), pad:get('pad')});
+    if(ok){ U.fm = get('f'); guardarSalud(); }
+    render();
+    var bt = document.querySelector('#medForm [type=submit]');
+    if(bt){ bt.focus({preventScroll:true}); if(!ok) avisar('Escribe al menos un valor válido: peso entre 20 y 350 kg, cintura o presión.', null); else avisar('Registro del ' + fechaSa(U.fm) + ' guardado.', null); }
+    return;
+  }
+  if(f.id === 'exForm'){
+    var vals = {}, otros = [];
+    SA.EXAMENES.forEach(function(e){ var v = get('x_' + e.k); if(v !== '') vals[e.k] = v; });
+    for(var i=0; fd.has('on_' + i); i++) otros.push({n:get('on_' + i), v:get('ov_' + i), u:get('ou_' + i)});
+    var ex = SA.guardarExamen(SS, {id:f.dataset.id || '', f:get('f'), valores:vals, otros:otros, notas:get('notas')});
+    if(!ex){ avisar('Escribe al menos un valor o una nota para guardar la toma.', null); return; }
+    U.ex = null; guardarSalud(); render();
+    avisar('Exámenes del ' + fechaSa(ex.f) + ' guardados.', null);
+    var sec = document.getElementById('sa-examenes'); if(sec) sec.scrollIntoView({block:'start'});
+  }
+}
+function importarSalud(file){
+  var rd = new FileReader();
+  rd.onload = function(){
+    try{
+      var nuevo = SA.importar(String(rd.result));
+      if(window.confirm && !window.confirm('¿Reemplazar los datos de Salud de este dispositivo por los del respaldo?')) return;
+      SS = SA.podar(nuevo, SA.hoyISO()); guardarSalud(); S.salud.msg = 'Respaldo importado.';
+    }catch(e){ S.salud.msg = e && e.message ? e.message : 'No se pudo leer el archivo.'; }
+    render();
+  };
+  rd.readAsText(file);
+}
 
 /* ================= RENDER ================= */
 function render(){
@@ -18675,12 +19471,14 @@ function render(){
   else if(S.vista === 'recetas') m.innerHTML = vRecetas();
   else if(S.vista === 'compras') m.innerHTML = vCompras();
   else if(S.vista === 'prep') m.innerHTML = vPrep();
+  else if(S.vista === 'salud') m.innerHTML = vSalud();
   else m.innerHTML = vReglas();
   Array.prototype.forEach.call(document.querySelectorAll('nav.main button'), function(b){
     b.setAttribute('aria-selected', String(b.dataset.v === S.vista));
   });
   pintarSync();
   hoyPintado = hoyKey();
+  saludHoy = SA.hoyISO();
   if(S.swap || S.asig) pintarCapa();
 }
 
@@ -18693,6 +19491,12 @@ function alVolver(){
     if(S.diaSel === hoyPintado) S.diaSel = hoy;
     cambio = true;
   }
+  /* El agua se cuenta por día de Guayaquil: a medianoche el contador vuelve a cero. */
+  if(saludHoy && saludHoy !== SA.hoyISO()){ SA.podar(SS, SA.hoyISO()); if(S.salud.fm === saludHoy) S.salud.fm = ''; cambio = true; }
+  try{
+    var rawS2 = localStorage.getItem('recetario.salud');
+    if(rawS2 && rawS2 !== ultimoRawSalud){ leerSalud(rawS2); cambio = true; }
+  }catch(e){}
   try{
     var raw = localStorage.getItem('recetario.menu');
     if(raw && raw !== ultimoRaw){
@@ -18709,12 +19513,19 @@ function alVolver(){
 document.addEventListener('visibilitychange', function(){ if(!document.hidden) alVolver(); });
 window.addEventListener('pageshow', function(e){ if(e.persisted) alVolver(); });
 window.addEventListener('focus', alVolver);
-window.addEventListener('storage', function(e){ if(e.key === 'recetario.menu') alVolver(); });
-setInterval(function(){ if(!document.hidden && hoyPintado !== hoyKey()) alVolver(); }, 60000);
+window.addEventListener('storage', function(e){ if(e.key === 'recetario.menu' || e.key === 'recetario.salud') alVolver(); });
+setInterval(function(){ if(!document.hidden && (hoyPintado !== hoyKey() || saludHoy !== SA.hoyISO())) alVolver(); }, 60000);
+/* #salud abre la sección directamente; al salir de ella el enlace se limpia sin tocar el historial. */
+function hashSalud(){
+  try{
+    if(S.vista === 'salud' && location.hash !== '#salud') history.replaceState(null, '', location.pathname + location.search + '#salud');
+    else if(S.vista !== 'salud' && location.hash === '#salud') history.replaceState(null, '', location.pathname + location.search);
+  }catch(e){}
+}
 function ir(v, sinScroll){
   if(S.cambio) salirCambio(false, true);
   if(S.verFicha){ S.verFicha = false; quitarHash(); }
-  S.vista = v; render();
+  S.vista = v; hashSalud(); render();
   if(!sinScroll) window.scrollTo({top:0, behavior:'smooth'});
 }
 function irPrep(pid){
@@ -18782,8 +19593,14 @@ document.addEventListener('keydown', function(e){
   if(S.verFicha && S.vista === 'recetas'){ volver(); return; }
   if(S.cambio && tag !== 'INPUT' && tag !== 'SELECT') salirCambio(true);
 });
+document.getElementById('marca').addEventListener('click', function(){ ir('inicio'); });
+document.getElementById('main').addEventListener('submit', function(e){
+  var f = e.target;
+  if(f.id === 'aguaLibre' || f.id === 'medForm' || f.id === 'exForm'){ e.preventDefault(); enviarSalud(f); }
+});
 document.getElementById('main').addEventListener('click', function(e){
   var t;
+  if((t = e.target.closest('[data-sa]'))){ accionSalud(t); return; }
   if((t = e.target.closest('[data-swap]'))){ var p = t.dataset.swap.split('|'); entrarCambio(p[0], p[1]); return; }
   if((t = e.target.closest('[data-elegir]'))){ abrirPrevia(t.dataset.elegir); return; }
   if(e.target.closest('[data-cancelar]')){ salirCambio(true); return; }
@@ -18872,6 +19689,8 @@ document.getElementById('main').addEventListener('input', function(e){
 document.getElementById('main').addEventListener('change', function(e){
   var t;
   if(e.target.id === 'cocina'){ S.filtro.cocina = e.target.value; render(); return; }
+  if(e.target.id === 'medF'){ S.salud.fm = e.target.value; render(); var mf = document.getElementById('medF'); if(mf) mf.focus({preventScroll:true}); return; }
+  if(e.target.id === 'saImport'){ if(e.target.files && e.target.files[0]) importarSalud(e.target.files[0]); return; }
   if((t = e.target.closest('[data-tog]'))){ S.filtro[t.dataset.tog] = t.checked; render(); return; }
   if((t = e.target.closest('[data-dulce]'))){
     var kd = t.dataset.dulce;
@@ -18895,6 +19714,7 @@ document.getElementById('fase').value = String(S.fase);
 (function(){
   var id = idDeHash();
   if(id && byId[id]){ S.vista = 'recetas'; S.abierta = id; S.verFicha = true; S.origenFicha = 'recetas'; }
+  else if(location.hash === '#salud') S.vista = 'salud';
   render();
   if(id && !byId[id]){ S.vista = 'recetas'; render(); avisar('No existe la receta ' + id + ' en el recetario.', null); }
 })();

@@ -186,7 +186,7 @@ await prueba('WhatsApp: mensaje completo, codificado, sin destinatario; copiar r
   const clip = await p.evaluate(() => navigator.clipboard.readText());
   assert.ok(clip.includes('*Preparación*') && clip.includes(r.pasos[r.pasos.length - 1]));
   // el enlace directo abre exactamente la receta compartida
-  const link = clip.split('\n').pop().replace(/^Ver receta: /, '');
+  const link = clip.split('\n').pop().replace(/^Ver receta en Amor de Mamá: /, '');
   const q = await nueva();
   await q.goto(link);
   assert.equal(await q.textContent('#fichaT'), r.nombre);

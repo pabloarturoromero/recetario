@@ -21,3 +21,11 @@ export function semilla() {
   const m = /var SEMILLA = (\{[\s\S]*?\n\});/.exec(html);
   return Function('return ' + m[1])();
 }
+export function salud(D = datos()) {
+  const m = /<script id="salud">([\s\S]*?)<\/script>/.exec(html);
+  const ctx = { globalThis: {} };
+  ctx.globalThis = ctx;
+  vm.createContext(ctx);
+  vm.runInContext(m[1], ctx);
+  return { SA: ctx.RecetarioSalud.crear(D), mod: ctx.RecetarioSalud };
+}

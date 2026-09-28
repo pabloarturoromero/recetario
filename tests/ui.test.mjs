@@ -168,7 +168,11 @@ test('sincronización simulada: no declara éxito antes de la confirmación y co
 for (const ancho of [375, 390, 1280]) {
   test(`sin desbordamiento horizontal a ${ancho} px`, { skip: saltar }, async () => {
     const { page, ctx, errores } = await abrir({ ancho, alto: 800 });
-    for (const v of ['inicio', 'semana', 'recetas', 'compras', 'prep', 'reglas']) {
+    const logo = await page.locator('.marca img').boundingBox();
+    assert.ok(logo && logo.x >= 0 && logo.x + logo.width <= ancho && logo.width >= 38, 'el logo se ve en la cabecera');
+    const cab = await page.evaluate(() => document.querySelector('.top-in').scrollWidth - document.querySelector('.top-in').clientWidth);
+    assert.ok(cab <= 0, `la cabecera desborda ${cab}px`);
+    for (const v of ['inicio', 'semana', 'recetas', 'compras', 'prep', 'salud', 'reglas']) {
       await page.click(`nav.main button[data-v="${v}"]`);
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       assert.ok(ov <= 0, `${v} desborda ${ov}px`);
