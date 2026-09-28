@@ -330,3 +330,38 @@ test('fotos: cada foto corresponde a una receta y trae crédito y enlace', async
     assert.ok(f.c && /^https:\/\//.test(f.u), 'crédito y enlace: ' + k);
   }
 });
+
+test('aleatorio: cambia los tres platos del día por otros compatibles y deja el resto de la semana igual', () => {
+  const sem = SEM();
+  for (const d of M.DIAS) {
+    const k = d.k;
+    const base = { ...sem, [k]: { ...sem[k], fuera: false } };
+    let semilla = 7;
+    const rnd = () => ((semilla = (semilla * 16807) % 2147483647) / 2147483647);
+    const nueva = M.aleatorioDia(base, k, undefined, rnd);
+    assert.ok(nueva, 'hay combinación para ' + k);
+    for (const [m] of M.COMIDAS) {
+      const r = M.byId[nueva[k][m]];
+      assert.ok(r, m + ' asignado en ' + k);
+      assert.equal(r.categoria, m);
+      assert.notEqual(r.id, base[k][m], m + ' distinto del actual en ' + k);
+      if (d.vent) assert.ok(r.apto_ventana_contencion, r.id + ' apto para la ventana');
+      assert.ok(!M.tiempo(r).antelacion, r.id + ' no hay que empezarlo la víspera');
+    }
+    assert.ok(!M.problemasDia(nueva, k).some((p) => p.t === 'bad'), 'sin alertas graves en ' + k);
+    for (const o of M.DIAS) if (o.k !== k) assert.deepEqual(nueva[o.k], base[o.k]);
+  }
+});
+
+test('aleatorio: respeta el almuerzo fuera de casa y no toca la semana original', () => {
+  const sem = SEM();
+  const k = M.DIAS[0].k;
+  sem[k].fuera = true; sem[k].almuerzo = '';
+  const antes = JSON.stringify(sem);
+  const nueva = M.aleatorioDia(sem, k);
+  assert.equal(JSON.stringify(sem), antes);
+  assert.equal(nueva[k].fuera, true);
+  assert.equal(nueva[k].almuerzo, '');
+  assert.notEqual(nueva[k].desayuno, sem[k].desayuno);
+  assert.notEqual(nueva[k].cena, sem[k].cena);
+});

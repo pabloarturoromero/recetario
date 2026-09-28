@@ -149,6 +149,9 @@ main{max-width:var(--maxw); margin:0 auto; padding:var(--s4) var(--s5) var(--s8)
 .sec-head{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s3); margin:var(--s6) 0 var(--s3)}
 .sec-head h2{font-size:19px; font-weight:700; letter-spacing:-.01em}
 .sec-head button, .link{color:var(--brand); font-size:13px; font-weight:500}
+.sec-acts{display:flex; gap:var(--s4); align-items:baseline; flex-wrap:wrap; justify-content:flex-end}
+.sec-head [data-aleatorio]{display:inline-flex; align-items:center; gap:4px; font-weight:600}
+.sec-head [data-aleatorio] svg{width:15px; height:15px; align-self:center}
 
 /* ============ PLATO (imagen) ============ */
 .pic{position:relative; display:grid; place-items:center; overflow:hidden; border-radius:var(--r3);
@@ -941,7 +944,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.9.0",
+    "version": "2.10.0",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -16833,6 +16836,36 @@ function crear(D){
     return out.filter(function(p){ var kk = p.tag + '|' + p.m; if(v[kk]) return false; v[kk] = 1; return true; });
   }
 
+  /* Aleatorio: cambia desayuno, almuerzo y cena de un día por platos distintos de los actuales.
+     Descarta los que no entran en la ventana y los que hay que empezar la víspera, prefiere los que no están
+     en la semana y, entre muchas combinaciones al azar, se queda con la que deja menos alertas en el día.
+     Un almuerzo fuera de casa se respeta. Devuelve la semana nueva o null si no hay con qué cambiar. */
+  function aleatorioDia(sem, k, faseId, rnd){
+    rnd = rnd || Math.random;
+    var d = diaDe(k);
+    if(!d) return null;
+    var s = sem[k] || vacio(), c = usos(sem), cand = {}, ok = true;
+    var comidas = COMIDAS.map(function(m){ return m[0]; }).filter(function(m){ return !(m === 'almuerzo' && s.fuera); });
+    comidas.forEach(function(m){
+      var l = R.filter(function(r){
+        return r.categoria === m && r.id !== s[m] && (!d.vent || r.apto_ventana_contencion) && !tiempo(r).antelacion;
+      });
+      var nuevos = l.filter(function(r){ return !c[r.id]; });
+      cand[m] = nuevos.length >= 3 ? nuevos : l;
+      if(!cand[m].length) ok = false;
+    });
+    if(!comidas.length || !ok) return null;
+    var mejor = null, mejorN = Infinity;
+    for(var i = 0; i < 400 && mejorN > 0; i++){
+      var sem2 = copia(sem);
+      if(!sem2[k]) sem2[k] = vacio();
+      comidas.forEach(function(m){ sem2[k][m] = cand[m][Math.floor(rnd() * cand[m].length) % cand[m].length].id; });
+      var n = problemasDia(sem2, k, faseId).reduce(function(a, p){ return a + (p.t === 'bad' ? 10 : 1); }, 0);
+      if(n < mejorN){ mejor = sem2; mejorN = n; }
+    }
+    return mejor;
+  }
+
   /* ---------- tiempos ---------- */
   function tiempo(r){
     var e = r.tiempo_espera || null;
@@ -17196,7 +17229,7 @@ function crear(D){
     objetivos:objetivos, evaluar:evaluar, umbrales:umbrales,
     normalizarSemana:normalizarSemana, platos:platos, usos:usos, usosDulce:usosDulce, omega:omega,
     cuentaRepeticion:cuentaRepeticion,
-    totalesDia:totalesDia, evaluarDia:evaluarDia, problemasDia:problemasDia, problemasSemana:problemasSemana,
+    totalesDia:totalesDia, evaluarDia:evaluarDia, problemasDia:problemasDia, problemasSemana:problemasSemana, aleatorioDia:aleatorioDia,
     tiempo:tiempo, textoTiempo:textoTiempo, fmtMin:fmtMin,
     filtrar:filtrar, seleccion:seleccion,
     plan:plan, usosPrep:usosPrep, estadoMarca:estadoMarca, migrarMarcas:migrarMarcas, marcasAntiguasDe:marcasAntiguasDe,
@@ -17491,6 +17524,10 @@ function crear(D){
     return JSON.stringify({app:'amor-de-mama', tipo:'salud', v:VERSION_SALUD, exportado:new Date().toISOString(),
       agua:st.agua, medidas:st.medidas, examenes:st.examenes}, null, 2);
   }
+  /* Un archivo que solo trae exámenes (sin agua ni medidas) se suma a lo guardado en lugar de reemplazarlo;
+     una toma con el mismo id se actualiza. */
+  function soloExamenes(st){ return !!st && st.examenes.length > 0 && !Object.keys(st.agua).length && !st.medidas.length; }
+  function sumarExamenes(st, nuevo){ nuevo.examenes.forEach(function(e){ guardarExamen(st, e); }); return st; }
   function importar(txt){
     var o = typeof txt === 'string' ? JSON.parse(txt) : txt;
     if(!o || typeof o !== 'object' || (o.tipo && o.tipo !== 'salud') || (o.v || 1) > VERSION_SALUD)
@@ -17536,7 +17573,7 @@ function crear(D){
     podar:podar, registrar:registrar, deshacer:deshacer, totalDia:totalDia, avisos:avisos, historial:historial, semanaDe:semanaDe,
     guardarMedida:guardarMedida, borrarMedida:borrarMedida, ultimaMedida:ultimaMedida, variacionSemanal:variacionSemanal,
     seriePeso:seriePeso, estadoPresion:estadoPresion,
-    guardarExamen:guardarExamen, borrarExamen:borrarExamen, historiaValor:historiaValor, estadoValor:estadoValor,
+    guardarExamen:guardarExamen, borrarExamen:borrarExamen, soloExamenes:soloExamenes, sumarExamenes:sumarExamenes, historiaValor:historiaValor, estadoValor:estadoValor,
     textoRango:textoRango, otrosNombres:otrosNombres,
     exportar:exportar, importar:importar, textoResumen:textoResumen,
     hoyISO:hoyISO, horaGYE:horaGYE, sumarDias:sumarDias, difDias:difDias, diaSemana:diaSemana
@@ -18044,7 +18081,7 @@ function vInicio(){
   h += aguaInicio();
   h += avisoNubeInicio();
 
-  h += '<div class="sec-head"><h2>Menú de hoy</h2><button data-goto="semana">Ver semana</button></div>';
+  h += '<div class="sec-head"><h2>Menú de hoy</h2><span class="sec-acts"><button data-aleatorio="' + k + '" title="Cambia desayuno, almuerzo y cena por platos distintos">' + ico('swap') + ' Aleatorio</button><button data-goto="semana">Ver semana</button></span></div>';
   h += '<div class="carousel">';
   function tarjeta(slot, sub, r, swapK, extra){
     var fuera = extra && extra.fuera;
@@ -19044,6 +19081,16 @@ function deshacer(){
   avisar('Cambio deshecho', null);
 }
 
+/* Botón Aleatorio de Hoy: tres platos distintos de una vez, con Deshacer. */
+function menuAleatorio(k){
+  var sem2 = M.aleatorioDia(S.semana, k, S.fase);
+  if(!sem2){ avisar('No hay otros platos compatibles para cambiar hoy.', null); return; }
+  var antes = M.copia(S.semana[k] || vacio()), n = sem2[k];
+  S.semana = sem2;
+  guardar(); render();
+  var nombres = COMIDAS.filter(function(m){ return !(m[0] === 'almuerzo' && n.fuera); }).map(function(m){ return byId[n[m[0]]].nombre; });
+  avisar('Menú de hoy al azar: ' + nombres.join(', ').replace(/, ([^,]*)$/, ' y $1') + (n.fuera ? ' (el almuerzo fuera se mantiene)' : ''), {dia:k, antes:antes});
+}
 /* Modo intercambio: los botones Cambiar de Inicio y Semana abren la galería filtrada por la comida. */
 function entrarCambio(diaK, comida){
   if(S.cambio) salirCambio(false, true);
@@ -19626,8 +19673,14 @@ function importarSalud(file){
   rd.onload = function(){
     try{
       var nuevo = SA.importar(String(rd.result));
-      if(window.confirm && !window.confirm('¿Reemplazar los datos de Salud de este dispositivo por los del respaldo?')) return;
-      SS = SA.podar(nuevo, SA.hoyISO()); guardarSalud(); S.salud.msg = 'Respaldo importado.';
+      if(SA.soloExamenes(nuevo)){
+        var n = nuevo.examenes.length;
+        if(window.confirm && !window.confirm('¿Añadir ' + (n === 1 ? 'esta toma de exámenes' : 'estas ' + n + ' tomas de exámenes') + ' a Salud? El agua, el peso y las otras tomas se conservan.')) return;
+        SA.sumarExamenes(SS, nuevo); guardarSalud(); S.salud.msg = n === 1 ? 'Exámenes añadidos.' : n + ' tomas de exámenes añadidas.';
+      } else {
+        if(window.confirm && !window.confirm('¿Reemplazar los datos de Salud de este dispositivo por los del respaldo?')) return;
+        SS = SA.podar(nuevo, SA.hoyISO()); guardarSalud(); S.salud.msg = 'Respaldo importado.';
+      }
     }catch(e){ S.salud.msg = e && e.message ? e.message : 'No se pudo leer el archivo.'; }
     render();
   };
@@ -19783,6 +19836,7 @@ document.getElementById('main').addEventListener('click', function(e){
   var t;
   if((t = e.target.closest('[data-sa]'))){ accionSalud(t); return; }
   if((t = e.target.closest('[data-nube]'))){ accionNube(t); return; }
+  if((t = e.target.closest('[data-aleatorio]'))){ menuAleatorio(t.dataset.aleatorio); return; }
   if((t = e.target.closest('[data-swap]'))){ var p = t.dataset.swap.split('|'); entrarCambio(p[0], p[1]); return; }
   if((t = e.target.closest('[data-elegir]'))){ abrirPrevia(t.dataset.elegir); return; }
   if(e.target.closest('[data-cancelar]')){ salirCambio(true); return; }

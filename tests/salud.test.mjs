@@ -234,3 +234,19 @@ test('exportar respaldo descarga un JSON que se puede importar', { skip: saltar 
   assert.equal(JSON.parse(txt).tipo, 'salud');
   await ctx.close();
 });
+
+test('un respaldo con solo exámenes se suma sin borrar agua, medidas ni otras tomas', () => {
+  const st = SA.normalizar({ agua: { '2026-09-01': [{ t: 'agua', ml: 500, h: '08:00' }] }, medidas: [{ f: '2026-09-01', kg: 90 }],
+    examenes: [{ id: 'viejo', f: '2026-03-01', valores: { glucosa: 110 } }] });
+  const nuevo = SA.importar({ tipo: 'salud', v: 1, agua: {}, medidas: [],
+    examenes: [{ id: 'nuevo', f: '2026-08-31', valores: { glucosa: 95, hba1c: 5.2 }, otros: [{ n: 'Prueba', v: 1, u: '' }] }] });
+  assert.equal(SA.soloExamenes(nuevo), true);
+  assert.equal(SA.soloExamenes(st), false);
+  SA.sumarExamenes(st, nuevo);
+  assert.deepEqual(plano(st.examenes.map((e) => e.id)), ['viejo', 'nuevo']);
+  assert.equal(Object.keys(st.agua).length, 1);
+  assert.equal(st.medidas.length, 1);
+  assert.deepEqual(plano(SA.historiaValor(st, 'glucosa').map((h) => h.v)), [95, 110]);
+  SA.sumarExamenes(st, nuevo);
+  assert.equal(st.examenes.length, 2, 'importar dos veces la misma toma no la duplica');
+});
