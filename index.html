@@ -19408,12 +19408,8 @@ function accionSalud(t){
     });
     return;
   } else if(a === 'exportar'){
-    try{
-      var b = new Blob([SA.exportar(SS)], {type:'application/json'}), u = URL.createObjectURL(b), l = document.createElement('a');
-      l.href = u; l.download = 'amor-de-mama-salud-' + hoy + '.json'; document.body.appendChild(l); l.click(); document.body.removeChild(l);
-      setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
-      U.msg = 'Respaldo descargado.';
-    }catch(e){ U.msg = 'No se pudo exportar en este navegador.'; }
+    exportarSalud('amor-de-mama-salud-' + hoy + '.json', SA.exportar(SS));
+    return;
   }
   var sel = '[data-sa="' + t.dataset.sa + '"]';
   render();
@@ -19445,6 +19441,27 @@ function enviarSalud(f){
     avisar('Exámenes del ' + fechaSa(ex.f) + ' guardados.', null);
     var sec = document.getElementById('sa-examenes'); if(sec) sec.scrollIntoView({block:'start'});
   }
+}
+/* Dentro del artifact de Claude la descarga pasa por la capacidad downloads, que pide confirmación;
+   en el sitio publicado, un enlace de descarga normal. */
+function mensajeSalud(t){ var el = document.getElementById('saOk'); if(el) el.textContent = t; }
+function exportarSalud(nombre, txt){
+  function directo(){
+    try{
+      var b = new Blob([txt], {type:'application/json'}), u = URL.createObjectURL(b), l = document.createElement('a');
+      l.href = u; l.download = nombre; document.body.appendChild(l); l.click(); document.body.removeChild(l);
+      setTimeout(function(){ URL.revokeObjectURL(u); }, 1000);
+      mensajeSalud('Respaldo descargado.');
+    }catch(e){ mensajeSalud('No se pudo exportar en este navegador.'); }
+  }
+  if(!(window.claude && window.claude.use)){ directo(); return; }
+  window.claude.use('downloads').then(function(dl){
+    if(!dl){ mensajeSalud('La descarga no está disponible en esta vista. Usa «Copiar resumen» o abre el sitio publicado.'); return; }
+    return dl.save({filename:nombre, data:txt}).then(function(){ mensajeSalud('Respaldo guardado.'); }, function(e){
+      var c = e && e.code;
+      mensajeSalud(c === 'declined' ? 'Descarga cancelada.' : (c === 'rate_limited' ? 'Ya hay una descarga pendiente de confirmar.' : 'No se pudo guardar el respaldo aquí.'));
+    });
+  }, function(){ mensajeSalud('La descarga no está disponible en esta vista.'); });
 }
 function importarSalud(file){
   var rd = new FileReader();

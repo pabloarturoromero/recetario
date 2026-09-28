@@ -223,3 +223,14 @@ test('topes de bebidas visibles en la interfaz', { skip: saltar }, async () => {
   assert.match(await page.textContent('#sa-agua'), /Van 3 tazas de café/);
   await ctx.close();
 });
+
+test('exportar respaldo descarga un JSON que se puede importar', { skip: saltar }, async () => {
+  const { page, ctx } = await abrir(390, 844, URL_APP + '#salud');
+  await page.click('[data-sa="agua|agua|500"]');
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.click('[data-sa="exportar"]')]);
+  assert.match(dl.suggestedFilename(), /^amor-de-mama-salud-\d{4}-\d{2}-\d{2}\.json$/);
+  const ruta = await dl.path();
+  const txt = (await import('node:fs')).readFileSync(ruta, 'utf8');
+  assert.equal(JSON.parse(txt).tipo, 'salud');
+  await ctx.close();
+});
