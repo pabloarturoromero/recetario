@@ -201,3 +201,16 @@ test('fotos: la ficha muestra la foto con su crédito y la galería usa las foto
   assert.deepEqual(errores, []);
   await ctx.close();
 });
+
+test('dulce pendiente: muestra la foto genérica con crédito, y el dulce elegido no la usa', { skip: saltar }, async () => {
+  const { page, ctx, errores } = await abrir();
+  const img = page.locator('.dish.mk-dulce .pic img');
+  assert.equal(await img.count(), 1);
+  assert.ok(await img.evaluate((i) => i.complete && i.naturalWidth > 0), 'la imagen carga');
+  assert.match(await img.getAttribute('alt'), /foto de referencia/);
+  assert.match(await page.getAttribute('.dish.mk-dulce .cred a', 'href'), /^https:\/\/commons\.wikimedia\.org\//);
+  await page.selectOption('.dish.mk-dulce select', 'S1');
+  assert.equal(await page.locator('.dish.mk-dulce .pic img').count(), 0);
+  assert.deepEqual(errores, []);
+  await ctx.close();
+});
