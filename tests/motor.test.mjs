@@ -163,7 +163,9 @@ test('cambiar una comida actualiza a la vez compras y preparaciones', () => {
   const s = SEM();
   const antes = M.plan(s, 1);
   const sinLegumbre = receta((r) => r.categoria === 'cena' && r.requiere.length === 0 && r.apto_ventana_contencion);
-  const s2 = M.copia(s); s2.dom.cena = sinLegumbre.id;
+  const dia = M.DIAS.map((d) => d.k).find((k) => M.byId[s[k].cena] && M.byId[s[k].cena].ingredientes.some((i) => /P1$/.test(i.item)));
+  assert.ok(dia, 'la semana de ejemplo tiene una cena con legumbre de P1');
+  const s2 = M.copia(s); s2[dia].cena = sinLegumbre.id;
   const desp = M.plan(s2, 1);
   for (const pl of [antes, desp]) {
     for (const o of pl.preps.P1.salidas) {
@@ -174,11 +176,30 @@ test('cambiar una comida actualiza a la vez compras y preparaciones', () => {
       assert.ok(Math.abs(l.cant - (o.prepararSeco + directo)) < 1e-9, 'compra de ' + o.id + ' = lo que se prepara + uso directo');
     }
   }
-  const cena = M.byId[s.dom.cena];
+  const cena = M.byId[s[dia].cena];
   const usaba = cena.ingredientes.filter((i) => /P1$/.test(i.item));
   assert.ok(usaba.length > 0);
   const total = (pl) => suma(pl.preps.P1.salidas.map((o) => o.necesario));
   assert.equal(total(antes) - total(desp), suma(usaba.map((i) => i.cantidad)));
+});
+
+test('legumbre: tope semanal por tipo, con un solo aviso por día', () => {
+  const s = SEM();
+  const O = M.objetivos(1);
+  assert.equal(O.legMax, 2);
+  const conGarbanzo = D.recetas.filter((r) => r.categoria === 'cena' && M.legumbres(r).includes('garbanzo'));
+  assert.ok(conGarbanzo.length >= 3);
+  assert.ok(M.legumbres(M.byId.D2).includes('lenteja'), 'la base de lenteja P3 cuenta como lenteja');
+  const s2 = M.copia(s);
+  ['lun', 'mar', 'mie'].forEach((k, n) => { s2[k].cena = conGarbanzo[n].id; });
+  assert.equal(M.usosLegumbre(s2).garbanzo, 3);
+  const avisos = M.problemasDia(s2, 'lun', 1).filter((p) => p.tag === 'Legumbre');
+  assert.equal(avisos.length, 1);
+  assert.equal(avisos[0].t, 'warn');
+  assert.match(avisos[0].m, /Garbanzo aparece en 3 comidas/);
+  s2.mie.cena = s.mie.cena;
+  assert.ok(!M.problemasDia(s2, 'lun', 1).some((p) => p.tag === 'Legumbre'), 'con dos veces no hay aviso');
+  assert.ok(!M.problemasSemana(s, 1).some((p) => /aparece en \d+ comidas/.test(p.m)), 'la semana de ejemplo respeta el tope');
 });
 
 test('rangos: se evalúa sin redondear y con los márgenes de aviso configurados', () => {

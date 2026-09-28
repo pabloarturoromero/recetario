@@ -10,12 +10,13 @@ Cloudflare Pages (proyecto `recetario-intercambiable`) está conectado a este re
 
 1. Partir de `main` actualizado: `git fetch origin main && git checkout main && git reset --hard origin/main`.
 2. Editar `index.html`. Para recetas nuevas, seguir el esquema de las existentes (id único por categoría: D, L, C, G), con `macros`, `apto_ventana_contencion`, `aporta_omega3_marino`, `requiere`, `ingredientes` con `vol_ml` y `volumen`, `pasos`, `sustitutos_locales` y `video_busqueda`. Las cenas llevan `version_aligerada`.
-3. Respetar los preceptos del plan: legumbre en cada plato principal, pan y pasta integrales, cero alcohol, cero azúcar y miel, ingredientes disponibles en Guayaquil. Rangos por porción: desayuno 600 a 700 kcal, almuerzo 630 a 760, cena 560 a 660, guarnición hasta 200; proteína 35 a 46 g por comida principal.
+3. Respetar los preceptos del plan: la legumbre va solo donde el plato original la lleva (garbanzo, lenteja y frejol, 2 veces como máximo cada uno por semana; el motor avisa con `tipos_legumbre` y `legumbre_por_semana`); cuando no la lleva, la fibra sale del cereal integral propio de esa cocina (bulgur, cebada, chapati de harina integral, pan y pasta integrales) y de verdura en cantidad, y la proteína de carne, pescado, huevo o tofu. No usar arveja tierna, haba tierna ni arveja partida en recetas nuevas. Pan y pasta integrales, cero alcohol, cero azúcar y miel, ingredientes disponibles en Guayaquil. Rangos por porción: desayuno 600 a 700 kcal, almuerzo 630 a 760, cena 560 a 660, guarnición hasta 200; proteína 35 a 46 g por comida principal.
 4. Subir `meta.version` y `meta.fecha`.
 5. Validar antes de subir:
    - que el JSON de `datos` sea válido y los id no se repitan;
    - que pasen las pruebas: `node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs tests/cocinera.test.mjs tests/salud.test.mjs tests/nube.test.mjs` (cubren catálogo de compras, preparaciones, alertas, dulce, búsqueda, persistencia, anchos móviles, la cocinera, la sección Salud y la nube propia);
    - si se añade una receta con un ingrediente nuevo, asignar su forma en `compras_catalogo.formas` (la prueba de catálogo falla si falta);
+   - si la receta nueva lleva garbanzo, lenteja o frejol en una forma nueva, añadirla a `meta.tipos_legumbre`;
    - abrir la página en un navegador (Playwright) y comprobar que carga sin errores, que la cabecera muestra el total correcto de recetas y que la lista de compras se genera.
 6. Commit en `main` con mensaje descriptivo en español y push: `git push origin main`.
 7. Si existe el artifact de Claude del recetario (https://claude.ai/artifact/LRsQg1oJpf6PTJMVcASPGr), republicarlo con el mismo `index.html` para que ambas versiones coincidan.
