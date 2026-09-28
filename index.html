@@ -879,6 +879,8 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .sa-tomas li:last-child{border-bottom:0}
 .sa-tomas .acts{display:flex; gap:var(--s1)}
 .sa-nota{font-size:12.5px; color:var(--ink-3); margin-top:var(--s3); line-height:1.5}
+.sa-btns{display:flex; flex-wrap:wrap; gap:var(--s3)}
+.sa-borrador{background:var(--warn-bg); border-color:transparent; font-size:13.5px; line-height:1.5; margin-bottom:var(--s3)}
 .sa-ok{color:var(--ok); font-size:12.5px; min-height:1.2em; margin-top:var(--s2)}
 @media (max-width:640px){
   .agua{grid-template-columns:88px minmax(0,1fr); gap:0 var(--s4)}
@@ -944,7 +946,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.10.0",
+    "version": "2.11.0",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -17519,6 +17521,151 @@ function crear(D){
     return Object.keys(s).map(function(k){ return s[k]; });
   }
 
+  /* ---------- lectura de informes en PDF ---------- */
+  /* Todo ocurre en el dispositivo: la interfaz saca el texto con pdf.js y estas funciones lo ordenan.
+     Nada se guarda sin que la persona revise el formulario. */
+  var MESES = {ene:1, feb:2, mar:3, abr:4, may:5, jun:6, jul:7, ago:8, sep:9, set:9, oct:10, nov:11, dic:12};
+  /* Agrupa los fragmentos de una página ({s, x, y, w, h}; y crece hacia arriba) en renglones de celdas. */
+  function renglonesPdf(items){
+    var l = (items || []).filter(function(it){ return it && typeof it.s === 'string' && it.s.trim(); })
+      .slice().sort(function(a, b){ return b.y - a.y || a.x - b.x; });
+    var filas = [];
+    l.forEach(function(it){
+      var f = filas[filas.length - 1];
+      if(f && Math.abs(f.y - it.y) <= Math.max(2, (it.h || 8) * 0.45)) f.items.push(it);
+      else filas.push({y:it.y, items:[it]});
+    });
+    return filas.map(function(f){
+      var celdas = [], fin = -1e9, esp = false;
+      f.items.sort(function(a, b){ return a.x - b.x; }).forEach(function(it){
+        var t = it.s.replace(/\s+/g, ' ').trim();
+        if(celdas.length && it.x - fin < Math.max(2.5, (it.h || 8) * 0.3))
+          celdas[celdas.length - 1] += (esp || /^\s/.test(it.s) || it.x - fin > 0.8 ? ' ' : '') + t;
+        else celdas.push(t);
+        esp = /\s$/.test(it.s);
+        fin = Math.max(fin, it.x + (it.w || 0));
+      });
+      return celdas;
+    });
+  }
+  function sinTildes(s){ return String(s).normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  function fechaDe(s){
+    s = sinTildes(String(s)).toLowerCase();
+    var m = /(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s), a, me, d;
+    if(m){ a = +m[1]; me = +m[2]; d = +m[3]; }
+    else if((m = /\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/.exec(s))){ d = +m[1]; me = +m[2]; a = +m[3]; }
+    else if((m = /\b(\d{1,2})(?:\s+de)?[\s\-\/]+([a-z]{3})[a-z]*\.?(?:\s+de)?[\s\-\/]+(\d{4})\b/.exec(s)) && MESES[m[2]]){ d = +m[1]; me = MESES[m[2]]; a = +m[3]; }
+    else return null;
+    if(me < 1 || me > 12 || d < 1 || d > 31 || a < 1990) return null;
+    return a + '-' + (me < 10 ? '0' : '') + me + '-' + (d < 10 ? '0' : '') + d;
+  }
+  /* Nombre del laboratorio → valor de la app. El orden importa: la HbA1c antes que la glucosa. */
+  var SINONIMOS = [
+    ['hba1c', /glicosilad|glucosilad|hba1c|^a1c|glicohemoglobina/],
+    ['glucosa', /^(glucosa|glicemia|glucemia)(?!.*(promedio|estimad|post|prandial|orina|curva|carga))/],
+    ['tg', /^triglicerid/],
+    ['hdl', /hdl/, /nohdl|\//],
+    ['ldl', /ldl/, /vldl|hdl|pequen|densa|sdldl|\//],
+    ['col_total', /^colesterol(total|serico|sericototal|totalserico|ensuero)?$/],
+    ['acido_urico', /acidourico|^uricemia/],
+    ['creatinina', /^creatinina(serica|ensuero|sangre)?$/],
+    ['tfg', /filtracion|^tfg|egfr|ckdepi/],
+    ['tgo', /tgo|got|aspartato|^ast(?!a)/],
+    ['tgp', /tgp|gpt|alanina|^alt(?!a)/],
+    ['ggt', /ggt|gammagt|gammaglutamil/],
+    ['tsh', /^tsh|tirotropina/],
+    ['vit_d', /vitaminad|25oh|25hidroxi/],
+    ['b12', /b12|cobalamina/],
+    ['ferritina', /ferritina/],
+    ['hemoglobina', /^(hemoglobina|hb|hgb)$/],
+    ['sodio', /^sodio/],
+    ['potasio', /^potasio/]
+  ];
+  function claveExamen(nombre){
+    var c = sinTildes(nombre).toLowerCase().replace(/[^a-z0-9\/]/g, '');
+    if(/^indice|ratio|cociente/.test(c)) return null;
+    for(var i = 0; i < SINONIMOS.length; i++){
+      var r = SINONIMOS[i];
+      if(r[1].test(c) && !(r[2] && r[2].test(c))) return r[0];
+    }
+    return null;
+  }
+  var RE_NUM = /^[<>≤≥]?\s*\d+(?:[.,]\d+)?$/;
+  var RE_UNIDAD = /^(%|[a-zµμ][a-z0-9µμ\/.^³²]*(?:\s?\/\s?[a-z0-9µμ.^³²]+)?|x\s?campo|x\s?camp)$/i;
+  function limpiarNombre(n){
+    return n.replace(/^[\s(»«*)]+/, '').replace(/\(\s*»\s*\)/g, '').replace(/[\s*]+$/, '')
+      .replace(/,?\s+(s[ée]ric[oa]|en suero|sangre total con edta|en sangre total)$/i, '').replace(/\s+/g, ' ').trim();
+  }
+  /* Lee los renglones de un informe (una lista de páginas, cada una con renglones de celdas) y arma un borrador de toma. */
+  function leerInforme(paginas, opc){
+    opc = opc || {};
+    var hoy = opc.hoy || hoyISO(), filas = [];
+    (paginas || []).forEach(function(p){ (p || []).forEach(function(c){ if(c && c.length) filas.push(c); }); });
+    var vals = {}, otros = [], vistos = {}, marcados = [], ctx = '', f = null, fechas = {}, lab = '', orden = '', concl = [];
+    filas.forEach(function(c, i){
+      var linea = c.join('  ');
+      /* fecha de la toma: la que acompaña a una etiqueta de atención, toma o estudio */
+      if(!/nacim/i.test(linea)){
+        c.forEach(function(x, j){
+          var d = fechaDe(x);
+          if(!d || d > hoy) return;
+          fechas[d] = (fechas[d] || 0) + 1;
+          var prev = c.slice(0, j + 1).join(' ');
+          if(!f && /fecha\s*(de\s*)?(atenci|toma|muestra|colecci|estudio|resultado|recepci|orden|informe)|f\.\s*colecci/i.test(sinTildes(prev))) f = d;
+        });
+      }
+      if(!lab && /laborator|interlab|hospital|cl[ií]nica/i.test(linea) && linea.length <= 80 && !/responsabiliza|uso indebido/i.test(linea)) lab = c[0].slice(0, 60);
+      if(!orden){ var mo = /(?:n[oº°.]*\s*(?:de\s*)?orden|orden\s*n[oº°.]*)\s*:?\s*(\d{4,})/i.exec(linea); if(mo) orden = mo[1]; }
+      if(/^conclusi[oó]n(es)?\s*:?$/i.test(c[0])){
+        for(var k = i + 1; k < filas.length && concl.length < 6; k++){
+          var t = filas[k].join(' ');
+          if(/informe|validad|firma|atentamente|^dr[a]?\.?\s/i.test(t)) break;
+          concl.push(t);
+        }
+      }
+      /* títulos de sección: cambian el contexto (orina, heces) */
+      if(!/\d/.test(linea) && linea === linea.toUpperCase() && /[A-ZÁÉÍÓÚ]{4}/.test(linea)){
+        if(/ORINA|URIN|UROAN/.test(linea)) ctx = 'orina';
+        else if(/HECES|COPRO/.test(linea)) ctx = 'heces';
+        else if(/BIOQU|HEMAT|BIOMETR|ENDOCR|ENZIM|ESPECIAL|LIPID|QU[IÍ]MIC|HORMON|INMUNO|SEROL|ELECTROL|TIROI|VITAMIN/.test(linea)) ctx = '';
+        return;
+      }
+      var a = 0;
+      while(a < c.length && /^[\s(»«*)]+$/.test(c[a])) a++;
+      var nombre = limpiarNombre(c[a] || '');
+      if(!/[a-záéíóúñ].*[a-záéíóúñ]/i.test(nombre) || /:$/.test(nombre) || /^\d/.test(nombre) || /^nombre|estudio$/i.test(nombre)) return;
+      var b = a + 1, marca = false;
+      while(b < c.length && /^[*↑↓hl!]$/i.test(c[b].trim())){ marca = true; b++; }
+      if(b >= c.length || !RE_NUM.test(c[b].trim())) return;
+      var v = num(c[b].replace(/[<>≤≥\s]/g, ''));
+      if(v === null || v < 0) return;
+      var u = c[b + 1] && c[b + 1].length <= 16 && RE_UNIDAD.test(c[b + 1].trim()) ? c[b + 1].trim() : '';
+      var clave = ctx ? null : claveExamen(nombre);
+      if(clave){
+        if(vals[clave] === undefined){ vals[clave] = v; if(marca) marcados.push(EX[clave].n); }
+        return;
+      }
+      if(!u && !/densidad|^ph$|indice|índice|homa|\//i.test(nombre)) return;
+      var n = (ctx === 'orina' && !/orina/i.test(nombre) ? nombre + ' en orina' : ctx === 'heces' && !/heces/i.test(nombre) ? nombre + ' en heces' : nombre).slice(0, 60);
+      var kn = n.toLowerCase();
+      if(vistos[kn] || otros.length >= 60) return;
+      vistos[kn] = 1;
+      otros.push({n:n, v:v, u:u.slice(0, 20)});
+      if(marca) marcados.push(n);
+    });
+    if(!f){
+      var mas = Object.keys(fechas).sort(function(x, y){ return fechas[y] - fechas[x] || (x < y ? 1 : -1); })[0];
+      f = mas || null;
+    }
+    var notas = [];
+    var ori = [opc.archivo ? 'Leído del PDF «' + String(opc.archivo).slice(0, 80) + '»' : 'Leído de un PDF', lab, orden ? 'orden ' + orden : ''].filter(Boolean).join(' · ');
+    notas.push(ori + '.');
+    if(marcados.length) notas.push('Marcados por el laboratorio: ' + marcados.join(', ') + '.');
+    if(concl.length) notas.push('Conclusiones: ' + concl.join(' ').replace(/\s+/g, ' ').trim());
+    return {f:f, valores:vals, otros:otros, notas:notas.join('\n').slice(0, 2000),
+      n:Object.keys(vals).length + otros.length, conclusiones:concl.length > 0, renglones:filas.length};
+  }
+
   /* ---------- respaldo ---------- */
   function exportar(st){
     return JSON.stringify({app:'amor-de-mama', tipo:'salud', v:VERSION_SALUD, exportado:new Date().toISOString(),
@@ -17573,7 +17720,7 @@ function crear(D){
     podar:podar, registrar:registrar, deshacer:deshacer, totalDia:totalDia, avisos:avisos, historial:historial, semanaDe:semanaDe,
     guardarMedida:guardarMedida, borrarMedida:borrarMedida, ultimaMedida:ultimaMedida, variacionSemanal:variacionSemanal,
     seriePeso:seriePeso, estadoPresion:estadoPresion,
-    guardarExamen:guardarExamen, borrarExamen:borrarExamen, soloExamenes:soloExamenes, sumarExamenes:sumarExamenes, historiaValor:historiaValor, estadoValor:estadoValor,
+    guardarExamen:guardarExamen, borrarExamen:borrarExamen, soloExamenes:soloExamenes, sumarExamenes:sumarExamenes, renglonesPdf:renglonesPdf, leerInforme:leerInforme, claveExamen:claveExamen, fechaDe:fechaDe, historiaValor:historiaValor, estadoValor:estadoValor,
     textoRango:textoRango, otrosNombres:otrosNombres,
     exportar:exportar, importar:importar, textoResumen:textoResumen,
     hoyISO:hoyISO, horaGYE:horaGYE, sumarDias:sumarDias, difDias:difDias, diaSemana:diaSemana
@@ -17727,7 +17874,7 @@ var S = {
   galScroll:0,
   pushed:false,
   fichaTab:'ing',
-  salud:{fm:'', rango:30, ex:null, msg:''}   /* estado de pantalla de Salud, no se guarda */
+  salud:{fm:'', rango:30, ex:null, msg:'', borrador:null, pdf:''}   /* estado de pantalla de Salud, no se guarda */
 };
 
 /* ---------- persistencia ---------- */
@@ -19498,9 +19645,13 @@ function vSalud(){
   /* ----- exámenes ----- */
   h += '<section class="sa-sec" id="sa-examenes" aria-labelledby="saExT"><h2 id="saExT">Exámenes de laboratorio</h2>';
   if(U.ex){
-    h += formExamen(U.ex === 'nuevo' ? null : SS.examenes.filter(function(x){ return x.id === U.ex; })[0]);
+    var bo = U.ex === 'nuevo' ? U.borrador : null;
+    if(bo) h += avisoBorrador(bo);
+    h += formExamen(U.ex === 'nuevo' ? bo : SS.examenes.filter(function(x){ return x.id === U.ex; })[0]);
   } else {
-    h += '<button class="btn pri" data-sa="exnuevo">' + ico('plus') + ' Registrar exámenes</button>';
+    h += '<div class="sa-btns"><button class="btn pri" data-sa="exnuevo">' + ico('plus') + ' Registrar exámenes</button>' +
+      '<label class="btn sec" style="cursor:pointer">' + ico('book') + ' Leer PDF del laboratorio<input type="file" id="saPdf" accept="application/pdf,.pdf" class="vh"></label></div>' +
+      '<p class="sa-nota" id="saPdfMsg" role="status" aria-live="polite">' + esc(U.pdf || 'El PDF se lee en este dispositivo y no se guarda: solo quedan los valores que confirmes.') + '</p>';
   }
   var hay = SA.EXAMENES.filter(function(e){ return SA.historiaValor(SS, e.k).length; });
   var otros = SA.otrosNombres(SS);
@@ -19600,9 +19751,9 @@ function accionSalud(t){
   else if(a === 'medborrar'){
     if(window.confirm && !window.confirm('¿Borrar el registro del ' + fechaSa(p[1]) + '?')) return;
     SA.borrarMedida(SS, p[1]); U.fm = ''; guardarSalud();
-  } else if(a === 'exnuevo'){ U.ex = 'nuevo'; }
+  } else if(a === 'exnuevo'){ U.ex = 'nuevo'; U.borrador = null; }
   else if(a === 'exeditar'){ U.ex = p[1]; }
-  else if(a === 'excancelar'){ U.ex = null; }
+  else if(a === 'excancelar'){ U.ex = null; U.borrador = null; }
   else if(a === 'exborrar'){
     var ex = SS.examenes.filter(function(x){ return x.id === p[1]; })[0];
     if(!ex || (window.confirm && !window.confirm('¿Borrar los exámenes del ' + fechaSa(ex.f) + '?'))) return;
@@ -19642,7 +19793,7 @@ function enviarSalud(f){
     for(var i=0; fd.has('on_' + i); i++) otros.push({n:get('on_' + i), v:get('ov_' + i), u:get('ou_' + i)});
     var ex = SA.guardarExamen(SS, {id:f.dataset.id || '', f:get('f'), valores:vals, otros:otros, notas:get('notas')});
     if(!ex){ avisar('Escribe al menos un valor o una nota para guardar la toma.', null); return; }
-    U.ex = null; guardarSalud(); render();
+    U.ex = null; U.borrador = null; U.pdf = ''; guardarSalud(); render();
     avisar('Exámenes del ' + fechaSa(ex.f) + ' guardados.', null);
     var sec = document.getElementById('sa-examenes'); if(sec) sec.scrollIntoView({block:'start'});
   }
@@ -19685,6 +19836,72 @@ function importarSalud(file){
     render();
   };
   rd.readAsText(file);
+}
+
+/* Lectura de PDF de laboratorio: pdf.js (Mozilla) se carga de cdnjs solo al usarlo, con huella de integridad.
+   El texto se ordena en el motor de Salud y termina en el formulario de siempre, para revisarlo antes de guardar. */
+var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+var PDFJS_SRI = 'sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e';
+var pdfjsCarga = null;
+function cargarPdfJs(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(pdfjsCarga) return pdfjsCarga;
+  pdfjsCarga = new Promise(function(ok, mal){
+    var sc = document.createElement('script');
+    sc.src = PDFJS + 'pdf.min.js'; sc.integrity = PDFJS_SRI; sc.crossOrigin = 'anonymous';
+    sc.onload = function(){
+      if(!window.pdfjsLib){ mal(new Error('sin pdfjs')); return; }
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
+      ok(window.pdfjsLib);
+    };
+    sc.onerror = function(){ pdfjsCarga = null; mal(new Error('sin red')); };
+    document.head.appendChild(sc);
+  });
+  return pdfjsCarga;
+}
+function paginasPdf(lib, buf){
+  return lib.getDocument({data:new Uint8Array(buf), isEvalSupported:false}).promise.then(function(doc){
+    var ps = [];
+    for(var i = 1; i <= Math.min(doc.numPages, 40); i++) ps.push(doc.getPage(i).then(function(pg){ return pg.getTextContent(); }).then(function(tc){
+      return SA.renglonesPdf(tc.items.filter(function(it){ return typeof it.str === 'string'; }).map(function(it){
+        return {s:it.str, x:it.transform[4], y:it.transform[5], w:it.width, h:it.height || Math.abs(it.transform[3])};
+      }));
+    }));
+    return Promise.all(ps);
+  });
+}
+function msgPdf(t){ S.salud.pdf = t; var el = document.getElementById('saPdfMsg'); if(el) el.textContent = t; }
+function leerPdfSalud(file){
+  var U = S.salud;
+  if(file.size > 20 * 1024 * 1024){ msgPdf('El archivo pesa más de 20 MB; no parece un informe de laboratorio.'); return; }
+  msgPdf('Leyendo «' + file.name + '»…');
+  var buf;
+  (file.arrayBuffer ? file.arrayBuffer() : new Promise(function(ok, mal){ var r = new FileReader(); r.onload = function(){ ok(r.result); }; r.onerror = mal; r.readAsArrayBuffer(file); }))
+    .then(function(b){ buf = b; return cargarPdfJs(); })
+    .then(function(lib){ return paginasPdf(lib, buf); })
+    .then(function(pags){
+      var b = SA.leerInforme(pags, {archivo:file.name, hoy:SA.hoyISO()});
+      if(!b.renglones){ msgPdf('Este PDF no tiene texto (parece una foto o un escaneo). Registra los valores a mano.'); return; }
+      if(!b.n && !b.conclusiones){ msgPdf('No encontré resultados de laboratorio en «' + file.name + '». Si es otro tipo de informe, resúmelo en las notas de una toma.'); return; }
+      b.id = ''; b.sinFecha = !b.f; if(!b.f) b.f = SA.hoyISO();
+      U.borrador = b; U.ex = 'nuevo'; U.pdf = '';
+      render();
+      var sec = document.getElementById('sa-examenes'); if(sec) sec.scrollIntoView({block:'start'});
+    })
+    .catch(function(e){
+      var n = e && e.name;
+      msgPdf(n === 'PasswordException' ? 'El PDF tiene contraseña. Ábrelo, guárdalo sin contraseña y vuelve a intentarlo.' :
+        (n === 'InvalidPDFException' ? 'El archivo no es un PDF válido.' :
+        (e && e.message === 'sin red' ? 'No se pudo cargar el lector de PDF. Hace falta conexión a internet para usarlo.' : 'No se pudo leer el PDF.')));
+    });
+}
+function avisoBorrador(b){
+  var nPri = Object.keys(b.valores).length, mismo = SS.examenes.filter(function(x){ return x.f === b.f; }).length;
+  return '<div class="panel sa-borrador" role="status"><b>Revisa antes de guardar.</b> Leí ' +
+    (b.n ? nPri + (nPri === 1 ? ' valor conocido' : ' valores conocidos') + ' y ' + b.otros.length + ' en «Otros valores»' : 'las conclusiones del informe') +
+    '. Compara con el PDF: la lectura automática puede equivocarse, y lo que no reconocí no aparece.' +
+    (b.sinFecha ? ' <b>No encontré la fecha de la toma:</b> puse la de hoy.' : '') +
+    (mismo ? ' Ya hay una toma del ' + esc(fechaSa(b.f)) + '; al guardar quedará otra aparte.' : '') + '</div>';
 }
 
 /* ================= RENDER ================= */
@@ -19926,6 +20143,7 @@ document.getElementById('main').addEventListener('change', function(e){
   var t;
   if(e.target.id === 'cocina'){ S.filtro.cocina = e.target.value; render(); return; }
   if(e.target.id === 'medF'){ S.salud.fm = e.target.value; render(); var mf = document.getElementById('medF'); if(mf) mf.focus({preventScroll:true}); return; }
+  if(e.target.id === 'saPdf'){ if(e.target.files && e.target.files[0]) leerPdfSalud(e.target.files[0]); return; }
   if(e.target.id === 'saImport'){ if(e.target.files && e.target.files[0]) importarSalud(e.target.files[0]); return; }
   if((t = e.target.closest('[data-tog]'))){ S.filtro[t.dataset.tog] = t.checked; render(); return; }
   if((t = e.target.closest('[data-dulce]'))){

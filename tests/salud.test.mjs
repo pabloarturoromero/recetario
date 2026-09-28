@@ -250,3 +250,70 @@ test('un respaldo con solo exámenes se suma sin borrar agua, medidas ni otras t
   SA.sumarExamenes(st, nuevo);
   assert.equal(st.examenes.length, 2, 'importar dos veces la misma toma no la duplica');
 });
+
+test('PDF: los fragmentos de texto se agrupan en renglones y celdas por posición', () => {
+  const items = [
+    { s: '', x: 10, y: 500, w: 0, h: 10 },
+    { s: '132', x: 248, y: 500.5, w: 15, h: 10 },
+    { s: 'Glucosa', x: 38, y: 500, w: 40, h: 10 },
+    { s: ' Sérica', x: 78, y: 500, w: 30, h: 10 },
+    { s: 'mg/dl', x: 400, y: 499.5, w: 25, h: 10 },
+    { s: 'Urea', x: 38, y: 480, w: 20, h: 10 },
+    { s: '30', x: 248, y: 480, w: 10, h: 10 },
+  ];
+  assert.deepEqual(plano(SA.renglonesPdf(items)), [['Glucosa Sérica', '132', 'mg/dl'], ['Urea', '30']]);
+});
+
+test('PDF: lee un informe tipo Interlab, separa la orina y no toma la fecha de nacimiento', () => {
+  const pagina = [
+    ['LABORATORIO CLINICO DE PRUEBA'],
+    ['No Orden:', '1234567', 'Fecha de Atención:', '5 mar. 2026', 'Hora:', '08:00'],
+    ['F. Nacimiento:', '01/01/1990'],
+    ['NOMBRE ESTUDIO', 'RESULTADO', 'UNIDADES', 'R.REFERENCIA'],
+    ['BIOQUIMICOS'],
+    ['Glucosa Sérica', '101', 'mg/dl', 'NORMAL: 70-99'],
+    ['(») H. Glicosilada Sangre total con EDTA', '5.40', '%HbA1c', 'PARA DIAGNÓSTICO:'],
+    ['Colesterol Sérico', '180', 'mg/dl'],
+    ['Colesterol H D L, sérico', '55.1', 'mg/dl'],
+    ['Colesterol L D L -C, determinado Sérico', '99.5', 'mg/dl'],
+    ['(») LDLC/HDL', '1.80', 'Mujeres : hasta 3.22'],
+    ['Colesterol No-HDL', '125', 'mg/dL'],
+    ['G O T ( A S T) Sérico', '*', '41', 'UI/L', '11 - 34'],
+    ['G P T ( A L T ) Sérico', '30', 'UI/L', '0 - 45'],
+    ['Glicemia Promedio en Ult 3 Meses', '108', 'mg/dl'],
+    ['Hombres:', '35.1 - 43.9'],
+    ['10 - 17 años : 12.5 - 16.1'],
+    ['(») Vitamina D Total 25 OH (D3 + D2) sérica', '31.0', 'ng/mL'],
+    ['EXAMEN DE ORINA'],
+    ['(») Glucosa', '0', 'mg/dl'],
+    ['(») Densidad', '*', '1.025', '1.015 - 1.020'],
+  ];
+  const b = SA.leerInforme([pagina], { archivo: 'prueba.pdf', hoy: '2026-09-28' });
+  assert.equal(b.f, '2026-03-05');
+  assert.deepEqual(plano(b.valores), { glucosa: 101, hba1c: 5.4, col_total: 180, hdl: 55.1, ldl: 99.5, tgo: 41, tgp: 30, vit_d: 31 });
+  assert.deepEqual(plano(b.otros), [
+    { n: 'LDLC/HDL', v: 1.8, u: '' },
+    { n: 'Colesterol No-HDL', v: 125, u: 'mg/dL' },
+    { n: 'Glicemia Promedio en Ult 3 Meses', v: 108, u: 'mg/dl' },
+    { n: 'Glucosa en orina', v: 0, u: 'mg/dl' },
+    { n: 'Densidad en orina', v: 1.025, u: '' },
+  ]);
+  assert.match(b.notas, /prueba\.pdf/);
+  assert.match(b.notas, /orden 1234567/);
+  assert.match(b.notas, /Marcados por el laboratorio: TGO \(AST\), Densidad en orina/);
+  const t = SA.guardarExamen(SA.vacio(), b);
+  assert.ok(t, 'el borrador se guarda con el mismo formato de una toma');
+});
+
+test('PDF: un informe narrativo aporta sus conclusiones y ningún valor', () => {
+  const b = SA.leerInforme([[
+    ['Fecha de Estudio: 2/6/2026'],
+    ['CONCLUSIONES:'],
+    ['Hallazgo uno.'],
+    ['Hallazgo dos.'],
+    ['Informe electrónicamente validado.'],
+  ]], { hoy: '2026-09-28' });
+  assert.equal(b.f, '2026-06-02');
+  assert.equal(b.n, 0);
+  assert.match(b.notas, /Conclusiones: Hallazgo uno\. Hallazgo dos\.$/);
+});
