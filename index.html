@@ -899,6 +899,64 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .agua-mini .tx span{font-size:12.5px; color:var(--ink-3); font-variant-numeric:tabular-nums}
 .agua-mini .track{margin-top:6px}
 .agua-mini .acts{display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex:none}
+
+/* ============ CHARLA CON LA COCINERA ============ */
+.charla-btn{width:40px; height:40px; border-radius:50%; flex:none; padding:0; overflow:hidden;
+  background:#FBF3E6; box-shadow:var(--sh1); outline-offset:2px}
+.charla-btn img{width:100%; height:100%; object-fit:cover; display:block}
+.charla-btn[aria-expanded="true"]{box-shadow:0 0 0 2px var(--brand), var(--sh1)}
+.charla{position:fixed; right:16px; bottom:16px; z-index:55; width:min(420px, calc(100% - 32px));
+  height:min(680px, calc(100vh - 112px)); background:var(--bg); border-radius:var(--r4); box-shadow:var(--sh3);
+  display:flex; flex-direction:column; overflow:hidden; animation:sy .2s ease}
+.charla[hidden]{display:none}
+.ch-h{display:flex; align-items:center; gap:var(--s3); padding:var(--s3) var(--s3) var(--s3) var(--s4); background:var(--surface);
+  border-bottom:1px solid var(--line)}
+.ch-h img{width:44px; height:44px; border-radius:50%; background:#FBF3E6; flex:none}
+.ch-h div{flex:1; min-width:0}
+.ch-h h2{font-size:16px; font-weight:700; margin:0}
+.ch-h p{font-size:11.5px; color:var(--ink-3); margin:1px 0 0; line-height:1.35}
+.ch-x{width:36px; height:36px; border-radius:50%; display:grid; place-items:center; color:var(--ink-2); flex:none}
+.ch-x:hover{background:var(--surface-2); color:var(--ink)}
+.ch-log{flex:1; overflow-y:auto; list-style:none; margin:0; padding:var(--s4) var(--s3); display:flex; flex-direction:column; gap:var(--s3)}
+.ch-m{max-width:92%; font-size:13.5px; line-height:1.5}
+.ch-m p{margin:0 0 6px}
+.ch-m p:last-child{margin-bottom:0}
+.ch-m.yo{align-self:flex-end; background:var(--brand); color:var(--on-brand); border-radius:16px 16px 4px 16px; padding:8px 12px}
+.ch-m.ella{align-self:flex-start; background:var(--surface); color:var(--ink); border-radius:16px 16px 16px 4px;
+  padding:10px 12px; box-shadow:var(--sh1)}
+.ch-m.alerta{box-shadow:inset 3px 0 0 var(--bad), var(--sh1)}
+.ch-t{display:block; font-size:13.5px; font-weight:600; margin-bottom:4px}
+.ch-f{display:block; margin-top:6px; font-size:11px; color:var(--ink-3)}
+.ch-recs{display:flex; flex-direction:column; gap:6px; margin:8px 0 2px}
+.ch-rec{display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:6px; border-radius:12px;
+  background:var(--surface-2); transition:background .12s ease}
+.ch-rec:hover{background:var(--surface-3)}
+.ch-rec .pic{width:48px; height:48px; border-radius:10px; flex:none}
+.ch-rec .pic .e{font-size:24px}
+.ch-rec span{min-width:0; display:flex; flex-direction:column}
+.ch-rec b{font-size:12.5px; font-weight:600; line-height:1.3}
+.ch-rec small{font-size:11px; color:var(--ink-3); margin-top:1px}
+.ch-acts{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.ch-chip{font-size:12px; padding:5px 10px; border-radius:99px; background:var(--brand-soft); color:var(--brand-ink); font-weight:500}
+.ch-chip:hover{background:color-mix(in srgb, var(--brand-soft) 70%, var(--brand) 12%)}
+.ch-pie{background:var(--surface); border-top:1px solid var(--line); padding:var(--s2) var(--s3) calc(var(--s2) + env(safe-area-inset-bottom,0px))}
+.ch-form{display:flex; gap:var(--s2)}
+.ch-form input{flex:1; min-width:0; border:1px solid var(--line-2); background:var(--bg); color:var(--ink); border-radius:99px;
+  padding:10px 14px; font:inherit; font-size:14px}
+.ch-form input:focus{outline:2px solid var(--brand); outline-offset:0; border-color:var(--brand)}
+.ch-form button{width:42px; height:42px; border-radius:50%; background:var(--brand); color:var(--on-brand); display:grid; place-items:center;
+  flex:none; box-shadow:var(--sh-brand)}
+.ch-form button svg.i{width:18px; height:18px}
+.ch-nota{font-size:10.5px; color:var(--ink-3); margin:6px 4px 0; line-height:1.35}
+@media (max-width:760px){
+  .charla{inset:0; width:auto; height:auto; border-radius:0; z-index:62; animation:sy .2s ease}
+  .ch-h{padding-top:calc(var(--s3) + env(safe-area-inset-top,0px))}
+  body.charla-on{overflow:hidden}
+  /* En el teléfono la cabecera no tiene sitio: el botón flota sobre la barra inferior. */
+  .charla-btn{position:fixed; right:14px; bottom:calc(var(--tabh) + 14px + env(safe-area-inset-bottom,0px)); width:54px; height:54px;
+    box-shadow:0 0 0 3px var(--surface), var(--sh2)}
+  body.charla-on .charla-btn{display:none}
+}
 </style>
 
 <div class="top">
@@ -918,6 +976,9 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
         <option value="1">Sem. 1 y 2</option><option value="2">Sem. 3 y 4</option>
       </select>
     </label>
+    <button class="charla-btn" id="charlaBtn" aria-controls="charla" aria-expanded="false" aria-label="Pregúntale a Mamá" title="Pregúntale a Mamá">
+      <img src="img/cocinera-avatar.webp" width="40" height="40" alt="">
+    </button>
     <span class="bell" id="bell" title="Guardado en este dispositivo">
       <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
       <i class="sync loc" id="dot"></i><span class="vh" id="syncTxt" role="status" aria-live="polite">Guardado en este dispositivo</span>
@@ -938,10 +999,26 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <main id="main"></main>
 <div id="layer"></div>
 <div id="aviso" role="status" aria-live="polite" hidden></div>
+<aside class="charla" id="charla" role="dialog" aria-labelledby="chT" hidden>
+  <div class="ch-h">
+    <img src="img/cocinera-avatar.webp" width="44" height="44" alt="">
+    <div><h2 id="chT">Pregúntale a Mamá</h2><p>Responde con el recetario y las reglas del plan. Sin IA ni internet.</p></div>
+    <button class="ch-x" data-ch-cerrar aria-label="Cerrar la conversación"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <ol class="ch-log" id="chLog" aria-live="polite"></ol>
+  <div class="ch-pie">
+    <form class="ch-form" id="chForm" autocomplete="off">
+      <label class="vh" for="chIn">Tu pregunta</label>
+      <input id="chIn" enterkeyhint="send" maxlength="200" placeholder="¿Qué como hoy? ¿Con qué cambio el atún?">
+      <button aria-label="Enviar"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+    </form>
+    <p class="ch-nota">No sustituye a tu médico ni a tu nutricionista. Si es urgente, llama al 911.</p>
+  </div>
+</aside>
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.9.0",
+    "version": "2.10.0",
     "fecha": "2026-09-28",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -17546,6 +17623,544 @@ function crear(D){
 root.RecetarioSalud = {crear:crear, hoyISO:hoyISO, horaGYE:horaGYE};
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
+<script id="charla-motor">
+/* Charla con la cocinera. Base cerrada, sin IA generativa: cada respuesta sale de los datos del recetario
+   (reglas, bebidas, dulces, equivalencias, recetas) o del estado de la semana que le pasa la interfaz.
+   Funciones puras, sin DOM: la interfaz y las pruebas usan las mismas. */
+(function(root){
+"use strict";
+
+/* Minúsculas, sin tildes ni signos. La ñ también pierde la tilde: igual en la pregunta y en los datos. */
+function norm(s){
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ').trim();
+}
+/* Raíz tosca: sin plural ni e final. «tomates» → «tomat», que es prefijo de «tomate». */
+function raiz(w){
+  w = w.replace(/s$/, '');
+  if(w.length > 4) w = w.replace(/e$/, '');
+  return w;
+}
+var VACIAS = ('a al algo alguna alguno algun ante como con cual cuales cuando cuanto cuanta cuantos cuantas de del donde el ella ' +
+  'en es esta este esto ese esa hay la las le lo los me mi mis muy para pero por puedo puede que se si sus su tan te ' +
+  'tengo tiene toca un una uno unos unas y ya yo o quiero quisiera dame dime hacer hago hoy favor gracias receta recetas ' +
+  'plato platos comida comidas comer cocinar preparar idea ideas opcion opciones algun alguna rico rica sugiere sugerencia ' +
+  'mama cocinera oye hola buenas buenos dias tardes noches semana manana').split(' ');
+var ES_VACIA = {};
+VACIAS.forEach(function(w){ ES_VACIA[w] = 1; });
+function palabras(s){ return norm(s).split(' ').filter(function(w){ return w.length > 1; }); }
+function significativas(s){ return palabras(s).filter(function(w){ return !ES_VACIA[w] && !/^\d+$/.test(w); }); }
+
+/* Grupos de ingredientes: una palabra de la pregunta abre varias del recetario. */
+var GRUPOS = {
+  pescado:['corvina', 'dorado', 'picudo', 'atun'],
+  mariscos:['corvina', 'dorado', 'picudo', 'atun'],
+  carne:['res'],
+  res:['res'],
+  legumbre:['lenteja', 'garbanzo', 'frejol', 'haba', 'arveja'],
+  menestra:['lenteja', 'garbanzo', 'frejol', 'haba', 'arveja'],
+  frijol:['frejol'],
+  poroto:['frejol'],
+  queso:['queso', 'mozzarella'],
+  pollo:['pollo'],
+  cerdo:['cerdo'],
+  chancho:['cerdo'],
+  puerco:['cerdo'],
+  huevo:['huevo'],
+  pasta:['pasta'],
+  fideo:['pasta'],
+  arroz:['arroz'],
+  pan:['pan'],
+  aguacate:['aguacate'],
+  palta:['aguacate'],
+  yogurt:['yogur'],
+  verde:['platano verde'],
+  platano:['platano verde']
+};
+/* Palabras de la conversación que no se buscan como ingrediente aunque aparezcan en alguno («pimentón dulce»). */
+var NO_INGREDIENTE = {dulce:1, postre:1, antojo:1, agua:1, gas:1, cafe:1, vino:1, sal:1, azucar:1, miel:1, hora:1, tarde:1, noche:1, menu:1, fuera:1, casa:1, fin:1, cita:1};
+var CARNES = ['res', 'cerdo', 'pollo', 'corvina', 'dorado', 'picudo', 'atun'];
+var CATEGORIAS = {desayuno:'desayuno', almuerzo:'almuerzo', cena:'cena', guarnicion:'guarnicion', ensalada:'guarnicion', merienda:'cena'};
+var DIAS_TXT = {lunes:'lun', martes:'mar', miercoles:'mie', jueves:'jue', viernes:'vie', sabado:'sab', domingo:'dom'};
+var ORDEN_DIAS = ['lun', 'mar', 'mie', 'jue', 'vie', 'sab', 'dom'];
+
+function crear(D, M){
+  var R = D.recetas, RA = D.meta.reglas_de_armado || {}, B = D.bebidas || {}, EQ = D.equivalencias || {};
+  var NS = D.reglas_no_sustituibles || [], DUL = D.dulces || [], PB = D.preparaciones_base || [];
+  var byId = {};
+  R.forEach(function(r){ byId[r.id] = r; });
+  var COCINAS = [];
+  R.forEach(function(r){ if(COCINAS.indexOf(r.cocina) < 0 && r.cocina !== 'Sin adscripción') COCINAS.push(r.cocina); });
+  /* Texto normalizado de cada receta: nombre, cocina, descripción e ingredientes. */
+  var PAJAR = {};
+  R.forEach(function(r){
+    PAJAR[r.id] = {
+      nombre:norm(r.nombre),
+      ing:' ' + norm(r.ingredientes.map(function(i){ return i.item; }).join(' ')) + ' ',
+      todo:' ' + norm(r.nombre + ' ' + r.cocina + ' ' + r.descripcion + ' ' + r.ingredientes.map(function(i){ return i.item; }).join(' ')) + ' '
+    };
+  });
+  function tieneRaiz(texto, rz){ return texto.indexOf(' ' + rz) >= 0; }
+
+  /* La palabra tal como la escribió la persona, con sus tildes. */
+  function original(q, w){
+    var l = String(q).split(/[^\wÀ-ÿ]+/);
+    for(var i = 0; i < l.length; i++) if(norm(l[i]) === w) return l[i].toLowerCase();
+    return w;
+  }
+  function fraseLista(a){
+    if(a.length < 2) return a.join('');
+    return a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
+  }
+  function minus(s){ return s.charAt(0).toLowerCase() + s.slice(1); }
+  function nombreCorto(r){ return r.nombre; }
+  function lineaReceta(r){
+    var t = M.textoTiempo(r);
+    return r.nombre + ' · ' + r.macros.proteina_g + ' g de proteína, ' + r.macros.kcal_aprox + ' kcal, ' + t;
+  }
+  function faseTxt(f){ return f === 2 ? 'semanas 3 y 4' : 'semanas 1 y 2'; }
+
+  /* ---------- respuestas de reglas (base cerrada) ---------- */
+  var FUENTE_PLAN = 'Reglas del plan';
+  var TEMAS = {
+    saludo:{t:'Hola', claves:['hola', 'buenas', 'buenos dias', 'buenas tardes', 'buenas noches', 'que tal']},
+    gracias:{t:'De nada', claves:['gracias', 'te agradezco', 'muy amable']},
+    ayuda:{t:'Lo que puedo contestar', claves:['ayuda', 'que puedes', 'que sabes', 'como funciona', 'que te puedo preguntar']},
+    hoy:{t:'Menú de hoy', claves:['hoy', 'que como', 'que cocino', 'que toca', 'que hay de', 'menu', 'manana', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']},
+    compras:{t:'Lista de compras', claves:['compra', 'comprar', 'mercado', 'supermercado', 'lista de compras', 'que me falta', 'que falta']},
+    prep:{t:'Preparaciones del domingo', claves:['preparacion', 'preparar el domingo', 'que preparo el domingo', 'adelant', 'dejar listo', 'dejo listo', 'dejar hecho', 'dejo hecho', 'listo', 'lista para la semana', 'domingo anterior', 'remojar', 'remojo', 'garam masala', 'berbere', 'curry en polvo', 'sofrito']},
+    agua:{t:'Agua del día', claves:['agua', 'liquido', 'hidrat', 'litros', 'cuanta agua']},
+    bebidas:{t:'Bebidas', claves:['bebida', 'beber', 'cafe', 'cafeina', 'te negro', 'infusion', 'gaseosa', 'cola', 'coca', 'soda', 'con gas', 'jugo', 'refresco']},
+    alcohol:{t:'Alcohol', claves:['alcohol', 'vino', 'cerveza', 'trago', 'licor', 'whisky', 'ron']},
+    dulce:{t:'El dulce del día', claves:['dulce', 'postre', 'chocolate', 'antojo', 'azucar', 'miel', 'datil', 'chia', 'algo rico']},
+    sustituir:{t:'Equivalencias', claves:['sustitu', 'reemplaz', 'cambiar', 'cambio', 'cambiar por', 'cambio por', 'en vez de', 'en lugar de', 'no tengo', 'no hay', 'no consigo', 'equivalen', 'intercambi']},
+    objetivos:{t:'Objetivos del día', claves:['proteina', 'fibra', 'caloria', 'kcal', 'carbohidrat', 'sodio', 'objetivo', 'meta del dia', 'macros', 'sal ']},
+    horario:{t:'Horarios', claves:['horario', 'a que hora', 'hora', 'tarde', 'cenar tarde', 'llego tarde', 'noche', 'aligerad']},
+    ventana:{t:'Ventana de contención', claves:['fin de semana', 'finde', 'contencion', 'ventana']},
+    omega:{t:'Pescado de la semana', claves:['omega', 'pescado esta semana', 'cuanto pescado', 'veces pescado', 'pescado marino']},
+    fuera:{t:'Comer fuera', claves:['comer fuera', 'almuerzo fuera', 'restaurante', 'afuera', 'invitacion', 'reunion']},
+    repetir:{t:'Repetir platos', claves:['repetir', 'repito', 'repeticion', 'mismo plato', 'otra vez']},
+    guarnicion:{t:'Guarnición', claves:['guarnicion', 'acompanante', 'acompanar', 'ensalada']},
+    medidas:{t:'Medidas sin balanza', claves:['taza', 'cucharada', 'cucharadita', 'balanza', 'medir', 'cuanto pesa', 'gramos por', 'sin pesar']},
+    porciones:{t:'Porciones', claves:['porcion', 'comensal', 'personas', 'para dos', 'para tres', 'para cuatro', 'familia']},
+    prohibido:{t:'Lo que no entra en el plan', claves:['prohibid', 'no puedo comer', 'no puedo tomar', 'que no puedo', 'pan blanco', 'pasta blanca', 'refinad']},
+    salud:{t:'Salud y consultas', claves:['medico', 'doctor', 'nutricionista', 'consulta', 'cita', 'examen', 'laboratorio', 'peso', 'bajar de peso', 'medida', 'presion', 'glucosa', 'colesterol']},
+    sintomas:{t:'Síntomas', claves:['dolor', 'mareo', 'mareado', 'desmay', 'alergi', 'nausea', 'vomit', 'diarrea', 'me siento mal', 'emergencia', 'urgencia', 'pecho', 'falta de aire', 'hinchad', 'sangr']}
+  };
+  var SUGERENCIAS = [
+    ['¿Qué como hoy?', 'hoy'],
+    ['Cena rápida con pescado', 'q:cena rápida con pescado'],
+    ['¿Con qué reemplazo el pollo?', 'q:¿con qué reemplazo el pollo?'],
+    ['¿Puedo tomar café?', 'bebidas'],
+    ['El dulce del día', 'dulce'],
+    ['¿Qué me falta comprar?', 'compras'],
+    ['Preparar el domingo', 'prep'],
+    ['Agua de hoy', 'agua']
+  ];
+
+  function puntaje(n, claves){
+    var s = 0, texto = ' ' + n + ' ';
+    claves.forEach(function(c){
+      /* Frase de varias palabras: vale más. Palabra suelta: se busca como comienzo de palabra. */
+      if(c.indexOf(' ') >= 0){ if(texto.indexOf(' ' + c + ' ') >= 0 || texto.indexOf(' ' + c) >= 0) s += 2; }
+      else if(texto.indexOf(' ' + c) >= 0) s += 1;
+    });
+    return s;
+  }
+
+  /* ---------- búsqueda de recetas ---------- */
+  function criterios(q){
+    var n = norm(q), ws = palabras(q), c = {cat:'', rapido:false, vent:false, omega:false, cocina:'', incluye:[], excluye:[], sinCarne:false};
+    ws.forEach(function(w){ if(CATEGORIAS[w]) c.cat = CATEGORIAS[w]; });
+    if(/\b(rapid|rapida|rapido|rapidas|rapidos|prisa|apurad|poco tiempo|express|facil)/.test(n)) c.rapido = true;
+    if(/\b(fin de semana|finde|contencion|ventana)\b/.test(n)) c.vent = true;
+    if(/\bomega\b/.test(n)) c.omega = true;
+    if(/\b(vegetarian|sin carne|no como carne)/.test(n)) c.sinCarne = true;
+    COCINAS.forEach(function(k){
+      var nk = norm(k).split(' ')[0];
+      if(nk.length > 3 && tieneRaiz(' ' + n + ' ', raiz(nk)) && !c.cocina) c.cocina = k;
+    });
+    /* «sin X», «ni X», «no me gusta X», «nada de X»: X se excluye. Solo cuentan palabras que aparecen
+       en el nombre o los ingredientes de alguna receta: «cena» o «rápida» no son ingredientes. */
+    var neg = false;
+    ws.forEach(function(w, i){
+      if(w === 'sin' || w === 'ni' || (w === 'gusta' && ws[i - 1] === 'me') || (w === 'de' && ws[i - 1] === 'nada')){ neg = true; return; }
+      if(ES_VACIA[w] || w === 'no' || CATEGORIAS[w] || NO_INGREDIENTE[w]) return;
+      var rz = raiz(w), alts = GRUPOS[rz] || GRUPOS[w] || [rz];
+      var existe = rz.length > 2 && alts.some(function(a){ return R.some(function(r){ return tieneRaiz(PAJAR[r.id].ing, a) || tieneRaiz(' ' + PAJAR[r.id].nombre + ' ', a); }); });
+      if(existe && !COCINAS.some(function(k){ return raiz(norm(k).split(' ')[0]) === rz; })) (neg ? c.excluye : c.incluye).push({palabra:w, alts:alts});
+      neg = false;
+    });
+    return c;
+  }
+  function buscar(c){
+    var lista = M.filtrar({cat:c.cat, rapido:c.rapido, vent:c.vent, omega:c.omega, cocina:c.cocina, q:''});
+    lista = lista.filter(function(r){
+      var p = PAJAR[r.id];
+      if(c.sinCarne && CARNES.some(function(a){ return tieneRaiz(p.ing, a); })) return false;
+      if(c.excluye.some(function(x){ return x.alts.some(function(a){ return tieneRaiz(p.ing, a) || tieneRaiz(' ' + p.nombre + ' ', a); }); })) return false;
+      return c.incluye.every(function(x){ return x.alts.some(function(a){ return tieneRaiz(p.ing, a) || tieneRaiz(' ' + p.nombre + ' ', a); }); });
+    });
+    /* Primero las que tienen lo pedido en el nombre; luego las más rápidas. */
+    lista.sort(function(a, b){
+      var na = c.incluye.filter(function(x){ return x.alts.some(function(al){ return tieneRaiz(' ' + PAJAR[a.id].nombre + ' ', al); }); }).length;
+      var nb = c.incluye.filter(function(x){ return x.alts.some(function(al){ return tieneRaiz(' ' + PAJAR[b.id].nombre + ' ', al); }); }).length;
+      if(na !== nb) return nb - na;
+      return (M.tiempo(a).total || 999) - (M.tiempo(b).total || 999);
+    });
+    return lista;
+  }
+  function describeCriterios(c){
+    var p = [];
+    if(c.cat) p.push({desayuno:'desayunos', almuerzo:'almuerzos', cena:'cenas', guarnicion:'guarniciones'}[c.cat]);
+    else p.push('recetas');
+    if(c.incluye.length) p.push('con ' + fraseLista(c.incluye.map(function(x){ return x.palabra; })));
+    if(c.excluye.length) p.push('sin ' + fraseLista(c.excluye.map(function(x){ return x.palabra; })));
+    if(c.sinCarne) p.push('sin carne ni pescado');
+    if(c.cocina) p.push('de cocina ' + minus(c.cocina));
+    if(c.rapido) p.push('listas en 30 minutos o menos');
+    if(c.vent) p.push('aptas para la ventana de contención');
+    if(c.omega) p.push('con pescado marino');
+    return p.join(' ');
+  }
+  function hayCriterio(c){ return !!(c.cat || c.rapido || c.vent || c.omega || c.cocina || c.incluye.length || c.excluye.length || c.sinCarne); }
+  function respuestaBusqueda(c){
+    var lista = buscar(c), desc = describeCriterios(c);
+    if(!lista.length){
+      return {id:'buscar', titulo:'Sin coincidencias', fuente:'Recetario',
+        parrafos:['No tengo ' + desc + ' en el recetario. Prueba quitando una condición o busca en la galería.'],
+        recetas:[], acciones:[{t:'Abrir recetas', ir:'recetas'}]};
+    }
+    var mas = lista.length > 5 ? ' Te muestro las primeras cinco; en Recetas están todas.' : '';
+    return {id:'buscar', titulo:lista.length === 1 ? 'Una receta' : lista.length + ' recetas', fuente:'Recetario',
+      parrafos:['Encontré ' + (lista.length === 1 ? 'una' : lista.length) + ' ' + (lista.length === 1 ? desc.replace(/^recetas/, 'receta').replace(/^(desayuno|almuerzo|cena|guarnicion)es?s?/, '$1') : desc) + '.' + mas],
+      recetas:lista.slice(0, 5).map(function(r){ return r.id; }), acciones:[{t:'Abrir recetas', ir:'recetas'}]};
+  }
+
+  /* Una receta concreta: por id («L64») o porque la pregunta repite buena parte de su nombre. */
+  function recetaNombrada(q){
+    var m = /\b([DLCG])\s?(\d{1,3})\b/i.exec(q);
+    if(m && byId[m[1].toUpperCase() + m[2]]) return byId[m[1].toUpperCase() + m[2]];
+    var ws = significativas(q).map(raiz);
+    if(ws.length < 2) return null;
+    var mejor = null, pm = 0;
+    R.forEach(function(r){
+      var nom = ' ' + PAJAR[r.id].nombre + ' ', nw = significativas(r.nombre).length;
+      var hit = ws.filter(function(w){ return tieneRaiz(nom, w); }).length;
+      var pt = hit / Math.max(nw, 1);
+      if(hit >= 2 && pt > pm){ pm = pt; mejor = r; }
+    });
+    return pm >= 0.6 ? mejor : null;
+  }
+  function respuestaReceta(r){
+    var p = [r.descripcion];
+    p.push('Por porción: ' + r.macros.proteina_g + ' g de proteína, ' + r.macros.fibra_g + ' g de fibra y unas ' + r.macros.kcal_aprox + ' kcal. Tiempo: ' + M.textoTiempo(r) + '.');
+    if(r.requiere && r.requiere.length) p.push('Necesita ' + fraseLista(r.requiere.map(function(pid){ var x = M.preps[pid]; return x ? minus(x.corto || x.nombre) : pid; })) +
+      (r.requiere.length > 1 ? ', que se dejan listas antes.' : ', que se deja lista antes.'));
+    if(r.version_aligerada) p.push('Si cenas tarde: ' + r.version_aligerada);
+    if(r.sustitutos_locales && r.sustitutos_locales.length) p.push(r.sustitutos_locales.join(' '));
+    return {id:'receta', titulo:r.nombre, fuente:'Recetario', parrafos:p, recetas:[r.id], acciones:[{t:'Abrir la receta', receta:r.id}]};
+  }
+
+  /* ---------- respuestas con el estado de la semana ---------- */
+  function diaPedido(n, ctx){
+    var k = '';
+    Object.keys(DIAS_TXT).forEach(function(d){ if((' ' + n + ' ').indexOf(' ' + d + ' ') >= 0) k = DIAS_TXT[d]; });
+    if(!k && / manana /.test(' ' + n + ' ') && ctx.hoy) k = ORDEN_DIAS[(ORDEN_DIAS.indexOf(ctx.hoy) + 1) % 7];
+    return k || ctx.hoy || 'lun';
+  }
+  function respHoy(n, ctx){
+    var k = diaPedido(n, ctx), d = M.diaDe(k), dia = (ctx.semana || {})[k] || M.vacio();
+    var nombreD = k === ctx.hoy ? 'Hoy' : d.n;
+    var ids = [], l = [];
+    [['desayuno', 'Desayuno'], ['almuerzo', 'Almuerzo'], ['cena', 'Cena'], ['guarnicion', 'Guarnición']].forEach(function(c){
+      if(c[0] === 'almuerzo' && dia.fuera){ l.push('Almuerzo: fuera de casa.'); return; }
+      var r = dia[c[0]] && byId[dia[c[0]]];
+      if(r){ ids.push(r.id); l.push(c[1] + ': ' + r.nombre + '.'); }
+    });
+    var du = dia.dulce && M.dulces[dia.dulce];
+    if(du) l.push('Dulce: ' + minus(du.nombre) + ', ' + du.porcion + '.');
+    if(!ids.length && !dia.fuera){
+      return {id:'hoy', titulo:nombreD + ' sin menú', fuente:'Tu semana',
+        parrafos:[nombreD + ' todavía no tiene platos asignados. Elígelos en Semana o pídeme ideas, por ejemplo «almuerzo con lenteja».'],
+        recetas:[], acciones:[{t:'Abrir semana', ir:'semana'}]};
+    }
+    var p = [(k === ctx.hoy ? 'Hoy, ' + minus(d.n) + ', toca:' : 'El ' + minus(d.n) + ' toca:')].concat(l);
+    if(d.vent) p.push('Es día de ventana de contención: menos grasa por comida, volumen moderado y picante contenido.');
+    var pend = (dia.desayuno || dia.almuerzo || dia.cena) ? ids.filter(function(id){ return byId[id].requiere && byId[id].requiere.length; }) : [];
+    if(pend.length) p.push('Algunos platos usan preparaciones del domingo; revisa que estén listas.');
+    return {id:'hoy', titulo:(k === ctx.hoy ? 'Hoy' : d.n), fuente:'Tu semana', parrafos:p, recetas:ids,
+      acciones:[{t:'Abrir semana', ir:'semana'}]};
+  }
+  function respCompras(ctx){
+    var c = ctx.compras;
+    if(!c || !c.total){
+      return {id:'compras', titulo:'Nada que comprar', fuente:'Tu semana',
+        parrafos:['La lista se genera sola con los platos de la semana, y ahora está vacía. Asigna platos en Semana.'], recetas:[], acciones:[{t:'Abrir semana', ir:'semana'}]};
+    }
+    var p = [c.pendientes ? 'Te faltan ' + c.pendientes + ' de ' + c.total + ' productos para la semana' + (ctx.comensales > 1 ? ', calculados para ' + ctx.comensales + ' porciones' : '') + '.' :
+      'Tienes marcados los ' + c.total + ' productos de la lista. No falta nada.'];
+    if(c.muestra && c.muestra.length) p.push('Por ejemplo: ' + fraseLista(c.muestra) + '.');
+    return {id:'compras', titulo:'Lista de compras', fuente:'Tu semana', parrafos:p, recetas:[], acciones:[{t:'Abrir compras', ir:'compras'}]};
+  }
+  function respPrep(ctx){
+    var p = ['Hay cosas que conviene dejar hechas antes de la semana:'];
+    PB.forEach(function(x){ p.push(x.nombre + (x.cuando ? ' (' + minus(x.cuando) + ')' : '') + '.'); });
+    if(ctx.prep && ctx.prep.total) p.push('Para el menú de esta semana ' + (ctx.prep.total === 1 ? 'hace falta una preparación' : 'hacen falta ' + ctx.prep.total + ' preparaciones') + (ctx.prep.pendientes ? (ctx.prep.pendientes === 1 ? ', y una sigue pendiente.' : ', y ' + ctx.prep.pendientes + ' siguen pendientes.') : ', y ya están todas listas.'));
+    return {id:'prep', titulo:'Preparaciones', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[{t:'Abrir preparar', ir:'prep'}]};
+  }
+  function respAgua(ctx){
+    var p = ['La meta de líquido es de ' + (RA.liquido_dia || '2,5 a 3 L') + ' al día.'];
+    if(ctx.agua){
+      var a = ctx.agua;
+      p.push('Hoy llevas ' + a.txt + '.' + (a.meta ? ' Meta cumplida.' : (a.minimo ? ' Ya pasaste el mínimo.' : (a.falta ? ' Te faltan ' + a.falta + ' para el mínimo.' : ''))));
+    }
+    p.push('Cuentan como libres: ' + fraseLista((B.libres || []).map(minus)) + '.');
+    return {id:'agua', titulo:'Agua del día', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[{t:'Abrir salud', ir:'salud'}]};
+  }
+  function respOmega(ctx){
+    var n = ctx.semana ? M.omega(ctx.semana) : 0;
+    var veces = String(RA.pescado_marino_por_semana || '3 a 4 veces').split(',')[0];
+    var p = ['El plan pide pescado marino ' + veces + ' por semana. Es por omega 3, no por proteína, así que no se cambia por carne ni pollo.'];
+    if(ctx.semana) p.push('Tu semana lleva ' + (n === 1 ? 'un plato' : n + ' platos') + ' con pescado marino.' + (n < 3 ? ' Faltan ' + (3 - n) + ' para llegar al mínimo.' : ''));
+    var c = {cat:'', rapido:false, vent:false, omega:true, cocina:'', incluye:[], excluye:[], sinCarne:false};
+    var l = buscar(c).slice(0, 3).map(function(r){ return r.id; });
+    return {id:'omega', titulo:'Pescado de la semana', fuente:FUENTE_PLAN, parrafos:p, recetas:l, acciones:[{t:'Abrir semana', ir:'semana'}]};
+  }
+
+  /* ---------- respuestas de reglas ---------- */
+  function respBebidas(n){
+    var p = [];
+    if(/con gas/.test(n)) p.push('Agua con gas: ' + minus(B.agua_con_gas || ''));
+    if(/cafe|cafeina|te negro/.test(n) || !p.length) p.push('Café: ' + minus(B.cafeina || ''));
+    if(/gaseosa|cola|coca|soda|refresco/.test(n) || p.length < 2){
+      p.push('Gaseosa cola light: ' + minus(B.gaseosa_cola_light || ''));
+      p.push('Gaseosa light sin cafeína: ' + minus(B.gaseosa_light_sin_cafeina || ''));
+    }
+    if(/jugo/.test(n)) p.push('Jugo de fruta, incluido el natural: no entra en el plan. La fruta va entera.');
+    p.push('Libres: ' + fraseLista((B.libres || []).map(minus)) + '.');
+    return {id:'bebidas', titulo:'Bebidas', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[{t:'Ver reglas', ir:'reglas'}]};
+  }
+  function respDulce(n, ctx){
+    var p = [];
+    if(/azucar|miel/.test(n)) p.push('El azúcar y la miel no entran en el plan, tampoco los jarabes. El dulce del día sale de la lista de abajo.');
+    p.push(RA.dulce || 'Uno al día, al final de una comida.');
+    p.push('Opciones: ' + DUL.map(function(d){ return minus(d.nombre) + ' (' + d.porcion + ', hasta ' + d.frecuencia_max_semana + (d.frecuencia_max_semana === 1 ? ' vez' : ' veces') + ' por semana)'; }).join('; ') + '.');
+    if(ctx.semana && ctx.hoy){
+      var du = (ctx.semana[ctx.hoy] || {}).dulce;
+      p.push(du && M.dulces[du] ? 'Hoy tienes elegido: ' + minus(M.dulces[du].nombre) + '.' : 'Hoy todavía no elegiste dulce; se elige en Inicio.');
+    }
+    return {id:'dulce', titulo:'El dulce del día', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[{t:'Abrir inicio', ir:'inicio'}]};
+  }
+  function respAlcohol(){
+    return {id:'alcohol', titulo:'Alcohol', fuente:FUENTE_PLAN,
+      parrafos:['Cero alcohol, incluido el vino de cocción. Es una de las reglas que no se sustituyen.', 'Si una receta de otra cocina lleva vino, en este recetario ya viene adaptada sin él.'],
+      recetas:[], acciones:[{t:'Ver reglas', ir:'reglas'}]};
+  }
+  function grupoDe(item){
+    var nit = raiz(norm(item));
+    var gr = [['proteinas_35g', 'porción de proteína (35 g)'], ['carbohidratos_30g', 'porción de carbohidrato (30 g)'], ['grasas_10g', 'porción de grasa (10 g)']];
+    for(var i = 0; i < gr.length; i++){
+      var l = EQ[gr[i][0]] || [];
+      for(var j = 0; j < l.length; j++) if(tieneRaiz(' ' + norm(l[j].alimento) + ' ', nit)) return {k:gr[i][0], n:gr[i][1], l:l, este:l[j]};
+    }
+    var v = EQ.verduras_intercambiables_200g_cocidas || [];
+    for(var k = 0; k < v.length; k++) if(tieneRaiz(' ' + norm(v[k]) + ' ', nit)) return {k:'verduras', n:'verdura (200 g cocidos)', v:v};
+    return null;
+  }
+  function respSustituir(q){
+    var ws = significativas(q).filter(function(w){ return !/^(sustitu|reemplaz|cambi|equivalen|intercambi|vez|lugar|consig|tengo|hay|no|puedo|usar)/.test(w); });
+    var p = [], g = null, palabra = '', nw = norm(q);
+    var legumbre = /legumbre|lenteja|garbanzo|frejol|menestra|haba|arveja/.test(nw);
+    for(var i = 0; i < ws.length && !palabra; i++){
+      var w = ws[i], alts = GRUPOS[raiz(w)] || [raiz(w)];
+      if(NO_INGREDIENTE[w] || CATEGORIAS[w]) continue;
+      for(var j = 0; j < alts.length && !g; j++) g = grupoDe(alts[j]);
+      if(!g) g = grupoDe(w);
+      if(g || alts.some(function(a){ return R.some(function(r){ return tieneRaiz(PAJAR[r.id].ing, a); }); })) palabra = w;
+    }
+    /* La legumbre solo se cambia por otra legumbre: no se ofrecen los carbohidratos equivalentes. */
+    if(legumbre) g = null;
+    /* Primero lo que no se cambia: pescado, legumbre, pan y pasta integrales. */
+    var no = [];
+    if(/pescad|corvina|dorado|picudo|atun|sardina/.test(nw)) no.push(NS[2]);
+    if(/legumbre|lenteja|garbanzo|frejol|menestra|haba|arveja/.test(nw)) no.push(NS[1]);
+    if(/\bpan\b|pasta|fideo/.test(nw)) no.push(NS[3]);
+    if(/carbohidrat|arroz|papa/.test(nw)) no.push(NS[0]);
+    no = no.filter(Boolean);
+    if(no.length) p.push('Ojo: ' + no.join(' '));
+    var esPescado = /pescad|corvina|dorado|picudo|atun|sardina/.test(nw);
+    if(g && g.l){
+      var otros = g.l.filter(function(x){ return x !== g.este && (!esPescado || /corvina|dorado|picudo|atun/.test(norm(x.alimento))); }).map(function(x){ return minus(x.alimento) + ' (' + x.cantidad + ')'; });
+      p.push(g.este.alimento + ' (' + g.este.cantidad + ') equivale a una ' + g.n + '. Se cambia por: ' + otros.join('; ') + '.');
+    } else if(g && g.v){
+      p.push('Las verduras cocidas se intercambian entre sí, 200 g por 200 g: ' + fraseLista(g.v.map(minus)) + '. ' + (EQ.verduras_con_descuento || ''));
+    }
+    var sl = [];
+    /* Reemplazos que traen las recetas para ese ingrediente: solo las frases que dicen por qué se cambia. */
+    if(palabra){
+      var rz = raiz(norm(palabra));
+      R.forEach(function(r){
+        (r.sustitutos_locales || []).forEach(function(s){
+          s.split(/(?<=\.)\s+/).forEach(function(f){
+            var nf = ' ' + norm(f) + ' ';
+            if(sl.length < 2 && sl.indexOf(f) < 0 && tieneRaiz(nf, rz) && /se (cambia|reemplaza|sustituye)|sirve|en lugar/.test(nf)) sl.push(f);
+          });
+        });
+      });
+      if(sl.length) p.push('En las recetas: ' + sl.join(' '));
+    }
+    if(legumbre && !sl.length) p.push('Una legumbre se cambia por otra legumbre cocida en la misma cantidad: lenteja, garbanzo, frejol, haba o arveja partida.');
+    if(!palabra && /desayuno|almuerzo|cena|plato|menu/.test(nw)){
+      p.push('Para cambiar un plato del menú usa «Cambiar» en Inicio o en Semana: antes de confirmar ves cómo quedan la proteína, la fibra y la energía del día.');
+      return {id:'sustituir', titulo:'Cambiar un plato', fuente:'', parrafos:p, recetas:[], acciones:[{t:'Abrir semana', ir:'semana'}]};
+    }
+    if(!p.length){
+      p.push('Dime qué ingrediente quieres cambiar, por ejemplo «¿con qué reemplazo el atún?». Las equivalencias completas están en Reglas.');
+    }
+    return {id:'sustituir', titulo:palabra ? 'En lugar de ' + original(q, palabra) : 'Equivalencias', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[{t:'Ver equivalencias', ir:'reglas'}]};
+  }
+  function respObjetivos(n, ctx){
+    var f = ctx.fase === 2 ? 2 : 1, p = ['Objetivos diarios en ' + faseTxt(f) + ':'];
+    var todos = !/proteina|fibra|caloria|kcal|carbohidrat|sodio|\bsal\b/.test(n);
+    if(todos || /proteina/.test(n)) p.push('Proteína: ' + RA.objetivo_proteina_dia + '.');
+    if(todos || /fibra/.test(n)) p.push('Fibra: ' + (f === 2 ? RA.objetivo_fibra_dia_semana_3_4 : RA.objetivo_fibra_dia_semana_1_2) + ' g.');
+    if(todos || /caloria|kcal/.test(n)) p.push('Energía: ' + (f === 2 ? RA.objetivo_kcal_semana_3_4 : RA.objetivo_kcal_semana_1_2) + ' kcal. ' + (D.meta.nota_kcal || ''));
+    if(todos || /carbohidrat/.test(n)) p.push('Carbohidrato: piso de ' + RA.piso_carbohidrato_dia + '.');
+    if(todos || /sodio|\bsal\b/.test(n)) p.push('Sodio: ' + RA.sodio_dia + '.');
+    return {id:'objetivos', titulo:'Objetivos del día', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[{t:'Abrir semana', ir:'semana'}]};
+  }
+  function respHorario(){
+    return {id:'horario', titulo:'Horarios', fuente:FUENTE_PLAN, parrafos:[
+      'Desayuno: ' + RA.desayuno_horario + '.',
+      'Cena: objetivo ' + RA.cena_horario_objetivo + ', tope ' + RA.cena_tope_duro + '.',
+      'Cenar tarde no se compensa comiendo menos: para eso cada cena trae su versión aligerada, en la ficha de la receta.'
+    ], recetas:[], acciones:[{t:'Ver reglas', ir:'reglas'}]};
+  }
+  function respVentana(){
+    var n = R.filter(function(r){ return r.apto_ventana_contencion; }).length;
+    return {id:'ventana', titulo:'Ventana de contención', fuente:FUENTE_PLAN, parrafos:[
+      RA.ventana_contencion, n + ' recetas del recetario sirven para esos días; en Recetas se filtran con «Fin de semana».'
+    ], recetas:[], acciones:[{t:'Abrir recetas', ir:'recetas'}]};
+  }
+  var ESTATICAS = {
+    saludo:function(){ return {id:'saludo', titulo:'Hola', fuente:'', parrafos:['Hola. Pregúntame por el menú, una receta, un reemplazo o las reglas del plan. Respondo solo con lo que está en el recetario.'], recetas:[], acciones:[]}; },
+    gracias:function(){ return {id:'gracias', titulo:'De nada', fuente:'', parrafos:['Con gusto. Aquí sigo si necesitas otra cosa.'], recetas:[], acciones:[]}; },
+    ayuda:function(){ return {id:'ayuda', titulo:'Lo que puedo contestar', fuente:'', parrafos:[
+      'Qué toca hoy o cualquier día de la semana; ideas de recetas por ingrediente, comida, cocina o tiempo («cena rápida con pescado», «almuerzo sin cerdo»); una receta por su nombre o código.',
+      'Reemplazos y equivalencias; bebidas, dulce y alcohol; objetivos de proteína, fibra y energía; horarios; fin de semana; compras, preparaciones y agua del día.',
+      'No uso IA ni internet: si algo no está en el recetario, te lo digo.'
+    ], recetas:[], acciones:[]}; },
+    alcohol:respAlcohol,
+    horario:respHorario,
+    ventana:respVentana,
+    fuera:function(){ return {id:'fuera', titulo:'Comer fuera', fuente:FUENTE_PLAN, parrafos:[
+      'El plan admite hasta ' + RA.almuerzos_fuera_por_semana + ' almuerzos fuera por semana. Márcalos en Semana con «Fuera de casa» y la app los estima en ' + M.FUERA.proteina_g + ' g de proteína y ' + M.FUERA.kcal_aprox + ' kcal.',
+      'Fuera valen las mismas reglas: legumbre, nada de alcohol ni jugo, pan y pasta integrales.'
+    ], recetas:[], acciones:[{t:'Abrir semana', ir:'semana'}]}; },
+    repetir:function(){ return {id:'repetir', titulo:'Repetir platos', fuente:FUENTE_PLAN, parrafos:[
+      'Un mismo almuerzo, cena o guarnición puede aparecer hasta ' + RA.repeticion_maxima_por_semana + ' veces por semana. Los desayunos sí se pueden repetir.'
+    ], recetas:[], acciones:[{t:'Abrir semana', ir:'semana'}]}; },
+    guarnicion:function(){ return {id:'guarnicion', titulo:'Guarnición', fuente:FUENTE_PLAN, parrafos:[RA.guarnicion],
+      recetas:R.filter(function(r){ return r.categoria === 'guarnicion'; }).slice(0, 4).map(function(r){ return r.id; }), acciones:[{t:'Abrir inicio', ir:'inicio'}]}; },
+    porciones:function(ctx){ return {id:'porciones', titulo:'Porciones', fuente:FUENTE_PLAN, parrafos:[
+      D.meta.nota_porciones, 'Ahora la app calcula para ' + (ctx.comensales || 1) + (ctx.comensales > 1 ? ' porciones' : ' porción') + '; se cambia arriba, junto al número de recetas.'
+    ], recetas:[], acciones:[]}; },
+    prohibido:function(ctx, n){
+      var p = ['No entran en el plan: ' + (B.prohibido || []).map(minus).join('; ') + '.'];
+      if(/\bpan\b|pasta|fideo|refinad|blanc/.test(n)) p.unshift(NS[3]);
+      p.push('Las reglas que no admiten sustituto están en Reglas.');
+      return {id:'prohibido', titulo:'Lo que no entra en el plan', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[{t:'Ver reglas', ir:'reglas'}]};
+    },
+    salud:function(){ return {id:'salud', titulo:'Salud y consultas', fuente:'', parrafos:[
+      'En Salud registras el agua, el peso, las medidas y los exámenes de laboratorio, y puedes copiar un resumen para llevarlo a la consulta.',
+      'Los rangos de laboratorio son orientativos: la app no diagnostica. Lo que cambie en el plan lo decide tu médico o tu nutricionista.'
+    ], recetas:[], acciones:[{t:'Abrir salud', ir:'salud'}]}; },
+    sintomas:function(){ return {id:'sintomas', titulo:'Eso no lo puedo evaluar', fuente:'', alerta:true, parrafos:[
+      'Soy la cocinera del recetario y no puedo valorar síntomas. Si es urgente, llama al 911.',
+      'Si no es urgente, consúltalo con tu médico o tu nutricionista, y cuéntales qué comiste; el menú de la semana está en Semana.'
+    ], recetas:[], acciones:[]}; }
+  };
+  function respMedidas(q){
+    var p = [D.meta.nota_volumen];
+    var ws = significativas(q).map(raiz), hallada = null;
+    (D.meta.tabla_densidades || []).forEach(function(t){
+      if(!hallada && ws.some(function(w){ return w.length > 2 && tieneRaiz(' ' + norm(t.ingrediente) + ' ', w); })) hallada = t;
+    });
+    if(hallada) p.unshift('Una taza de ' + hallada.ingrediente + ' pesa unos ' + hallada.gramos_por_taza + ' g.');
+    return {id:'medidas', titulo:'Medidas sin balanza', fuente:FUENTE_PLAN, parrafos:p, recetas:[], acciones:[]};
+  }
+
+  function porId(id, ctx, q){
+    ctx = ctx || {};
+    var n = norm(q || '');
+    if(id === 'hoy') return respHoy(n, ctx);
+    if(id === 'compras') return respCompras(ctx);
+    if(id === 'prep') return respPrep(ctx);
+    if(id === 'agua') return respAgua(ctx);
+    if(id === 'omega') return respOmega(ctx);
+    if(id === 'bebidas') return respBebidas(n);
+    if(id === 'dulce') return respDulce(n, ctx);
+    if(id === 'sustituir') return respSustituir(q || '');
+    if(id === 'objetivos') return respObjetivos(n, ctx);
+    if(id === 'medidas') return respMedidas(q || '');
+    if(ESTATICAS[id]) return ESTATICAS[id](ctx, n);
+    return null;
+  }
+  function conTambien(r, ids){
+    r.tambien = ids.filter(function(x){ return x !== r.id; }).slice(0, 3).map(function(x){ return {id:x, t:TEMAS[x].t}; });
+    return r;
+  }
+  function fallback(){
+    return {id:'nada', titulo:'No lo encuentro', fuente:'',
+      parrafos:['Eso no está en el recetario ni en las reglas del plan, y prefiero no inventar. Prueba con una de estas preguntas o pregúntame por un ingrediente.'],
+      recetas:[], acciones:[], sugerir:true};
+  }
+
+  /* Punto de entrada. ctx: {semana, hoy, fase, comensales, compras:{total,pendientes,muestra}, prep:{total,pendientes}, agua:{txt,meta,minimo,falta}} */
+  function responder(q, ctx){
+    ctx = ctx || {};
+    var n = norm(q);
+    if(!n) return fallback();
+    var puntos = Object.keys(TEMAS).map(function(k){ return [k, puntaje(n, TEMAS[k].claves)]; })
+      .filter(function(x){ return x[1] > 0; });
+    /* Desempates por contexto. */
+    puntos.forEach(function(x){
+      if(x[0] === 'agua' && /con gas/.test(n)) x[1] = 0;
+      if(x[0] === 'omega' && /semana|cuanto|veces/.test(n) && /pescad|omega/.test(n)) x[1] += 2;
+      if(x[0] === 'sintomas') x[1] += 10;
+      if(x[0] === 'sustituir') x[1] += 1;
+      if(x[0] === 'dulce' && /azucar|miel/.test(n)) x[1] += 1;
+      if(x[0] === 'hoy' && /\bhora\b|tarde|noche/.test(n) && !/que (como|cocino|toca)/.test(n)) x[1] -= 1;
+      if(x[0] === 'saludo' || x[0] === 'gracias') x[1] -= 0.5;
+    });
+    puntos = puntos.filter(function(x){ return x[1] > 0; }).sort(function(a, b){ return b[1] - a[1]; });
+    var ids = puntos.map(function(x){ return x[0]; });
+
+    var rec = recetaNombrada(q);
+    if(rec && (!ids.length || ids[0] === 'hoy' || puntos[0][1] < 2) && ids[0] !== 'sustituir') return conTambien(respuestaReceta(rec), ids);
+
+    var c = criterios(q);
+    var pideRecetas = /\b(receta|recetas|idea|ideas|sugier|sugerencia|que hago con|algo con|que preparo|que cocino con|opcion|opciones)\b/.test(n);
+    var fuerte = ids.length && puntos[0][1] >= 2;
+    /* «almuerzo con lenteja», «cena rápida sin cerdo»: búsqueda de recetas antes que una regla suelta. */
+    if(hayCriterio(c) && (pideRecetas || c.incluye.length || c.excluye.length || c.cat || c.cocina || c.sinCarne) &&
+       (!fuerte || ['ventana', 'guarnicion', 'hoy'].indexOf(ids[0]) >= 0) && ids[0] !== 'sintomas' && ids[0] !== 'sustituir'){
+      if(!(ids[0] === 'hoy' && !c.incluye.length && !pideRecetas && !c.cocina && !c.rapido && !c.sinCarne && !c.excluye.length))
+        return conTambien(respuestaBusqueda(c), ids.filter(function(x){ return x !== 'guarnicion' && x !== 'hoy'; }));
+    }
+    if(ids.length) return conTambien(porId(ids[0], ctx, q), ids);
+    if(hayCriterio(c)) return respuestaBusqueda(c);
+    return fallback();
+  }
+
+  return {responder:responder, porId:porId, SUGERENCIAS:SUGERENCIAS, TEMAS:TEMAS, norm:norm, buscar:buscar, criterios:criterios};
+}
+
+root.RecetarioCharla = {crear:crear, norm:norm};
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+
 <script>
 (function(){
 "use strict";
@@ -19633,6 +20248,105 @@ function importarSalud(file){
   };
   rd.readAsText(file);
 }
+
+/* ================= CHARLA CON LA COCINERA ================= */
+/* Base cerrada (script #charla): responde desde los datos del recetario y el estado de la semana. La conversación
+   vive solo en memoria: no se guarda ni se sincroniza. */
+var CH = window.RecetarioCharla.crear(D, M);
+var CHS = {abierto:false, msgs:[]};
+var CH_MAX = 40;
+function ctxCharla(){
+  var pl = planActual(), sp = M.semanaPrep(new Date());
+  var pend = pl.lineas.filter(function(l){ var e = M.estadoMarca(l, S.compras); return !e.s || e.parcial; });
+  var nec = Object.keys(pl.necesarias || {}).filter(function(pid){ return pl.necesarias[pid]; });
+  var hoy = SA.hoyISO(), ag = SA.totalDia(SS, hoy);
+  return {
+    semana:S.semana, hoy:hoyKey(), fase:S.fase, comensales:S.comensales,
+    compras:{total:pl.lineas.length, pendientes:pend.length, muestra:pend.slice(0, 3).map(function(l){ return l.nombre.toLowerCase(); })},
+    prep:{total:nec.length, pendientes:nec.filter(function(pid){ return M.estadoPrep(pl.preps[pid], S.prep[pid], sp).s !== 'lista'; }).length},
+    agua:{txt:litros(ag.ml) + ' L', meta:ag.meta, minimo:ag.minimo, falta:ag.minimo ? '' : litros(Math.max(0, SA.META.min - ag.ml)) + ' L'}
+  };
+}
+function burbujaCharla(m){
+  if(m.yo) return '<li class="ch-m yo"><p>' + esc(m.t) + '</p></li>';
+  var r = m.r, h = '<li class="ch-m ella' + (r.alerta ? ' alerta' : '') + '">';
+  if(r.titulo) h += '<b class="ch-t">' + esc(r.titulo) + '</b>';
+  r.parrafos.forEach(function(p){ h += '<p>' + esc(p) + '</p>'; });
+  if(r.recetas.length){
+    h += '<div class="ch-recs">' + r.recetas.map(function(id){
+      var x = byId[id];
+      return '<button class="ch-rec" data-ch-receta="' + x.id + '">' + pic(x, '', '') +
+        '<span><b>' + esc(x.nombre) + '</b><small>' + esc(CAT_N[x.categoria]) + ' · ' + x.macros.proteina_g + ' g prot. · ' + esc(M.textoTiempo(x)) + '</small></span></button>';
+    }).join('') + '</div>';
+  }
+  if(r.acciones.length || (r.tambien && r.tambien.length) || r.sugerir){
+    h += '<div class="ch-acts">';
+    r.acciones.forEach(function(a){
+      h += a.receta ? '<button class="btn pri sm" data-ch-receta="' + esc(a.receta) + '">' + esc(a.t) + '</button>'
+                    : '<button class="btn sec sm" data-ch-ir="' + esc(a.ir) + '">' + esc(a.t) + '</button>';
+    });
+    (r.tambien || []).forEach(function(x){ h += '<button class="ch-chip" data-ch-tema="' + esc(x.id) + '">' + esc(x.t) + '</button>'; });
+    if(r.sugerir) h += sugerenciasCharla();
+    h += '</div>';
+  }
+  if(r.fuente) h += '<small class="ch-f">Fuente: ' + esc(r.fuente) + '</small>';
+  return h + '</li>';
+}
+function sugerenciasCharla(){
+  return CH.SUGERENCIAS.map(function(s){
+    return '<button class="ch-chip" ' + (s[1].indexOf('q:') === 0 ? 'data-ch-q="' + esc(s[1].slice(2)) + '"' : 'data-ch-tema="' + esc(s[1]) + '"') + '>' + esc(s[0]) + '</button>';
+  }).join('');
+}
+function pintarCharla(){
+  var el = document.getElementById('charla');
+  el.hidden = !CHS.abierto;
+  document.getElementById('charlaBtn').setAttribute('aria-expanded', String(CHS.abierto));
+  document.body.classList.toggle('charla-on', CHS.abierto);
+  if(!CHS.abierto) return;
+  var log = document.getElementById('chLog');
+  var h = '<li class="ch-m ella"><p>Hola. Pregúntame qué toca hoy, pídeme ideas con lo que tengas o consulta las reglas del plan.</p>' +
+    '<div class="ch-acts">' + sugerenciasCharla() + '</div></li>';
+  h += CHS.msgs.map(burbujaCharla).join('');
+  log.innerHTML = h;
+  var ult = log.lastElementChild;
+  if(ult) log.scrollTop = CHS.msgs.length ? ult.offsetTop - 8 : 0;
+}
+function preguntarCharla(t, tema){
+  t = String(t || '').trim();
+  if(!t && !tema) return;
+  var cx = ctxCharla();
+  var r = tema ? CH.porId(tema, cx, t) : CH.responder(t, cx);
+  CHS.msgs.push({yo:true, t:t || (CH.TEMAS[tema] ? CH.TEMAS[tema].t : tema)});
+  CHS.msgs.push({r:r});
+  if(CHS.msgs.length > CH_MAX) CHS.msgs = CHS.msgs.slice(-CH_MAX);
+  pintarCharla();
+}
+function abrirCharla(){
+  if(S.swap || S.asig) cerrarCapa();
+  CHS.abierto = true; pintarCharla();
+  var i = document.getElementById('chIn'); if(i) i.focus({preventScroll:true});
+}
+function cerrarCharla(devolverFoco){
+  CHS.abierto = false; pintarCharla();
+  if(devolverFoco) document.getElementById('charlaBtn').focus({preventScroll:true});
+}
+document.getElementById('charlaBtn').addEventListener('click', function(){ if(CHS.abierto) cerrarCharla(true); else abrirCharla(); });
+document.getElementById('chForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var i = document.getElementById('chIn'), t = i.value;
+  i.value = ''; preguntarCharla(t); i.focus({preventScroll:true});
+});
+document.getElementById('charla').addEventListener('click', function(e){
+  var t;
+  if(e.target.closest('[data-ch-cerrar]')){ cerrarCharla(true); return; }
+  if((t = e.target.closest('[data-ch-receta]'))){ cerrarCharla(false); abrirReceta(t.dataset.chReceta); return; }
+  if((t = e.target.closest('[data-ch-ir]'))){ cerrarCharla(false); ir(t.dataset.chIr); return; }
+  if((t = e.target.closest('[data-ch-tema]'))){ preguntarCharla('', t.dataset.chTema); return; }
+  if((t = e.target.closest('[data-ch-q]'))){ preguntarCharla(t.dataset.chQ); return; }
+});
+document.getElementById('charla').addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){ e.stopPropagation(); cerrarCharla(true); }
+});
 
 /* ================= RENDER ================= */
 function render(){

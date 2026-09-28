@@ -29,3 +29,12 @@ export function salud(D = datos()) {
   vm.runInContext(m[1], ctx);
   return { SA: ctx.RecetarioSalud.crear(D), mod: ctx.RecetarioSalud };
 }
+export function charla(D = datos()) {
+  const m = /<script id="charla-motor">([\s\S]*?)<\/script>/.exec(html);
+  const ctx = { globalThis: {} };
+  ctx.globalThis = ctx;
+  vm.createContext(ctx);
+  vm.runInContext(m[1], ctx);
+  const M = motor(D);
+  return { CH: ctx.RecetarioCharla.crear(D, M), M };
+}
