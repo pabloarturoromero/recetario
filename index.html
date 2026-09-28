@@ -184,6 +184,13 @@ main{max-width:var(--maxw); margin:0 auto; padding:var(--s4) var(--s5) var(--s8)
   .hello .coci{height:128px}
   .empty .coci, .gal-empty .coci{height:140px}
 }
+/* En escritorio la cocinera es el símbolo de la app: más grande, y en Inicio
+   baja junto a los accesos rápidos, que solo ocupan la mitad izquierda. */
+@media (min-width:1041px){
+  .coci{height:200px; margin:-16px var(--s4) -8px var(--s5)}
+  .hello .coci{height:310px; margin:-24px var(--s6) -180px var(--s5)}
+  .empty .coci, .gal-empty .coci{height:220px}
+}
 
 /* ============ INICIO ============ */
 .hello h1{font-size:30px; font-weight:700; letter-spacing:-.025em; line-height:1.15}
