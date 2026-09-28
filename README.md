@@ -2,7 +2,7 @@
 
 Plan nutricional de cuatro semanas con 100 recetas intercambiables de 48 cocinas, con fotografía de referencia en 97 de ellas, organizadas en desayunos, almuerzos, cenas y guarniciones. Incluye armado de la semana con validación de proteína, fibra, energía y pescado marino, lista de compras generada automáticamente y preparaciones base.
 
-Toda la aplicación vive en un solo archivo, `index.html`, sin dependencias ni paso de compilación.
+Toda la aplicación vive en un solo archivo, `index.html`, sin dependencias ni paso de compilación. La interfaz sigue el diseño Savora: navegación inferior en el móvil, carrusel del menú de hoy y una galería de recetas con fotos, ficha compartible por WhatsApp y enlace directo por receta (`#receta/L64`).
 
 ## Publicación
 
@@ -29,7 +29,9 @@ La lista de compras y las preparaciones salen del mismo cálculo. El bloque `com
 Sin dependencias propias. El motor de cálculo (`<script id="motor">` en `index.html`) se prueba con Node 20 o superior; la interfaz, con Playwright si está instalado (local o global):
 
 ```
-node --test tests/motor.test.mjs tests/ui.test.mjs
+node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs
 ```
+
+`galeria.test.mjs` cubre la galería de recetas, los filtros, las fichas, los enlaces directos `#receta/ID`, el mensaje de WhatsApp (sin enviarlo), «Añadir al menú», el intercambio con vista previa, «Deshacer» y los anchos de 375 y 390 px.
 
 Si Playwright no está disponible, las pruebas de interfaz se omiten y lo indican.

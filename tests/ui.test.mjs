@@ -44,21 +44,24 @@ test('carga sin errores y muestra el guardado real', { skip: saltar }, async () 
   await ctx.close();
 });
 
-test('buscar: el detalle sigue a los resultados y el vacío borra la ficha anterior', { skip: saltar }, async () => {
+test('buscar: la galería sigue a la búsqueda y muestra el vacío', { skip: saltar }, async () => {
   const { page, ctx } = await abrir();
   await page.click('nav.main button[data-v="recetas"]');
-  assert.match(await page.textContent('#ficha h2'), /Yogur griego/);
+  assert.equal(await page.locator('#gal .gcard').count(), 100);
   await page.fill('#q', 'caraota');
-  const nombreLista = (await page.textContent('.reclist button .t')).trim();
-  assert.equal((await page.textContent('#ficha h2')).trim(), nombreLista);
-  assert.equal(await page.getAttribute('.reclist button', 'aria-current'), 'true');
+  const n = await page.locator('#gal .gcard').count();
+  assert.ok(n >= 1);
+  assert.match(await page.textContent('#galCount'), new RegExp(`Mostrando ${n} de 100`));
+  await page.locator('#gal .gcard .gopen').first().click();
+  assert.match(await page.textContent('#fichaT'), /aracota|araota/i);
+  await page.click('[data-back]');
   await page.fill('#q', 'arepa');
-  assert.equal(await page.locator('#ficha h2').count(), 0, 'sin receta anterior');
-  assert.match(await page.textContent('#ficha'), /Sin resultados/);
+  assert.equal(await page.locator('#gal .gcard').count(), 0);
+  assert.match(await page.textContent('.gal-empty'), /Ninguna receta coincide/);
   await page.fill('#q', '');
   await page.click('.seg button[data-cat="cena"]');
-  const cat = await page.textContent('#ficha .eyebrow');
-  assert.match(cat, /^Cena/, 'al cambiar de categoría se abre una cena');
+  const cats = await page.locator('#gal .gcard .kat').allTextContents();
+  assert.ok(cats.length && cats.every((c) => c === 'Cena'), 'solo cenas');
   await ctx.close();
 });
 
@@ -67,7 +70,8 @@ test('cambiar un plato: vista previa antes de confirmar; el menú solo cambia al
   const antes = await guardado(page);
   await page.click('nav.main button[data-v="semana"]');
   await page.click('.day.show [data-swap$="|cena"], .day [data-swap="lun|cena"]');
-  const opcion = page.locator('.drawer .opt[data-pre^="C"]').first();
+  const opcion = page.locator('#gal .gcard [data-elegir^="C"]').first();
+  const id = await opcion.getAttribute('data-elegir');
   await opcion.click();
   await page.waitForSelector('.preview');
   const pv = await page.textContent('.preview');
@@ -76,7 +80,6 @@ test('cambiar un plato: vista previa antes de confirmar; el menú solo cambia al
   assert.match(pv, /Tiempo/);
   assert.match(pv, /Pescado marino/);
   assert.deepEqual(await guardado(page), antes, 'nada cambia antes de confirmar');
-  const id = await opcion.getAttribute('data-pre');
   await page.click('.preview [data-set]');
   const st = await guardado(page);
   const dia = Object.keys(st.semana).find((k) => st.semana[k].cena === id);
@@ -171,12 +174,12 @@ for (const ancho of [375, 390, 1280]) {
       assert.ok(ov <= 0, `${v} desborda ${ov}px`);
       const fuera = await page.evaluate(() => [...document.querySelectorAll('main button, nav button')]
         .filter((b) => { const r = b.getBoundingClientRect(); return r.width && (r.right > window.innerWidth + 1 || r.left < -1); })
-        .filter((b) => !b.closest('.tw, .daysel')).length);
+        .filter((b) => !b.closest('.tw, .daysel, .carousel, .seg')).length);
       assert.equal(fuera, 0, `${v}: botones fuera de la pantalla`);
     }
     await page.click('nav.main button[data-v="inicio"]');
-    await page.click('[data-swap$="|almuerzo"]');
-    await page.locator('.drawer .opt').nth(2).click();
+    await page.click('.dish [data-swap$="|almuerzo"] >> nth=0');
+    await page.locator('#gal .gcard [data-elegir]').nth(2).click();
     const box = await page.locator('.preview [data-set]').boundingBox();
     assert.ok(box && box.x >= 0 && box.x + box.width <= ancho, 'el botón de confirmar es accesible');
     assert.deepEqual(errores, []);
@@ -184,15 +187,17 @@ for (const ancho of [375, 390, 1280]) {
   });
 }
 
-test('fotos: la ficha muestra la foto con su crédito y la lista usa miniaturas', { skip: saltar }, async () => {
+test('fotos: la ficha muestra la foto con su crédito y la galería usa las fotos', { skip: saltar }, async () => {
   const { page, ctx, errores } = await abrir();
   await page.click('nav.main button[data-v="recetas"]');
-  const img = page.locator('#ficha .ficha-foto img');
+  await page.locator('#gal .gcard .gopen').first().click();
+  const img = page.locator('#ficha .hero img');
   assert.equal(await img.count(), 1);
   assert.ok(await img.evaluate((i) => i.complete && i.naturalWidth > 0), 'la imagen carga');
-  assert.equal(await img.getAttribute('alt'), (await page.textContent('#ficha h2')).trim());
+  assert.equal(await img.getAttribute('alt'), (await page.textContent('#fichaT')).trim());
   assert.match(await page.getAttribute('#ficha .cred a', 'href'), /^https:\/\//);
-  assert.ok(await page.locator('.reclist img.th').count() > 50);
+  await page.click('[data-back]');
+  assert.ok(await page.locator('#gal .pic img').count() > 50);
   assert.deepEqual(errores, []);
   await ctx.close();
 });
