@@ -944,6 +944,76 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .ej-fig{display:flex; gap:6px}
 .ej-fig figure{margin:0; text-align:center}
 .ej-fig figcaption{font-size:10.5px; color:var(--ink-3); margin-top:2px}
+.ej-anim{flex-direction:column; align-items:center; gap:4px}
+.fg-btn{position:relative; display:block; padding:0; border:0; background:none; border-radius:var(--r2); cursor:pointer; color:inherit}
+.fg-btn:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
+.fg-est{position:absolute; right:5px; bottom:5px; width:22px; height:22px; border-radius:50%; background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.18);
+  opacity:0; transform:scale(.6); transition:opacity .2s, transform .2s}
+.fg-est::before{content:""; position:absolute; left:8px; top:6px; border-style:solid; border-width:5px 0 5px 8px; border-color:transparent transparent transparent var(--brand)}
+.ej-anim.pausa .fg-est{opacity:1; transform:none}
+.fg-rango{width:100%; max-width:112px; height:18px; margin:0; accent-color:var(--brand); cursor:grab}
+.ej-anim figcaption{min-width:5em; font-weight:600; color:var(--brand-ink)}
+.ej-tit{display:inline-flex; align-items:center; gap:8px}
+.ej-ses h3 .ej-ic.sm{width:36px; height:36px}
+
+/* Iconos de la sesión: calcomanías con cara que se mueven como el ejercicio que anuncian. */
+.ej-ic svg.ic{width:44px; height:44px; overflow:visible}
+.ej-ses h3 .ej-ic.sm svg.ic{width:28px; height:28px}
+.ic *{transform-box:fill-box}
+.ic .l{stroke:#3B2A2E; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.ic .c1{fill:#FF8C8A}
+.ic .c2{fill:#FFD66B}
+.ic .c3{fill:#A8E0D1}
+.ic .barra{fill:#8C7B80}
+.ic .suela{fill:#FFFFFF}
+.ic .br, .ic .boca, .ic .ojo, .ic .suave{fill:none}
+.ic .o{fill:#3B2A2E}
+.ic .rb{fill:#FF5E7E; opacity:.45}
+.ic .sombra{fill:#3B2A2E; opacity:.14}
+.ic .gota{fill:#9ED8F5}
+.ic .nube{fill:#FFFFFF; stroke-width:1.4}
+.ic .bri{fill:#FFD66B; stroke:#3B2A2E; stroke-width:1}
+.ic .halo{fill:#A8E0D1; opacity:.35}
+.ic .zz{font:700 9px Poppins, sans-serif; fill:#7A6CF0; stroke:#3B2A2E; stroke-width:.5}
+/* En modo oscuro, un borde claro de calcomanía para que el contorno no se pierda en el fondo. */
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .ic{filter:drop-shadow(0 0 .6px rgba(255,255,255,.85)) drop-shadow(0 0 .6px rgba(255,255,255,.85))} }
+:root[data-theme="dark"] .ic{filter:drop-shadow(0 0 .6px rgba(255,255,255,.85)) drop-shadow(0 0 .6px rgba(255,255,255,.85))}
+/* fuerza: sube la pesa y el cuerpo se aplasta y estira */
+.ic-fuerza .pesa{animation:ic-pesa 1.6s cubic-bezier(.5,0,.3,1.4) infinite; transform-origin:50% 100%}
+.ic-fuerza .cuerpo{animation:ic-squash 1.6s cubic-bezier(.5,0,.3,1.4) infinite; transform-origin:50% 100%}
+.ic-fuerza .gota{animation:ic-gota 1.6s ease-in infinite}
+.ic-fuerza .bri{animation:ic-bri 1.6s ease-in-out infinite; transform-origin:50% 50%}
+@keyframes ic-pesa{0%,100%{transform:translateY(5px)} 45%,60%{transform:translateY(-2px)}}
+@keyframes ic-squash{0%,100%{transform:scale(1.08,.9)} 45%,60%{transform:scale(.95,1.06)}}
+@keyframes ic-gota{0%,40%{opacity:0; transform:translateY(-3px)} 55%{opacity:1} 100%{opacity:0; transform:translateY(6px)}}
+/* caminata: el zapato rebota, líneas de velocidad y polvito */
+.ic-cardio .zapa{animation:ic-bote .6s cubic-bezier(.4,0,.4,1.5) infinite; transform-origin:30% 100%}
+.ic-cardio .vel{animation:ic-vel .6s linear infinite}
+.ic-cardio .polvo{animation:ic-polvo .6s ease-out infinite; transform-origin:50% 50%}
+.ic-cardio .sombra{animation:ic-sombra .6s ease-in-out infinite; transform-origin:50% 50%}
+@keyframes ic-bote{0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-4px) rotate(-7deg)}}
+@keyframes ic-vel{0%{transform:translateX(3px); opacity:0} 40%{opacity:1} 100%{transform:translateX(-4px); opacity:0}}
+@keyframes ic-polvo{0%{transform:scale(.4); opacity:0} 30%{opacity:1} 100%{transform:scale(1.2) translateX(-3px); opacity:0}}
+@keyframes ic-sombra{0%,100%{transform:scaleX(1)} 50%{transform:scaleX(.75)}}
+/* yoga: respira con el halo y brillan las chispas */
+.ic-yoga .cuerpo, .ic-movilidad .cuerpo{animation:ic-respira 4.5s ease-in-out infinite; transform-origin:50% 100%}
+.ic-yoga .halo, .ic-movilidad .halo{animation:ic-halo 4.5s ease-in-out infinite; transform-origin:50% 50%}
+.ic-yoga .bri, .ic-movilidad .bri{animation:ic-bri 2.2s ease-in-out infinite; transform-origin:50% 50%}
+.ic-yoga .bri:nth-child(2), .ic-movilidad .bri:nth-child(2){animation-delay:.7s}
+.ic-yoga .bri:nth-child(3), .ic-movilidad .bri:nth-child(3){animation-delay:1.4s}
+@keyframes ic-respira{0%,100%{transform:scale(1,.97)} 45%{transform:scale(1.02,1.05)}}
+@keyframes ic-halo{0%,100%{transform:scale(.8); opacity:.2} 45%{transform:scale(1.05); opacity:.5}}
+@keyframes ic-bri{0%,100%{transform:scale(.3) rotate(0); opacity:.3} 50%{transform:scale(1) rotate(45deg); opacity:1}}
+/* descanso: la luna se mece y suben las zetas */
+.ic-descanso .luna{animation:ic-mece 4s ease-in-out infinite; transform-origin:50% 50%}
+.ic-descanso .zz{animation:ic-zz 3s ease-in infinite}
+.ic-descanso .z2{animation-delay:1.5s}
+.ic-descanso .bri{animation:ic-bri 2.6s ease-in-out infinite; transform-origin:50% 50%}
+@keyframes ic-mece{0%,100%{transform:rotate(-8deg)} 50%{transform:rotate(6deg)}}
+@keyframes ic-zz{0%{transform:translate(0,4px) scale(.6); opacity:0} 30%{opacity:1} 100%{transform:translate(4px,-6px) scale(1.15); opacity:0}}
+/* al pasar el dedo o el ratón, un saltito */
+.ej-ic{transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.ej-mini:hover .ej-ic, .ej-ses h3:hover .ej-ic{transform:scale(1.12) rotate(-6deg)}
 .fg{width:104px; height:104px; display:block; background:var(--surface-2); border-radius:var(--r2)}
 .fg *{stroke-linecap:round; stroke-linejoin:round}
 .fg-suelo{stroke:var(--line-2); stroke-width:1}
@@ -1102,7 +1172,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.18.4",
+    "version": "2.19.0",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -27315,13 +27385,46 @@ function ejercicioInicio(){
   }
   return '<div class="agua-mini panel ej-mini"><span class="ej-ic" aria-hidden="true">' + icoEj(s) + '</span><div class="tx">' + tx + '</div><div class="acts">' + act + '</div></div>';
 }
+/* Iconos de la sesión en estilo calcomanía: personajes con contorno, colores pastel y cara, animados por CSS (.ic-*). */
 function icoEj(s){
   var t = SA.PLAN && SA.PLAN.sesiones[s] ? SA.PLAN.sesiones[s].tipo : 'descanso';
-  var p = t === 'fuerza' ? '<path d="M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12"/>' :
-    t === 'cardio' ? '<circle cx="13" cy="4.5" r="1.8"/><path d="m9 21 2.5-6 3 3V22M8 11l3-3.5 3 1.5 2 3.5M11.5 15l1-6.5"/>' :
-    t === 'movilidad' ? '<circle cx="12" cy="4.5" r="1.8"/><path d="M5 9.5h14M12 9.5V15m0 0-3.5 6M12 15l3.5 6"/>' :
-    '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>';
-  return '<svg class="i" viewBox="0 0 24 24">' + p + '</svg>';
+  var ojos = '<circle class="o" cx="19.5" cy="31" r="1.6"/><circle class="o" cx="28.5" cy="31" r="1.6"/>',
+    cachetes = '<ellipse class="rb" cx="16" cy="35" rx="2.4" ry="1.4"/><ellipse class="rb" cx="32" cy="35" rx="2.4" ry="1.4"/>',
+    brillo = function(x, y, r){ return '<path class="bri" d="M' + x + ' ' + (y - r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + r) +
+      'Q' + x + ' ' + y + ' ' + (x - r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - r) + 'z"/>'; };
+  var p;
+  if(t === 'fuerza') p =
+    '<ellipse class="sombra" cx="24" cy="45" rx="11" ry="1.8"/>' +
+    '<g class="cuerpo"><path class="l c1" d="M12 44c0-9 5-16 12-16s12 7 12 16z"/>' + ojos +
+      '<path class="l boca" d="M21.5 36.5q2.5 2.4 5 0"/>' + cachetes + '</g>' +
+    '<g class="pesa"><path class="l br" d="M15 32 11 13M33 32l4-19"/>' +
+      '<rect class="l barra" x="7" y="10.5" width="34" height="3.4" rx="1.7"/>' +
+      '<rect class="l c2" x="3.5" y="5.5" width="7" height="13.5" rx="3"/><rect class="l c2" x="37.5" y="5.5" width="7" height="13.5" rx="3"/></g>' +
+    '<path class="l gota" d="M40 26q2.4 3.2 0 4.6q-2.4-1.4 0-4.6z"/>' + brillo(8, 27, 2.6);
+  else if(t === 'cardio') p =
+    '<g class="vel"><path class="l suave" d="M2 20h8M4 26h7M2 32h6"/></g>' +
+    '<ellipse class="sombra" cx="27" cy="45" rx="14" ry="1.8"/>' +
+    '<g class="zapa"><path class="l c1" d="M13 20c0-3 2-5 5-5 3 0 4 2 6 5 3 4 9 6 14 7 4 1 6 3 6 6v2H13z"/>' +
+      '<path class="l suela" d="M12 35h33v2.5a3 3 0 0 1-3 3H15a3 3 0 0 1-3-3z"/>' +
+      '<path class="l suave" d="M22 21l3-2M25 24l3-2M28 27l3-2"/>' +
+      '<circle class="o" cx="18" cy="26" r="1.5"/><path class="l boca" d="M16.5 30q1.8 1.6 3.6 0"/><ellipse class="rb" cx="23" cy="30" rx="2" ry="1.2"/></g>' +
+    '<g class="polvo"><circle class="l nube" cx="8" cy="40" r="2.6"/><circle class="l nube" cx="4" cy="43" r="1.7"/></g>';
+  else if(t === 'yoga' || t === 'movilidad') p =
+    '<circle class="halo" cx="24" cy="27" r="19"/>' +
+    '<ellipse class="sombra" cx="24" cy="45" rx="13" ry="1.8"/>' +
+    '<g class="cuerpo"><path class="l c3" d="M9 43c2-3 8-4 15-4s13 1 15 4c-3 2-27 2-30 0z"/>' +
+      '<path class="l c1" d="M14 41c0-9 4-15 10-15s10 6 10 15z"/>' +
+      '<path class="l br" d="M15 33q-5 4-3 8M33 33q5 4 3 8"/>' +
+      '<circle class="l c1" cx="24" cy="17" r="7.5"/>' +
+      '<path class="l ojo" d="M20 17q1.3 1.4 2.6 0M25.4 17q1.3 1.4 2.6 0"/><ellipse class="rb" cx="19.5" cy="20" rx="1.8" ry="1.1"/><ellipse class="rb" cx="28.5" cy="20" rx="1.8" ry="1.1"/>' +
+      '<path class="l boca" d="M22.8 21.2q1.2 1 2.4 0"/></g>' +
+    '<g class="chispas">' + brillo(7, 12, 2.6) + brillo(41, 9, 2.2) + brillo(42, 30, 1.8) + '</g>';
+  else p =
+    '<g class="luna"><path class="l c2" d="M31 8a16 16 0 1 0 10 25A13 13 0 0 1 31 8z"/>' +
+      '<path class="l ojo" d="M16 26q1.6 1.6 3.2 0M23 27.5q1.6 1.6 3.2 0"/><ellipse class="rb" cx="15.5" cy="30.5" rx="2" ry="1.2"/>' +
+      '<path class="l boca" d="M19.5 32q1.5 1 3 0"/></g>' +
+    '<text class="zz z1" x="34" y="20">z</text><text class="zz z2" x="39" y="12">z</text>' + brillo(8, 10, 2.4) + brillo(42, 40, 2);
+  return '<svg class="ic ic-' + t + '" viewBox="0 0 48 48">' + p + '</svg>';
 }
 /* Figura de un ejercicio en un lienzo de 100 x 100 con el suelo en y=92: accesorios, extremidades lejanas en tono suave,
    torso, cabeza y extremidades cercanas en el color de la marca, y la mancuerna en la mano que la lleva. */
@@ -27362,14 +27465,129 @@ function svgPose(f, P, titulo){
   });
   return '<svg class="fg" viewBox="0 -6 100 100" role="img" aria-label="' + esc(titulo) + '">' + s + '</svg>';
 }
-/* Ilustración (inicio y final, o la postura) y video de un ejercicio. El video se carga solo al pedirlo. */
-function figuraEj(f, n){
+/* Ilustración animada de un ejercicio: la figura va de la posición inicial a la final y vuelve, al ritmo del tipo de sesión
+   (fuerza controlada, yoga con la respiración, caminata al paso). Con una sola postura, respira: el pecho sube y baja.
+   Tocar la figura la pausa o la reanuda; la barra la mueve a mano. Con «reducir movimiento» empieza quieta. */
+var FG_RITMO = {fuerza:{ida:1800, vuelta:2200, pausa:450}, yoga:{ida:3200, vuelta:3200, pausa:700}, cardio:{ida:520, vuelta:520, pausa:0},
+  respira:{ida:4000, vuelta:6000, pausa:300}};
+function figuraEj(f, n, tipo){
   if(!f || !f.a) return '';
-  return '<div class="ej-fig">' + (f.b
-    ? '<figure>' + svgPose(f, f.a, n + ', posición inicial') + '<figcaption>Inicio</figcaption></figure>' +
-      '<figure>' + svgPose(f, f.b, n + ', posición final') + '<figcaption>Final</figcaption></figure>'
-    : '<figure>' + svgPose(f, f.a, n) + '<figcaption>Postura</figcaption></figure>') + '</div>';
+  var modo = f.b ? (FG_RITMO[tipo] ? tipo : 'fuerza') : 'respira';
+  var ini = f.b ? 'Inicio' : 'Inhala';
+  return '<div class="ej-fig ej-anim" data-fig="' + esc(JSON.stringify(f)) + '" data-modo="' + modo + '" data-n="' + esc(n) + '">' +
+    '<figure><button type="button" class="fg-btn" data-fg="play" aria-pressed="true" aria-label="' + esc(n) + ': pausar la animación">' +
+    svgPose(f, f.a, n + (f.b ? ', posición inicial' : '')) + '<span class="fg-est" aria-hidden="true"></span></button>' +
+    '<figcaption aria-hidden="true">' + ini + '</figcaption></figure>' +
+    '<input type="range" class="fg-rango" min="0" max="1000" value="0" aria-label="' + esc(n) + ': mover la figura ' + (f.b ? 'del inicio al final' : 'al respirar') + '">' +
+    '</div>';
 }
+var FG = (function(){
+  var lista = [], memo = {}, io = null, reloj = 0, ultimo = 0, quieto = false;
+  try{ quieto = matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  function mezcla(a, b, t){ return a && b ? [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t] : a || b; }
+  function cabeza(P){ if(P.h) return P.h; var dx = P.n[0] - P.p[0], dy = P.n[1] - P.p[1], l = Math.sqrt(dx * dx + dy * dy) || 1; return [P.n[0] + dx / l * 9, P.n[1] + dy / l * 9]; }
+  function curva(P){ return P.c || [(P.n[0] + P.p[0]) / 2, (P.n[1] + P.p[1]) / 2]; }
+  function pieDe(P, k){ var a = P[k === 'ft' ? 'a' : 'A']; return P[k] || (a && [a[0] + 6, a[1] + 1.5]); }
+  /* La postura sola respira: hombros, cabeza y brazos suben un poco al inhalar, sin mover la base. */
+  function respira(A){
+    var B = {}, sube = ['n', 'h', 'c', 'e', 'w', 'E', 'W'];
+    Object.keys(A).forEach(function(k){ B[k] = A[k]; });
+    B.h = cabeza(A);
+    var tumbado = Math.abs(A.n[1] - A.p[1]) < 8;
+    sube.forEach(function(k){ if(B[k] && Array.isArray(B[k])) B[k] = [B[k][0], B[k][1] - (tumbado ? (k === 'n' || k === 'c' ? 1.6 : 0.6) : 1.4)]; });
+    return B;
+  }
+  function pose(A, B, t){
+    if(t <= 0) return A;
+    if(t >= 1) return B;
+    var P = {}, ks = {};
+    Object.keys(A).concat(Object.keys(B)).forEach(function(k){ ks[k] = 1; });
+    Object.keys(ks).forEach(function(k){
+      if(k === 'db') P.db = A.db || B.db;
+      else if(k === 'h') P.h = mezcla(cabeza(A), cabeza(B), t);
+      else if(k === 'c') P.c = mezcla(curva(A), curva(B), t);
+      else if(k === 'ft' || k === 'FT') P[k] = mezcla(pieDe(A, k), pieDe(B, k), t);
+      else P[k] = mezcla(A[k], B[k], t);
+    });
+    return P;
+  }
+  function suave(x){ return (1 - Math.cos(Math.PI * x)) / 2; }
+  /* Fase del ciclo (ms) → avance entre 0 (inicio) y 1 (final), con una pausa breve en cada extremo. */
+  function avance(r, ms){
+    var ciclo = r.ida + r.vuelta + 2 * r.pausa, x = ms % ciclo;
+    if(x < r.ida) return {t:suave(x / r.ida), sube:true};
+    x -= r.ida;
+    if(x < r.pausa) return {t:1, sube:true};
+    x -= r.pausa;
+    if(x < r.vuelta) return {t:1 - suave(x / r.vuelta), sube:false};
+    return {t:0, sube:false};
+  }
+  function dibujar(o, t, sube){
+    if(o.ult !== null && Math.abs(o.ult - t) < 0.004) return;
+    o.ult = t;
+    var svg = o.btn.querySelector('svg');
+    var tmp = document.createElement('div');
+    tmp.innerHTML = svgPose(o.f, pose(o.A, o.B, t), o.titulo);
+    svg.innerHTML = tmp.firstChild.innerHTML;
+    if(!o.arrastre) o.rango.value = Math.round(t * 1000);
+    var txt = o.respira ? (sube ? 'Inhala' : 'Exhala') : o.modo === 'cardio' ? 'Al paso' : t > 0.5 ? 'Final' : 'Inicio';
+    if(o.cap.textContent !== txt) o.cap.textContent = txt;
+  }
+  function paso(ahora){
+    reloj = 0;
+    var dt = ultimo ? Math.min(ahora - ultimo, 100) : 16;
+    ultimo = ahora;
+    var hay = false;
+    lista = lista.filter(function(o){ return o.el.isConnected; });
+    lista.forEach(function(o){
+      if(!o.visible || !o.play) return;
+      hay = true;
+      o.ms += dt;
+      var a = avance(o.r, o.ms);
+      dibujar(o, a.t, a.sube);
+    });
+    if(hay) reloj = requestAnimationFrame(paso); else ultimo = 0;
+  }
+  function andar(){ if(!reloj) reloj = requestAnimationFrame(paso); }
+  function marcar(o){
+    o.el.classList.toggle('pausa', !o.play);
+    o.btn.setAttribute('aria-pressed', String(o.play));
+    o.btn.setAttribute('aria-label', o.n + ': ' + (o.play ? 'pausar' : 'reanudar') + ' la animación');
+  }
+  /* Tiempo del ciclo que corresponde a un avance t, para que al reanudar siga desde donde quedó. */
+  function msDe(o, t){
+    var r = o.r, x = Math.max(0, Math.min(1, t)), y = Math.acos(1 - 2 * x) / Math.PI;
+    return r.ida * y;
+  }
+  function iniciar(){
+    document.querySelectorAll('.ej-anim:not([data-listo])').forEach(function(el){
+      var f; try{ f = JSON.parse(el.dataset.fig); }catch(e){ return; }
+      el.dataset.listo = '1';
+      var modo = el.dataset.modo, o = {el:el, f:f, modo:modo, respira:modo === 'respira', r:FG_RITMO[modo] || FG_RITMO.fuerza,
+        A:f.a, B:f.b || respira(f.a), n:el.dataset.n, titulo:el.dataset.n, ms:0, ult:null, visible:!('IntersectionObserver' in window), play:!quieto,
+        btn:el.querySelector('.fg-btn'), rango:el.querySelector('.fg-rango'), cap:el.querySelector('figcaption'), arrastre:false};
+      o.clave = modo + '|' + o.n;
+      if(memo[o.clave]){ o.ms = memo[o.clave].ms; o.play = memo[o.clave].play; }
+      memo[o.clave] = o;
+      el._fg = o;
+      o.btn.addEventListener('click', function(){ o.play = !o.play; marcar(o); if(o.play) andar(); });
+      o.rango.addEventListener('input', function(){
+        o.arrastre = true; o.play = false; marcar(o);
+        var t = o.rango.value / 1000; o.ms = msDe(o, t); dibujar(o, t, true); o.arrastre = false;
+      });
+      marcar(o);
+      if(io) io.observe(el);
+      lista.push(o);
+    });
+    andar();
+  }
+  if('IntersectionObserver' in window) io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.target._fg){ e.target._fg.visible = e.isIntersecting; } });
+    andar();
+  }, {rootMargin:'80px'});
+  return {iniciar:iniciar, pose:pose, respira:respira};
+})();
+/* Video de un ejercicio: se carga solo al pedirlo. */
 function videoEj(x){
   var h = '<div class="ej-vid">';
   if(x.vid) h += '<button class="btn sec sm" data-sa="ejvideo|' + esc(x.vid.id) + '" aria-expanded="false">▶ Ver video</button>';
@@ -27401,7 +27619,7 @@ function listaEj(d, vueltas, pr, f){
       }
       pasos = '<div class="ej-pasos">' + b.join('') + '</div>';
     }
-    return '<li>' + figuraEj(e.fig, e.n) + '<div class="ej-tx"><div class="ej-n"><b>' + esc(e.n) + '</b><span class="ej-r">' + (vueltas ? vueltas + ' × ' : '') + esc(e.reps) + '</span></div>' +
+    return '<li>' + figuraEj(e.fig, e.n, d.tipo) + '<div class="ej-tx"><div class="ej-n"><b>' + esc(e.n) + '</b><span class="ej-r">' + (vueltas ? vueltas + ' × ' : '') + esc(e.reps) + '</span></div>' +
       '<p>' + esc(e.c) + '</p>' + pasos + videoEj(e) + '</div></li>';
   }).join('') + '</ol>';
 }
@@ -27450,7 +27668,7 @@ function secEjercicio(hoy){
   /* sesión del día elegido */
   var hecha = SA.hechaEj(SS, dia, sd), futuro = dia > hoy;
   var pr = w && !futuro ? SA.progresoEj(SS, dia, sd) : null;
-  h += '<div class="panel ej-ses" id="ejSes"><h3>' + esc(d.n) + ' <em>' + esc(fechaSa(dia)) + (dia === hoy ? ', hoy' : '') + (d.min ? ' · ' + d.min + ' min' : '') + (d.principal || sd === 'desc' ? '' : ' · opcional') + '</em></h3>';
+  h += '<div class="panel ej-ses" id="ejSes"><h3><span class="ej-tit"><span class="ej-ic sm" aria-hidden="true">' + icoEj(sd) + '</span>' + esc(d.n) + '</span> <em>' + esc(fechaSa(dia)) + (dia === hoy ? ', hoy' : '') + (d.min ? ' · ' + d.min + ' min' : '') + (d.principal || sd === 'desc' ? '' : ' · opcional') + '</em></h3>';
   if(d.tipo === 'fuerza'){
     h += '<p class="txt2"><b>Calentamiento.</b> ' + esc(d.calentamiento) + '</p>' +
       '<p class="txt2"><b>' + d.vueltas + ' vueltas</b> del circuito, en orden. ' + esc(d.descanso) + '</p>' + (pr ? barraEj(pr) : '') + listaEj(d, 0, pr, dia) +
@@ -27460,7 +27678,7 @@ function secEjercicio(hoy){
       '<p class="txt2"><b>' + (d.vueltas > 1 ? d.vueltas + ' vueltas' : 'Una vuelta') + '</b> a la secuencia, en orden, sobre una colchoneta o toalla gruesa.</p>' + (pr ? barraEj(pr) : '') + listaEj(d, 0, pr, dia) +
       '<p class="txt2">' + esc(d.calma) + '</p>';
   } else if(d.tipo === 'cardio'){
-    h += '<div class="ej-card">' + figuraEj(d.fig, d.n) + '<div class="ej-tx"><p class="txt2"><b>' + esc(d.detalle) + '</b></p><p class="txt2">' + esc(d.c) + '</p>' + videoEj(d) + '</div></div>';
+    h += '<div class="ej-card">' + figuraEj(d.fig, d.n, 'cardio') + '<div class="ej-tx"><p class="txt2"><b>' + esc(d.detalle) + '</b></p><p class="txt2">' + esc(d.c) + '</p>' + videoEj(d) + '</div></div>';
   } else h += '<p class="txt2">' + esc(d.c) + '</p>';
   if(futuro) h += '<p class="sa-nota">Se podrá marcar ese día.</p>';
   else if(w){
@@ -27868,6 +28086,7 @@ function render(){
   else if(S.vista === 'prep') m.innerHTML = vPrep();
   else if(S.vista === 'salud') m.innerHTML = vSalud();
   else m.innerHTML = vReglas();
+  FG.iniciar();
   Array.prototype.forEach.call(document.querySelectorAll('nav.main button'), function(b){
     b.setAttribute('aria-selected', String(b.dataset.v === S.vista));
   });

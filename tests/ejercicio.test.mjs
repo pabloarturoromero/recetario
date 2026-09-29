@@ -130,7 +130,21 @@ for (const ancho of [320, 390, 1280]) {
     await page.locator('.ej-dia').first().click();
     assert.match(await page.textContent('#ejSes h3'), /Fuerza A/);
     assert.equal(await page.locator('#ejSes .ej-list li').count(), 6);
-    assert.equal(await page.locator('#ejSes .ej-list li svg.fg').count(), 11, 'inicio y final de cada ejercicio; la plancha, una postura');
+    assert.equal(await page.locator('#ejSes .ej-list li .ej-anim svg.fg').count(), 6, 'una figura animada por ejercicio');
+    // La figura se mueve sola; al tocarla se detiene y la barra la lleva a mano hasta el final.
+    const fig = page.locator('#ejSes .ej-anim').first(), dibujo = () => fig.locator('svg.fg').innerHTML();
+    const d0 = await dibujo();
+    await page.waitForTimeout(700);
+    assert.notEqual(await dibujo(), d0, 'la figura se mueve');
+    await fig.locator('.fg-btn').click();
+    assert.equal(await fig.locator('.fg-btn').getAttribute('aria-pressed'), 'false', 'queda en pausa');
+    const d1 = await dibujo();
+    await page.waitForTimeout(400);
+    assert.equal(await dibujo(), d1, 'en pausa no cambia');
+    await fig.locator('.fg-rango').fill('1000');
+    assert.equal(await fig.locator('figcaption').textContent(), 'Final');
+    await fig.locator('.fg-btn').click();
+    assert.equal(await fig.locator('.fg-btn').getAttribute('aria-pressed'), 'true', 'se reanuda');
     await page.locator('#ejSes [data-sa^="ejvideo|"]').first().click();
     assert.match(await page.getAttribute('#ejSes .ej-player iframe', 'src'), /youtube-nocookie\.com\/embed\/[\w-]{11}/);
     await page.locator('#ejSes [data-sa^="ejvideo|"]').first().click();
@@ -141,7 +155,7 @@ for (const ancho of [320, 390, 1280]) {
     assert.equal(await page.locator('#ejSes .ej-list li').count(), 8);
     await page.locator('.ej-dia').nth(2).click();
     assert.match(await page.textContent('#ejSes h3'), /Caminata.*opcional/s);
-    assert.ok(await page.locator('#ejSes .ej-card svg.fg').count() === 2);
+    assert.ok(await page.locator('#ejSes .ej-card .ej-anim svg.fg').count() === 1);
     assert.ok(await page.locator('#ejSes [data-sa^="ejvideo|"]').count() === 1);
     await page.locator('.ej-dia').first().click();
     const lunesMarcable = await page.locator('#ejSes [data-sa^="ejmarcar|"]').count();
