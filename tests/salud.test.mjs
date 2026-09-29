@@ -317,3 +317,110 @@ test('PDF: un informe narrativo aporta sus conclusiones y ningún valor', () => 
   assert.equal(b.n, 0);
   assert.match(b.notas, /Conclusiones: Hallazgo uno\. Hallazgo dos\.$/);
 });
+
+/* ---------- lo que comí ---------- */
+const plato = (id, e = 'si') => { const r = D.recetas.find((x) => x.id === id); return { e, id, n: r.nombre, p: r.macros.proteina_g, fb: r.macros.fibra_g, kc: r.macros.kcal_aprox, o: !!r.aporta_omega3_marino }; };
+
+test('comidas: registro por fecha y franja, porción, validación y deshacer', () => {
+  const st = SA.vacio(), f = '2026-09-28';
+  assert.equal(SA.registrarComida(st, f, 'desayuno', plato('D7')), true);
+  assert.equal(SA.registrarComida(st, f, 'merienda', plato('D7')), false, 'solo las franjas del plan');
+  assert.equal(SA.registrarComida(st, f, 'cena', { e: 'si', n: 'x', kc: 5000 }), false, 'energía fuera de rango');
+  assert.equal(SA.registrarComida(st, f, 'cena', { e: 'quizas', kc: 100 }), false);
+  assert.equal(SA.registrarComida(st, f, 'almuerzo', { ...plato('L13'), x: 1.5 }), true);
+  assert.equal(SA.registrarComida(st, f, 'cena', { e: 'no', kc: 999 }), true);
+  const d7 = plato('D7'), l13 = plato('L13');
+  const t = SA.totalComidasDia(st, f);
+  assert.equal(t.registradas, 3); assert.equal(t.completo, true); assert.equal(t.si, 2); assert.equal(t.no, 1);
+  assert.equal(t.kc, Math.round(d7.kc + l13.kc * 1.5));
+  assert.equal(SA.comidaDe(st, f, 'cena').kc, 0, '«No comí» no suma');
+  assert.equal(SA.quitarComida(st, f, 'cena'), true);
+  assert.equal(SA.totalComidasDia(st, f).completo, false);
+  assert.equal(SA.quitarComida(st, f, 'cena'), false);
+});
+
+test('comidas: acumulado de lunes a hoy, promedio de días completos y total del domingo', () => {
+  const st = SA.vacio(), lun = '2026-09-28', mar = '2026-09-29', mie = '2026-09-30', dom = '2026-10-04';
+  const pesc = D.recetas.find((r) => r.aporta_omega3_marino && r.categoria === 'cena');
+  for (const f of [lun, mar]) {
+    SA.registrarComida(st, f, 'desayuno', plato('D7'));
+    SA.registrarComida(st, f, 'almuerzo', plato('L13'));
+    SA.registrarComida(st, f, 'cena', plato(pesc.id));
+  }
+  SA.registrarComida(st, mar, 'dulce', { e: 'otra', n: 'Helado', kc: 200, p: 3 });
+  SA.registrarComida(st, mie, 'desayuno', plato('D7'));
+  const r = SA.resumenComidas(st, mie, mie);
+  assert.equal(r.lunes, lun); assert.equal(r.hasta, mie); assert.equal(r.cerrada, false);
+  assert.equal(r.dias.length, 3, 'solo hasta hoy');
+  assert.equal(r.completos, 2);
+  const dia = plato('D7').kc + plato('L13').kc + pesc.macros.kcal_aprox;
+  assert.equal(r.acum.kc, dia * 2 + 200 + plato('D7').kc);
+  assert.equal(r.prom.kc, Math.round((dia * 2 + 200) / 2), 'el miércoles incompleto no entra en el promedio');
+  assert.equal(r.si, 7); assert.equal(r.otra, 1); assert.equal(r.adherencia, Math.round(7 / 8 * 100));
+  assert.equal(r.omega, 2 * [plato('D7'), plato('L13'), plato(pesc.id)].filter((x) => x.o).length);
+  const d = SA.resumenComidas(st, dom, dom);
+  assert.equal(d.cerrada, true); assert.equal(d.dias.length, 7); assert.equal(d.acum.kc, r.acum.kc);
+  const pasada = SA.resumenComidas(st, lun, '2026-10-08');
+  assert.equal(pasada.cerrada, true, 'una semana ya pasada está cerrada');
+  assert.equal(SA.resumenComidas(SA.vacio(), mie, mie).adherencia, null);
+});
+
+test('comidas: se conservan un año, sobreviven al respaldo y se fusionan entre dispositivos', () => {
+  const st = SA.vacio();
+  SA.registrarComida(st, '2025-09-01', 'cena', plato('C24'));
+  SA.registrarComida(st, '2026-09-01', 'cena', plato('C24'));
+  SA.podar(st, '2026-09-29');
+  assert.deepEqual(Object.keys(st.comidas), ['2026-09-01']);
+  const vuelta = SA.importar(SA.exportar(st));
+  assert.deepEqual(plano(vuelta.comidas), plano(st.comidas));
+  assert.equal(SA.soloExamenes(vuelta), false);
+  const base = SA.normalizar(plano(st));
+  const tel = SA.normalizar(plano(st)), pc = SA.normalizar(plano(st));
+  SA.registrarComida(tel, '2026-09-29', 'desayuno', plato('D7'));
+  SA.quitarComida(pc, '2026-09-01', 'cena');
+  SA.registrarComida(pc, '2026-09-29', 'almuerzo', plato('L13'));
+  const f = SA.fusionar(base, tel, pc);
+  assert.deepEqual(Object.keys(f.comidas['2026-09-29']).sort(), ['almuerzo', 'desayuno']);
+  assert.equal(f.comidas['2026-09-01'], undefined, 'lo quitado en otro dispositivo no reaparece');
+  assert.equal(SA.igualSalud(f, tel), false);
+  assert.equal(SA.igualSalud(SA.normalizar(plano(f)), f), true);
+});
+
+for (const ancho of [390, 1280]) {
+  test(`lo que comí a ${ancho} px: «Lo comí» en Inicio, otra cosa en Salud y el informe de la semana`, { skip: saltar }, async () => {
+    const { page, ctx, errores } = await abrir(ancho);
+    const btn = page.locator('.dish.mk-desayuno [data-sa^="comi|"]');
+    await btn.click();
+    assert.match(await page.textContent('.dish.mk-desayuno .co-hecho'), /Lo comí/);
+    assert.match(await page.textContent('.co-mini'), /1 comida registrada/);
+    await page.click('.co-mini [data-sa="comver"]');
+    assert.equal(await page.evaluate(() => location.hash), '#salud');
+    const sec = page.locator('#sa-comidas');
+    assert.match(await sec.textContent(), /Lo que comí/);
+    await page.click('#coDia [data-sa^="comotra|"][data-sa$="|almuerzo"]');
+    await page.fill('#comForm [name=n]', 'Seco de pollo del restaurante');
+    await page.fill('#comForm [name=kc]', '850');
+    await page.fill('#comForm [name=p]', '42');
+    await page.click('#comForm [type=submit]');
+    assert.match(await page.textContent('#coDia'), /Seco de pollo del restaurante/);
+    await page.click('#coDia [data-sa^="comno|"][data-sa$="|cena"]');
+    await page.selectOption('#coDia [data-comx$="|almuerzo"]', '0.5');
+    const inf = await page.textContent('.co-inf');
+    assert.match(inf, /Hasta hoy|Total de la semana/);
+    assert.match(inf, /Comidas según el menú/);
+    assert.match(inf, /33 %/, 'una de tres comidas registradas fue la del menú; «No comí» también cuenta');
+    const g = await page.evaluate(() => JSON.parse(localStorage.getItem('recetario.salud')));
+    const hoy = Object.keys(g.comidas)[0];
+    assert.equal(g.comidas[hoy].almuerzo.kc, 850); assert.equal(g.comidas[hoy].almuerzo.x, 0.5);
+    assert.equal(g.comidas[hoy].cena.e, 'no');
+    assert.equal(g.v, 1);
+    const ov = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    assert.ok(ov <= 0, `desborda ${ov}px`);
+    await page.reload();
+    assert.match(await page.textContent('#coDia'), /Seco de pollo del restaurante/);
+    await page.click('[data-sa^="comsem|"]');
+    assert.match(await page.textContent('#sa-comidas'), /Semana del/);
+    assert.deepEqual(errores, []);
+    await ctx.close();
+  });
+}
