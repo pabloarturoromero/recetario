@@ -56,7 +56,7 @@ Copiar la forma de una receta existente de la misma categoría. Campos: `id` (si
 3. Subir `meta.version` (menor: 2.12.0 → 2.13.0) y `meta.fecha`.
 4. Validar:
    - JSON válido e ids únicos; macros dentro de los rangos;
-   - `node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs tests/cocinera.test.mjs tests/salud.test.mjs tests/nube.test.mjs`;
+   - `node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs tests/cocinera.test.mjs tests/salud.test.mjs tests/nube.test.mjs tests/chat.test.mjs`;
    - Playwright (global: `require(execSync('npm root -g').toString().trim() + '/playwright')`): la página carga sin errores de página, `#sub` muestra el total nuevo de recetas, la lista de compras se genera (botón `[data-goto="compras"]`) y la receta nueva abre en `#receta/ID`.
 5. Commit en `main` con mensaje en español (`vX.Y.Z: ...`) y `git push origin main`. Si el push falla por red, reintentar con espera creciente.
 6. Si existe el artifact del recetario (https://claude.ai/artifact/LRsQg1oJpf6PTJMVcASPGr), republicarlo con el mismo `index.html`.

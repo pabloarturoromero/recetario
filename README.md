@@ -26,15 +26,21 @@ Fuera de Claude, el plan semanal, las marcas de compras y las preparaciones list
 
 La lista de compras y las preparaciones salen del mismo cálculo. El bloque `compras_catalogo` asigna cada forma de ingrediente a un producto de compra, y el campo `modelo` de cada preparación base define su rendimiento o su lote.
 
+## Chat «Pregúntale a Mamá»
+
+El chat busca recetas y contesta preguntas sobre ellas sin conexión. Su vocabulario está en el bloque `<script type="application/json" id="chat">` de `index.html`, separado del código: para que acepte otra manera de pedir algo, basta con añadir la frase a la lista `dice` de la categoría, cocina, ingrediente, tipo de plato o atributo, o a los patrones de `preguntas`. Las respuestas salen de `respuestas`, con variantes que se alternan.
+
 ## Pruebas
 
 Sin dependencias propias. El motor de cálculo (`<script id="motor">` en `index.html`) se prueba con Node 20 o superior; la interfaz, con Playwright si está instalado (local o global):
 
 ```
-node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs
+node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs tests/cocinera.test.mjs tests/salud.test.mjs tests/nube.test.mjs tests/chat.test.mjs
 ```
 
 `galeria.test.mjs` cubre la galería de recetas, los filtros, las fichas, los enlaces directos `#receta/ID`, el mensaje de WhatsApp (sin enviarlo), «Añadir al menú», el intercambio con vista previa, «Deshacer» y los anchos de 375 y 390 px.
+
+`chat.test.mjs` cubre el chat «Pregúntale a Mamá»: búsquedas con ingredientes y negaciones, sinónimos y errores de escritura, refinamientos y preguntas sobre una receta.
 
 Si Playwright no está disponible, las pruebas de interfaz se omiten y lo indican.
 

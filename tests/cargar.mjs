@@ -29,3 +29,12 @@ export function salud(D = datos()) {
   vm.runInContext(m[1], ctx);
   return { SA: ctx.RecetarioSalud.crear(D), mod: ctx.RecetarioSalud };
 }
+export function chat(D = datos()) {
+  const db = JSON.parse(/<script type="application\/json" id="chat">([\s\S]*?)<\/script>/.exec(html)[1]);
+  const m = /<script id="chat-motor">([\s\S]*?)<\/script>/.exec(html);
+  const ctx = { globalThis: {} };
+  ctx.globalThis = ctx;
+  vm.createContext(ctx);
+  vm.runInContext(m[1], ctx);
+  return { CH: ctx.RecetarioChat.crear(D, db), db };
+}
