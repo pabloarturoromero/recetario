@@ -163,7 +163,7 @@ for (const ancho of [390, 1280]) {
     const { page, ctx, errores } = await abrir(ancho);
     assert.equal(await page.title(), 'Amor de Mamá');
     assert.equal(await page.getAttribute('.marca img', 'alt'), 'Amor de Mamá');
-    assert.match(await page.textContent('#sub'), /^100 recetas/);
+    assert.match(await page.textContent('#sub'), new RegExp(`^${D.recetas.length} recetas`));
     await page.click('nav.main button[data-v="salud"]');
     assert.equal(await page.evaluate(() => location.hash), '#salud');
     const vistas = [await ilus(page)];

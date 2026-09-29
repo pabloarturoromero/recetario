@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { datos } from './cargar.mjs';
 
 function cargarPlaywright() {
   const req = createRequire(import.meta.url);
@@ -12,6 +13,7 @@ function cargarPlaywright() {
   return null;
 }
 const pw = cargarPlaywright();
+const TOTAL = datos().recetas.length;
 const URL_APP = 'file://' + fileURLToPath(new URL('../index.html', import.meta.url));
 const saltar = pw ? false : 'Playwright no está disponible';
 
@@ -34,7 +36,7 @@ const guardado = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('
 test('carga sin errores y muestra el guardado real', { skip: saltar }, async () => {
   const { page, ctx, errores } = await abrir();
   assert.equal(await page.textContent('#syncTxt'), 'Guardado en este dispositivo');
-  assert.match(await page.textContent('#sub'), /^100 recetas/);
+  assert.match(await page.textContent('#sub'), new RegExp(`^${TOTAL} recetas`));
   await page.click('nav.main button[data-v="compras"]');
   const pie = await page.textContent('.foot');
   assert.match(pie, /solo en este dispositivo/);
@@ -47,11 +49,11 @@ test('carga sin errores y muestra el guardado real', { skip: saltar }, async () 
 test('buscar: la galería sigue a la búsqueda y muestra el vacío', { skip: saltar }, async () => {
   const { page, ctx } = await abrir();
   await page.click('nav.main button[data-v="recetas"]');
-  assert.equal(await page.locator('#gal .gcard').count(), 100);
+  assert.equal(await page.locator('#gal .gcard').count(), TOTAL);
   await page.fill('#q', 'caraota');
   const n = await page.locator('#gal .gcard').count();
   assert.ok(n >= 1);
-  assert.match(await page.textContent('#galCount'), new RegExp(`Mostrando ${n} de 100`));
+  assert.match(await page.textContent('#galCount'), new RegExp(`Mostrando ${n} de ${TOTAL}`));
   await page.locator('#gal .gcard .gopen').first().click();
   assert.match(await page.textContent('#fichaT'), /aracota|araota/i);
   await page.click('[data-back]');
