@@ -918,6 +918,37 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .agua-mini .track{margin-top:6px}
 .agua-mini .acts{display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex:none}
 
+/* Ejercicio */
+.ej-mini{margin-top:var(--s3)}
+.ej-ic{width:52px; height:52px; border-radius:50%; background:var(--brand-soft); color:var(--brand-ink); display:grid; place-items:center; flex:none}
+.ej-ic svg.i{width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.ej-sem{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin-top:var(--s4)}
+.ej-dia{display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 2px; border-radius:var(--r3); background:var(--surface);
+  box-shadow:var(--sh1); color:var(--ink-2); min-width:0; cursor:pointer; font:inherit}
+.ej-dia .l{font-size:13px; font-weight:700; color:var(--ink)}
+.ej-dia .s{font-size:12px; line-height:1.2; text-align:center; overflow-wrap:anywhere; min-height:2.4em}
+.ej-dia .m{font-size:12px; color:var(--ok); min-height:1.2em; font-weight:700}
+.ej-dia.opc .s{color:var(--ink-3)}
+.ej-dia.hoy{outline:2px solid var(--brand-soft); outline-offset:0}
+.ej-dia[aria-selected="true"]{background:var(--brand); box-shadow:var(--sh-brand)}
+.ej-dia[aria-selected="true"] :is(.l,.s,.m){color:var(--on-brand)}
+.ej-ses{margin-top:var(--s3)}
+.ej-ses .txt2{margin-top:var(--s2)}
+.ej-list{margin:var(--s3) 0; padding-left:1.3em; display:flex; flex-direction:column; gap:var(--s3)}
+.ej-list li{padding-left:2px}
+.ej-list .ej-n{display:flex; justify-content:space-between; gap:var(--s3); flex-wrap:wrap; align-items:baseline}
+.ej-list .ej-r{font-size:12.5px; font-weight:600; color:var(--brand-ink); font-variant-numeric:tabular-nums}
+.ej-list p{font-size:13px; color:var(--ink-2); line-height:1.5; margin:2px 0}
+.ej-form select{max-width:100%}
+.ej-ul{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:6px}
+@media (max-width:640px){
+  .ej-form select, .ej-form input{flex:1 1 130px}
+  .ej-dia .s{font-size:10px}
+}
+@media (max-width:360px){
+  .ej-dia .s{font-size:9.5px}
+}
+
 /* ============ CHAT «PREGÚNTALE A MAMÁ» ============ */
 .mama-btn{width:40px; height:40px; border-radius:50%; flex:none; padding:0; overflow:hidden; background:var(--brand-soft);
   box-shadow:var(--sh1); border:2px solid var(--surface); cursor:pointer}
@@ -1008,7 +1039,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.15.1",
+    "version": "2.16.0",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -24433,8 +24464,91 @@ function crear(D){
 root.RecetarioMotor = {crear:crear, semanaPrep:semanaPrep};
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
+<script type="application/json" id="ejercicio">{
+  "titulo": "Plan de ejercicio en casa, 4 semanas",
+  "version": 1,
+  "semanas": 4,
+  "equipo": "Una mancuerna de 10 libras (4,5 kg), una silla firme, una mesa o encimera y un escalón bajo.",
+  "semana_tipo": {"1": "fa", "2": "cam", "3": "mov", "4": "fb", "5": "cam", "6": "larga", "0": "desc"},
+  "sesiones": {
+    "fa": {
+      "n": "Fuerza A", "tipo": "fuerza", "principal": true,
+      "min": [30, 30, 35, 35],
+      "vueltas": [2, 2, 3, 3],
+      "descanso": "60 a 90 segundos entre ejercicios; 2 minutos entre vueltas.",
+      "calentamiento": "5 minutos: marcha en el sitio, círculos de hombros y de cadera, 10 sentadillas a la silla sin peso.",
+      "vuelta_a_la_calma": "5 minutos: caminar despacio y estirar pantorrilla, muslo y pecho, 20 a 30 segundos cada uno, sin rebotes.",
+      "ej": [
+        {"n": "Sentadilla a la silla con mancuerna al pecho", "reps": ["10", "12", "10", "12"], "c": "Pies al ancho de la cadera; siéntate apenas tocando la silla y levántate empujando con los talones. Sopla al subir.", "v": "sentadilla a la silla con mancuerna goblet principiantes"},
+        {"n": "Remo a una mano apoyado en la silla", "reps": ["10 por lado", "12 por lado", "10 por lado", "12 por lado"], "c": "Mano y rodilla libres sobre la silla, espalda recta; lleva el codo hacia la cadera y baja despacio.", "v": "remo a una mano con mancuerna apoyado en silla"},
+        {"n": "Flexión de brazos inclinada en la mesa", "reps": ["8", "10", "10", "12"], "c": "Manos en el borde de una mesa firme o encimera, cuerpo en línea; baja el pecho y empuja soltando el aire. Si cuesta, hazla en la pared.", "v": "flexiones inclinadas en mesa principiantes"},
+        {"n": "Peso muerto rumano con mancuerna", "reps": ["10", "12", "10", "12"], "c": "Rodillas un poco flexionadas; lleva la cadera atrás con la espalda recta y la mancuerna cerca de las piernas, hasta media espinilla.", "v": "peso muerto rumano con una mancuerna tecnica"},
+        {"n": "Puente de glúteo", "reps": ["12", "15", "12", "15"], "c": "Boca arriba, rodillas dobladas; sube la cadera apretando glúteos, sostén un segundo y baja. La mancuerna sobre la cadera desde la semana 3.", "v": "puente de gluteo principiantes"},
+        {"n": "Plancha inclinada en la mesa", "reps": ["20 s", "25 s", "30 s", "30 s"], "c": "Antebrazos en la mesa, cuerpo en línea; respira todo el tiempo, sin aguantar el aire.", "v": "plancha inclinada principiantes"}
+      ]
+    },
+    "fb": {
+      "n": "Fuerza B", "tipo": "fuerza", "principal": true,
+      "min": [30, 30, 35, 35],
+      "vueltas": [2, 2, 3, 3],
+      "descanso": "60 a 90 segundos entre ejercicios; 2 minutos entre vueltas.",
+      "calentamiento": "5 minutos: marcha en el sitio, balanceo de brazos, 10 elevaciones de talón y 5 zancadas cortas por lado apoyándote en la silla.",
+      "vuelta_a_la_calma": "5 minutos: caminar despacio y estirar cadera, muslo posterior y hombros, 20 a 30 segundos cada uno.",
+      "ej": [
+        {"n": "Subida al escalón", "reps": ["8 por lado", "10 por lado", "8 por lado", "10 por lado"], "c": "Escalón bajo y firme, junto a una pared o baranda; sube con todo el pie y baja controlando. La mancuerna en la mano desde la semana 3.", "v": "subida al escalon step up principiantes"},
+        {"n": "Press de hombro sentado a una mano", "reps": ["8 por lado", "10 por lado", "10 por lado", "12 por lado"], "c": "Sentado con la espalda recta; empuja la mancuerna hacia arriba soplando y baja despacio hasta la altura de la oreja.", "v": "press de hombro sentado una mancuerna"},
+        {"n": "Zancada estática con apoyo en la silla", "reps": ["6 por lado", "8 por lado", "8 por lado", "10 por lado"], "c": "Un pie adelante y otro atrás; baja recto como un ascensor, solo hasta donde estés cómodo, con una mano en la silla.", "v": "zancada estatica con apoyo principiantes"},
+        {"n": "Remo a una mano apoyado en la silla", "reps": ["10 por lado", "12 por lado", "10 por lado", "12 por lado"], "c": "El mismo de la Fuerza A: la espalda se trabaja dos veces por semana.", "v": "remo a una mano con mancuerna apoyado en silla"},
+        {"n": "Curl de bíceps a una mano", "reps": ["10 por lado", "12 por lado", "10 por lado", "12 por lado"], "c": "Codo pegado al cuerpo; sube sin balancear y baja en tres tiempos.", "v": "curl de biceps con mancuerna tecnica"},
+        {"n": "Bicho muerto", "reps": ["6 por lado", "8 por lado", "8 por lado", "10 por lado"], "c": "Boca arriba, brazos al techo y rodillas a 90 grados; estira brazo y pierna contrarios sin despegar la espalda baja del piso.", "v": "dead bug bicho muerto ejercicio principiantes"}
+      ]
+    },
+    "cam": {
+      "n": "Caminata a paso ligero", "tipo": "cardio", "principal": true,
+      "min": [30, 35, 40, 45],
+      "detalle": ["5 min suave, 20 min a paso ligero, 5 min suave.", "5 min suave, 25 min a paso ligero, 5 min suave.", "5 min suave, 30 min a paso ligero, 5 min suave.", "5 min suave, 35 min a paso ligero, 5 min suave."],
+      "c": "Paso ligero es el que te deja hablar en frases completas pero no cantar (esfuerzo 4 a 5 de 10). En Guayaquil, mejor antes de las 9:00 o después de las 17:00, con agua y en terreno plano; en un centro comercial si llueve o hace mucho calor."
+    },
+    "larga": {
+      "n": "Caminata larga suave", "tipo": "cardio", "principal": false,
+      "min": [30, 35, 40, 45],
+      "detalle": ["30 min a paso cómodo.", "35 min a paso cómodo.", "40 min a paso cómodo.", "45 min a paso cómodo."],
+      "c": "Opcional. Paso de paseo, con conversación fácil (esfuerzo 3 a 4 de 10). Sirve un paseo en familia, por el Malecón o por el parque."
+    },
+    "mov": {
+      "n": "Movilidad y equilibrio", "tipo": "movilidad", "principal": false,
+      "min": [15, 15, 15, 15],
+      "c": "Opcional y suave: ayuda a recuperarse de la fuerza del día anterior.",
+      "ej": [
+        {"n": "Círculos de hombros y brazos", "reps": ["10 adelante y 10 atrás"], "c": "Amplios y lentos.", "v": "circulos de hombros movilidad"},
+        {"n": "Gato y vaca", "reps": ["8 lentos"], "c": "En cuatro apoyos, redondea y arquea la espalda con la respiración.", "v": "gato vaca ejercicio movilidad"},
+        {"n": "Estiramiento de cadera en zancada", "reps": ["30 s por lado"], "c": "Rodilla de atrás en el piso sobre un cojín; lleva la cadera adelante sin arquear la espalda.", "v": "estiramiento flexor de cadera arrodillado"},
+        {"n": "Equilibrio en un pie con apoyo", "reps": ["30 s por lado, 2 veces"], "c": "Junto a la silla, tocándola con los dedos; suelta la mano solo si te sientes estable.", "v": "ejercicio equilibrio en un pie adultos"},
+        {"n": "Respiración diafragmática", "reps": ["2 minutos"], "c": "Boca arriba o sentado: inhala por la nariz en 4 tiempos inflando el abdomen y exhala en 6.", "v": "respiracion diafragmatica tutorial"}
+      ]
+    },
+    "desc": {"n": "Descanso", "tipo": "descanso", "principal": false, "min": [0, 0, 0, 0], "c": "Día libre. Un paseo tranquilo también vale, sin contarlo como sesión."}
+  },
+  "progresion": "Cada semana sube un poco: minutos de caminata, repeticiones y, desde la semana 3, una vuelta más de fuerza. Si una semana costó mucho (esfuerzo de 8 o más), repítela antes de avanzar. Después de la semana 4, mantén ese nivel y conversa con tu cardiólogo antes de subir la intensidad.",
+  "seguridad": [
+    "Tu cardiólogo autorizó el ejercicio de fuerza. Si te dio un rango de pulso o alguna indicación, esa manda sobre este plan.",
+    "Guíate por el esfuerzo percibido de 0 a 10: la fuerza entre 5 y 6 (las dos últimas repeticiones cuestan, pero salen con buena técnica) y la caminata entre 4 y 5. Algunos medicamentos del corazón bajan el pulso, por eso el esfuerzo es mejor guía que el reloj.",
+    "Nunca aguantes la respiración al hacer fuerza: sopla al subir o empujar y toma aire al bajar.",
+    "Siempre calentamiento de 5 minutos antes y vuelta a la calma después; no te sientes ni te acuestes de golpe al terminar.",
+    "Espera una a dos horas después del almuerzo o la cena antes de la fuerza o la caminata a paso ligero. Un paseo suave de 10 minutos después de comer sí está bien.",
+    "Detente y busca atención médica si aparece dolor, presión u opresión en el pecho, el brazo, el cuello o la mandíbula, falta de aire que no corresponde al esfuerzo, mareo, palpitaciones o latidos irregulares, o sudor frío.",
+    "No entrenes con fiebre, gripe o si dormiste muy mal: ese día toca descanso o solo movilidad.",
+    "Toma agua antes, durante y después; el vaso de la caminata se registra en el medidor de agua."
+  ],
+  "con_la_comida": [
+    "El plan no cambia las porciones en los días de ejercicio: las tres tomas de 35 a 40 g de proteína del menú ya cubren la recuperación muscular.",
+    "Si entrenas en la mañana, hazlo después del desayuno esperando una hora, o antes con un vaso de agua si te sientes bien en ayunas.",
+    "El piso de 150 g de carbohidrato al día sostiene la energía para entrenar: no lo recortes los días de fuerza.",
+    "En las semanas 3 y 4 del plan de comidas, con menos kcal, el ejercicio de fuerza ayuda a conservar el músculo mientras baja el peso."
+  ]
+}</script>
 <script id="salud">
-/* Motor de Salud: agua, peso y exámenes. Funciones puras, sin DOM: la interfaz y las pruebas usan las mismas.
+/* Motor de Salud: agua, peso, exámenes y ejercicio. Funciones puras, sin DOM: la interfaz y las pruebas usan las mismas.
    Se guarda aparte del menú, en la clave recetario.salud, con su propia versión. */
 (function(root){
 "use strict";
@@ -24504,7 +24618,7 @@ function partesGYE(d){
 function hoyISO(d){ return partesGYE(d).f; }
 function horaGYE(d){ return partesGYE(d).h; }
 
-function crear(D){
+function crear(D, P){
   var liq = (D && D.meta && D.meta.reglas_de_armado && D.meta.reglas_de_armado.liquido_dia) || '';
   var nums = (String(liq).match(/\d+(?:[.,]\d+)?/g) || []).map(function(x){ return parseFloat(x.replace(',', '.')); });
   var ml = /m\s*l/i.test(liq) ? 1 : 1000;
@@ -24531,7 +24645,7 @@ function crear(D){
   }
   function fmtL(v){ return (Math.round(v / 100) / 10).toFixed(1).replace('.', ',') + ' L'; }
 
-  function vacio(){ return {v:VERSION_SALUD, agua:{}, medidas:[], examenes:[]}; }
+  function vacio(){ return {v:VERSION_SALUD, agua:{}, medidas:[], examenes:[], ejercicio:ejVacio()}; }
 
   function normalizar(o){
     var st = vacio();
@@ -24548,6 +24662,9 @@ function crear(D){
     });
     (Array.isArray(o.medidas) ? o.medidas : []).forEach(function(m){ if(m && esISO(m.f)) guardarMedida(st, m); });
     (Array.isArray(o.examenes) ? o.examenes : []).forEach(function(e){ if(e && esISO(e.f)) guardarExamen(st, e); });
+    var ej = o.ejercicio && typeof o.ejercicio === 'object' ? o.ejercicio : {};
+    if(esISO(ej.inicio)) st.ejercicio.inicio = ej.inicio;
+    (Array.isArray(ej.hechas) ? ej.hechas : []).forEach(function(h){ if(h) marcarEj(st, h.f, h.s, h.min, h.esf); });
     if(typeof o.actualizado === 'string') st.actualizado = o.actualizado;
     return st;
   }
@@ -24857,14 +24974,91 @@ function crear(D){
       n:Object.keys(vals).length + otros.length, conclusiones:concl.length > 0, renglones:filas.length};
   }
 
+
+  /* ---------- ejercicio ---------- */
+  /* P es el programa del bloque JSON «ejercicio»: sesiones por día de la semana y progresión de cuatro semanas.
+     Lo guardado es mínimo: la fecha de inicio (un lunes) y las sesiones hechas, {f, s, min, esf}. */
+  var PLAN = P && P.sesiones && P.semana_tipo ? P : null;
+  var NSEM = PLAN ? PLAN.semanas || 4 : 4;
+  var MAX_HECHAS = 600;
+  function ejVacio(){ return {inicio:'', hechas:[]}; }
+  function lunesDe(f){ return sumarDias(f, -((diaSemana(f) + 6) % 7)); }
+  function sesionValida(s){
+    if(typeof s !== 'string' || s === 'desc') return false;
+    return PLAN ? !!PLAN.sesiones[s] : /^[a-z]{1,12}$/.test(s);
+  }
+  function empezarEj(st, f){ st.ejercicio.inicio = lunesDe(f); return st.ejercicio.inicio; }
+  function reiniciarEj(st){ st.ejercicio.inicio = ''; return st; }
+  /* Semana del plan que contiene f: 0 sin empezar, 1 en adelante; el nivel no pasa de la última semana. */
+  function semanaEj(st, f){
+    var i = st.ejercicio.inicio;
+    if(!i || f < i) return 0;
+    return Math.floor(difDias(f, i) / 7) + 1;
+  }
+  function nivelEj(st, f){ return Math.max(1, Math.min(NSEM, semanaEj(st, f) || 1)); }
+  function sesionDia(f){ return PLAN ? PLAN.semana_tipo[String(diaSemana(f))] || 'desc' : 'desc'; }
+  function deNivel(a, n){ return Array.isArray(a) ? a[Math.min(n, a.length) - 1] : a; }
+  /* La sesión con cantidades de la semana n (1 a 4). */
+  function detalleSesion(id, n){
+    var x = PLAN && PLAN.sesiones[id];
+    if(!x) return null;
+    n = Math.max(1, Math.min(NSEM, n || 1));
+    return {id:id, n:x.n, tipo:x.tipo, principal:!!x.principal, min:deNivel(x.min, n), vueltas:deNivel(x.vueltas, n) || 0,
+      detalle:deNivel(x.detalle, n) || '', c:x.c || '', descanso:x.descanso || '', calentamiento:x.calentamiento || '',
+      calma:x.vuelta_a_la_calma || '',
+      ej:(x.ej || []).map(function(e){ return {n:e.n, reps:deNivel(e.reps, n), c:e.c || '', v:e.v || ''}; })};
+  }
+  function marcarEj(st, f, s, min, esf){
+    if(!esISO(f) || !sesionValida(s)) return false;
+    var m = num(min), e = num(esf);
+    if(m === null){ var d = detalleSesion(s, nivelEj(st, f)); m = d ? d.min : 30; }
+    m = Math.round(m);
+    if(m <= 0 || m > 300) return false;
+    e = e === null ? null : Math.round(e);
+    if(e !== null && (e < 0 || e > 10)) e = null;
+    var l = st.ejercicio.hechas.filter(function(h){ return !(h.f === f && h.s === s); });
+    l.push({f:f, s:s, min:m, esf:e});
+    l.sort(function(a, b){ return a.f < b.f ? -1 : a.f > b.f ? 1 : (a.s < b.s ? -1 : a.s > b.s ? 1 : 0); });
+    st.ejercicio.hechas = l.slice(-MAX_HECHAS);
+    return true;
+  }
+  function desmarcarEj(st, f, s){
+    var n = st.ejercicio.hechas.length;
+    st.ejercicio.hechas = st.ejercicio.hechas.filter(function(h){ return !(h.f === f && h.s === s); });
+    return st.ejercicio.hechas.length < n;
+  }
+  function hechasDia(st, f){ return st.ejercicio.hechas.filter(function(h){ return h.f === f; }); }
+  function hechaEj(st, f, s){ return st.ejercicio.hechas.filter(function(h){ return h.f === f && h.s === s; })[0] || null; }
+  /* Lunes a domingo de la semana de f: lo planeado, lo hecho y el conteo de las sesiones principales. */
+  function semanaResumenEj(st, f){
+    var n = nivelEj(st, f), o = {semana:semanaEj(st, f), nivel:n, dias:[], principales:0, hechasPrincipales:0, minutos:0, extras:0};
+    semanaDe(f).forEach(function(d){
+      var s = sesionDia(d), det = detalleSesion(s, n), hs = hechasDia(st, d);
+      var hecha = hs.some(function(h){ return h.s === s; });
+      if(det && det.principal){ o.principales++; if(hecha) o.hechasPrincipales++; }
+      hs.forEach(function(h){ o.minutos += h.min; if(h.s !== s) o.extras++; });
+      o.dias.push({f:d, s:s, n:det ? det.n : 'Descanso', principal:!!(det && det.principal), hecha:hecha, hechas:hs});
+    });
+    return o;
+  }
+  function historialEj(st, hoy, n){
+    var r = [];
+    for(var i=n-1;i>=0;i--){
+      var f = sumarDias(hoy, -i), hs = hechasDia(st, f);
+      r.push({f:f, min:hs.reduce(function(a, h){ return a + h.min; }, 0), n:hs.length});
+    }
+    return r;
+  }
+  function conEjercicio(st){ return !!st.ejercicio.inicio || st.ejercicio.hechas.length > 0; }
+
   /* ---------- respaldo ---------- */
   function exportar(st){
     return JSON.stringify({app:'amor-de-mama', tipo:'salud', v:VERSION_SALUD, exportado:new Date().toISOString(),
-      agua:st.agua, medidas:st.medidas, examenes:st.examenes}, null, 2);
+      agua:st.agua, medidas:st.medidas, examenes:st.examenes, ejercicio:st.ejercicio}, null, 2);
   }
   /* Un archivo que solo trae exámenes (sin agua ni medidas) se suma a lo guardado en lugar de reemplazarlo;
      una toma con el mismo id se actualiza. */
-  function soloExamenes(st){ return !!st && st.examenes.length > 0 && !Object.keys(st.agua).length && !st.medidas.length; }
+  function soloExamenes(st){ return !!st && st.examenes.length > 0 && !Object.keys(st.agua).length && !st.medidas.length && !conEjercicio(st); }
   function sumarExamenes(st, nuevo){ nuevo.examenes.forEach(function(e){ guardarExamen(st, e); }); return st; }
   function importar(txt){
     var o = typeof txt === 'string' ? JSON.parse(txt) : txt;
@@ -24887,6 +25081,9 @@ function crear(D){
     var h = historial(st, hoy, 7), dm = h.filter(function(x){ return x.ml > 0; });
     if(dm.length) l.push('Líquidos, promedio de los días registrados de la última semana: ' +
       fmtL(dm.reduce(function(a, x){ return a + x.ml; }, 0) / dm.length) + ' (meta ' + fmtL(META.min) + ' a ' + fmtL(META.max) + ')');
+    var he = historialEj(st, hoy, 7).filter(function(x){ return x.n; });
+    if(he.length) l.push('Ejercicio, últimos 7 días: ' + he.reduce(function(a, x){ return a + x.n; }, 0) + ' sesiones, ' +
+      he.reduce(function(a, x){ return a + x.min; }, 0) + ' min' + (semanaEj(st, hoy) ? ' (semana ' + semanaEj(st, hoy) + ' del plan de ejercicio)' : ''));
     var cab = false;
     EXAMENES.forEach(function(e){
       var hv = historiaValor(st, e.k);
@@ -24913,6 +25110,9 @@ function crear(D){
     seriePeso:seriePeso, estadoPresion:estadoPresion,
     guardarExamen:guardarExamen, borrarExamen:borrarExamen, soloExamenes:soloExamenes, sumarExamenes:sumarExamenes, renglonesPdf:renglonesPdf, leerInforme:leerInforme, claveExamen:claveExamen, fechaDe:fechaDe, historiaValor:historiaValor, estadoValor:estadoValor,
     textoRango:textoRango, otrosNombres:otrosNombres,
+    PLAN:PLAN, empezarEj:empezarEj, reiniciarEj:reiniciarEj, semanaEj:semanaEj, nivelEj:nivelEj, sesionDia:sesionDia,
+    detalleSesion:detalleSesion, marcarEj:marcarEj, desmarcarEj:desmarcarEj, hechaEj:hechaEj, hechasDia:hechasDia,
+    semanaResumenEj:semanaResumenEj, historialEj:historialEj, conEjercicio:conEjercicio, lunesDe:lunesDe,
     exportar:exportar, importar:importar, textoResumen:textoResumen,
     hoyISO:hoyISO, horaGYE:horaGYE, sumarDias:sumarDias, difDias:difDias, diaSemana:diaSemana
   };
@@ -25068,7 +25268,7 @@ var S = {
   galScroll:0,
   pushed:false,
   fichaTab:'ing',
-  salud:{fm:'', rango:30, ex:null, msg:'', borrador:null, pdf:''}   /* estado de pantalla de Salud, no se guarda */
+  salud:{fm:'', rango:30, ex:null, msg:'', borrador:null, pdf:'', ejDia:''}   /* estado de pantalla de Salud, no se guarda */
 };
 
 /* ---------- persistencia ---------- */
@@ -25130,13 +25330,13 @@ function guardar(){
 }
 /* ---------- persistencia de Salud ---------- */
 /* Clave propia, recetario.salud, con su versión: no toca recetario.menu ni su migración. */
-var SA = window.RecetarioSalud.crear(D);
+var SA = window.RecetarioSalud.crear(D, JSON.parse(document.getElementById('ejercicio').textContent));
 var SS = SA.vacio();
 var dbSalud = null, tmrSalud = null, ultimoRawSalud = null, saludHoy = null;
 function cuerpoSalud(){
-  return {v:SA.VERSION, agua:SS.agua, medidas:SS.medidas, examenes:SS.examenes, actualizado:new Date().toISOString()};
+  return {v:SA.VERSION, agua:SS.agua, medidas:SS.medidas, examenes:SS.examenes, ejercicio:SS.ejercicio, actualizado:new Date().toISOString()};
 }
-function saludConDatos(o){ return !!o && (Object.keys(o.agua).length || o.medidas.length || o.examenes.length); }
+function saludConDatos(o){ return !!o && (Object.keys(o.agua).length || o.medidas.length || o.examenes.length || SA.conEjercicio(o)); }
 function leerSalud(raw){ SS = SA.podar(SA.normalizar(JSON.parse(raw)), SA.hoyISO()); ultimoRawSalud = raw; }
 try{
   var rawS = localStorage.getItem('recetario.salud');
@@ -25421,6 +25621,7 @@ function vInicio(){
     '<button data-goto="compras"><span class="ic">' + ico('bag') + '</span>Compras</button>' +
     '<button data-goto="prep"><span class="ic">' + ico('pot') + '</span>Preparar</button></div>';
   h += aguaInicio();
+  h += ejercicioInicio();
   h += avisoNubeInicio();
 
   h += '<div class="sec-head"><h2>Menú de hoy</h2><span class="sec-acts"><button data-aleatorio="' + k + '" title="Cambia desayuno, almuerzo y cena por platos distintos">' + ico('swap') + ' Aleatorio</button><button data-goto="semana">Ver semana</button></span></div>';
@@ -26930,9 +27131,119 @@ function formExamen(ex){
   h += '<div class="acts"><button class="btn pri" type="submit">Guardar exámenes</button><button class="btn gh" type="button" data-sa="excancelar">Cancelar</button></div></form>';
   return h;
 }
+/* ---------- ejercicio ---------- */
+var EJ_CORTO = {fa:'Fuerza A', fb:'Fuerza B', cam:'Caminar', larga:'Paseo', mov:'Movilidad', desc:'Libre'};
+var DIA_LETRA = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+var ESFUERZO = {1:'muy suave', 3:'suave', 5:'moderado', 7:'fuerte', 9:'muy fuerte', 10:'máximo'};
+function ytEj(q){ return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q); }
+function ejercicioInicio(){
+  if(!SA.PLAN) return '';
+  var hoy = SA.hoyISO(), s = SA.sesionDia(hoy), d = SA.detalleSesion(s, SA.nivelEj(SS, hoy)), hecha = SA.hechaEj(SS, hoy, s), w = SA.semanaEj(SS, hoy);
+  var tx, act;
+  if(!w){
+    tx = '<b>Plan de ejercicio en casa</b><span>Cuatro semanas con tu mancuerna y caminatas. Empieza cuando quieras.</span>';
+    act = '<button class="btn pri sm" data-sa="ejver">Ver el plan</button>';
+  } else if(s === 'desc'){
+    tx = '<b>Ejercicio de hoy</b><span>Día libre · semana ' + w + ' del plan</span>';
+    act = '<button class="link" data-sa="ejver">Ver semana</button>';
+  } else {
+    tx = '<b>Ejercicio de hoy: ' + esc(d.n) + '</b><span id="ejMiniTx">' + d.min + ' min · semana ' + w + (d.principal ? '' : ' · opcional') + (hecha ? ' · hecha' : '') + '</span>';
+    act = (hecha ? '<span class="chip-s ok">Hecha</span>' : '<button class="btn pri sm" data-sa="ejmarcar|' + hoy + '|' + s + '">Marcar hecha</button>') +
+      '<button class="link" data-sa="ejver">Ver rutina</button>';
+  }
+  return '<div class="agua-mini panel ej-mini"><span class="ej-ic" aria-hidden="true">' + icoEj(s) + '</span><div class="tx">' + tx + '</div><div class="acts">' + act + '</div></div>';
+}
+function icoEj(s){
+  var t = SA.PLAN && SA.PLAN.sesiones[s] ? SA.PLAN.sesiones[s].tipo : 'descanso';
+  var p = t === 'fuerza' ? '<path d="M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12"/>' :
+    t === 'cardio' ? '<circle cx="13" cy="4.5" r="1.8"/><path d="m9 21 2.5-6 3 3V22M8 11l3-3.5 3 1.5 2 3.5M11.5 15l1-6.5"/>' :
+    t === 'movilidad' ? '<circle cx="12" cy="4.5" r="1.8"/><path d="M5 9.5h14M12 9.5V15m0 0-3.5 6M12 15l3.5 6"/>' :
+    '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>';
+  return '<svg class="i" viewBox="0 0 24 24">' + p + '</svg>';
+}
+function listaEj(d, vueltas){
+  return '<ol class="ej-list">' + d.ej.map(function(e){
+    return '<li><div class="ej-n"><b>' + esc(e.n) + '</b><span class="ej-r">' + (vueltas ? vueltas + ' × ' : '') + esc(e.reps) + '</span></div>' +
+      '<p>' + esc(e.c) + '</p>' + (e.v ? '<a class="lnk" href="' + esc(ytEj(e.v)) + '" target="_blank" rel="noopener">Ver cómo se hace</a>' : '') + '</li>';
+  }).join('') + '</ol>';
+}
+function secEjercicio(hoy){
+  var P = SA.PLAN, U = S.salud;
+  if(!P) return '';
+  var w = SA.semanaEj(SS, hoy), R = SA.semanaResumenEj(SS, hoy), n = R.nivel;
+  var dia = U.ejDia && R.dias.some(function(x){ return x.f === U.ejDia; }) ? U.ejDia : hoy;
+  var sd = SA.sesionDia(dia), d = SA.detalleSesion(sd, n);
+  var h = '<section class="sa-sec" id="sa-ejercicio" aria-labelledby="saEjT"><h2 id="saEjT">Ejercicio</h2>';
+  if(!w){
+    h += '<div class="panel ej-intro"><p class="txt2">' + esc(P.titulo) + ': dos días de fuerza con la mancuerna, dos caminatas a paso ligero y dos sesiones opcionales suaves. ' +
+      'Cada semana sube un poco. Equipo: ' + esc(P.equipo) + '</p>' +
+      '<div class="agua-acts"><button class="btn pri" data-sa="ejempezar">Empezar esta semana</button></div>' +
+      '<p class="sa-nota">Lee antes las indicaciones de seguridad de abajo. La semana del plan cuenta desde el lunes de la semana en que empiezas.</p></div>';
+  } else {
+    var ult = SS.ejercicio.hechas.filter(function(x){ return x.esf !== null; }).slice(-1)[0];
+    h += '<div class="sa-grid tres">' +
+      '<div class="sa-stat"><div class="k">Semana del plan</div><div class="v">' + Math.min(w, P.semanas) + ' <small>de ' + P.semanas + '</small></div><div class="d">' +
+        (w > P.semanas ? 'plan completo: se mantiene el nivel de la semana ' + P.semanas : 'desde el ' + esc(fechaSa(SS.ejercicio.inicio))) + '</div></div>' +
+      '<div class="sa-stat"><div class="k">Sesiones principales</div><div class="v">' + R.hechasPrincipales + ' <small>de ' + R.principales + '</small></div><div class="d">esta semana' + (R.extras ? ', más ' + R.extras + ' extra' : '') + '</div></div>' +
+      '<div class="sa-stat"><div class="k">Minutos activos</div><div class="v">' + R.minutos + ' <small>min</small></div><div class="d">esta semana, lunes a domingo</div></div>' +
+      '<div class="sa-stat"><div class="k">Último esfuerzo</div><div class="v">' + (ult ? ult.esf + ' <small>de 10</small>' : '—') + '</div><div class="d">' +
+        (ult ? esc(fechaSa(ult.f) + ' · ' + (P.sesiones[ult.s] ? P.sesiones[ult.s].n : ult.s)) : 'se anota al marcar una sesión') + '</div></div></div>';
+    if(ult && ult.esf >= 8) h += '<div class="alerts" style="margin-top:var(--s3)"><div class="alert warn"><span class="tag">Ejercicio</span><span>La última sesión se sintió de ' + ult.esf +
+      ' de 10: baja el ritmo en la próxima y, si la semana entera costó así, repítela antes de avanzar.</span></div></div>';
+  }
+  /* semana: siete días, el elegido abajo */
+  h += '<div class="ej-sem" role="tablist" aria-label="Días de la semana">' + R.dias.map(function(x){
+    var cls = (x.f === hoy ? ' hoy' : '') + (x.hecha || (x.s === 'desc' && x.hechas.length) ? ' ok' : '') + (x.principal ? '' : ' opc');
+    return '<button role="tab" class="ej-dia' + cls + '" data-sa="ejdia|' + x.f + '" aria-selected="' + (x.f === dia) + '" aria-label="' +
+      esc(fechaSa(x.f) + ': ' + x.n + (x.hecha ? ', hecha' : '')) + '"><span class="l">' + DIA_LETRA[SA.diaSemana(x.f)] + '</span>' +
+      '<span class="s">' + esc(EJ_CORTO[x.s] || x.n) + '</span><span class="m" aria-hidden="true">' + (x.hecha || x.hechas.length ? '✓' : '') + '</span></button>';
+  }).join('') + '</div>';
+
+  /* sesión del día elegido */
+  var hecha = SA.hechaEj(SS, dia, sd), futuro = dia > hoy;
+  h += '<div class="panel ej-ses" id="ejSes"><h3>' + esc(d.n) + ' <em>' + esc(fechaSa(dia)) + (dia === hoy ? ', hoy' : '') + (d.min ? ' · ' + d.min + ' min' : '') + (d.principal || sd === 'desc' ? '' : ' · opcional') + '</em></h3>';
+  if(d.tipo === 'fuerza'){
+    h += '<p class="txt2"><b>Calentamiento.</b> ' + esc(d.calentamiento) + '</p>' +
+      '<p class="txt2"><b>' + d.vueltas + ' vueltas</b> del circuito, en orden. ' + esc(d.descanso) + '</p>' + listaEj(d, 0) +
+      '<p class="txt2"><b>Vuelta a la calma.</b> ' + esc(d.calma) + '</p>';
+  } else if(d.tipo === 'cardio'){
+    h += '<p class="txt2"><b>' + esc(d.detalle) + '</b></p><p class="txt2">' + esc(d.c) + '</p>';
+  } else if(d.tipo === 'movilidad'){
+    h += '<p class="txt2">' + esc(d.c) + '</p>' + listaEj(d, 0);
+  } else h += '<p class="txt2">' + esc(d.c) + '</p>';
+  if(futuro) h += '<p class="sa-nota">Se podrá marcar ese día.</p>';
+  else if(w){
+    if(sd !== 'desc') h += '<div class="agua-acts">' + (hecha
+      ? '<span class="chip-s ok">Hecha · ' + hecha.min + ' min' + (hecha.esf !== null ? ' · esfuerzo ' + hecha.esf : '') + '</span><button class="btn gh sm" data-sa="ejquitar|' + dia + '|' + sd + '">Deshacer</button>'
+      : '<button class="btn pri" data-sa="ejmarcar|' + dia + '|' + sd + '">Marcar hecha</button>') + '</div>';
+    var otras = SA.hechasDia(SS, dia).filter(function(x){ return x.s !== sd; });
+    if(otras.length) h += '<ul class="sa-reg">' + otras.map(function(x){
+      return '<li><span>' + esc(P.sesiones[x.s].n) + ' · ' + x.min + ' min' + (x.esf !== null ? ' · esfuerzo ' + x.esf : '') + '</span><button class="btn gh sm" data-sa="ejquitar|' + dia + '|' + x.s + '">Quitar</button></li>';
+    }).join('') + '</ul>';
+    h += '<form class="agua-libre ej-form" id="ejForm" data-f="' + dia + '"><select name="s" aria-label="Sesión">' +
+      Object.keys(P.sesiones).filter(function(k){ return k !== 'desc'; }).map(function(k){
+        return '<option value="' + k + '"' + (k === (sd === 'desc' ? 'cam' : sd) ? ' selected' : '') + '>' + esc(P.sesiones[k].n) + '</option>';
+      }).join('') + '</select>' +
+      '<input type="number" name="min" min="5" max="300" step="5" placeholder="min" aria-label="Minutos">' +
+      '<select name="esf" aria-label="Esfuerzo percibido"><option value="">Esfuerzo, 0 a 10</option>' +
+      [1,2,3,4,5,6,7,8,9,10].map(function(i){ return '<option value="' + i + '">' + i + (ESFUERZO[i] ? ', ' + ESFUERZO[i] : '') + '</option>'; }).join('') + '</select>' +
+      '<button class="btn gh sm" type="submit">Registrar</button></form>' +
+      '<p class="sa-nota">Para anotar minutos, esfuerzo o una sesión cambiada de día. Si registras la misma sesión otra vez ese día, se reemplaza.</p>';
+  }
+  h += '</div>';
+
+  h += '<details class="disc"' + (w ? '' : ' open') + '><summary>Seguridad: léelo antes de empezar</summary><div class="dbody"><ul class="ej-ul">' +
+    P.seguridad.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></details>';
+  h += '<details class="disc"><summary>Con el plan de comidas</summary><div class="dbody"><ul class="ej-ul">' +
+    P.con_la_comida.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></details>';
+  h += '<details class="disc"><summary>Cómo progresa</summary><div class="dbody"><p>' + esc(P.progresion) + '</p>' +
+    (w ? '<p><button class="btn gh sm" data-sa="ejreiniciar">Volver a empezar desde la semana 1</button></p>' : '') + '</div></details>';
+  h += '<p class="sa-nota">Orientación general para un adulto con autorización médica; no sustituye las indicaciones de tu cardiólogo.</p></section>';
+  return h;
+}
 function vSalud(){
   var hoy = SA.hoyISO(), t = SA.totalDia(SS, hoy), av = SA.avisos(SS, hoy), U = S.salud;
-  var h = '<div class="page-h"><h1>Salud</h1><div class="sub">Agua del día, peso y exámenes. Se guarda aparte del menú' +
+  var h = '<div class="page-h"><h1>Salud</h1><div class="sub">Agua del día, ejercicio, peso y exámenes. Se guarda aparte del menú' +
     (dbSalud ? (NUBE.db ? ' y se sincroniza con tu nube' : ' y se sincroniza con la copia compartida') : ', solo en este dispositivo') + '.</div></div>';
 
   /* ----- agua ----- */
@@ -26962,6 +27273,9 @@ function vSalud(){
     (h30.length ? 'En 30 días: ' + h30.filter(function(x){ return x.ml >= SA.META.min; }).length + ' de ' + h30.length + ' días registrados con el mínimo' : 'Sin días anteriores registrados') +
     '</em></h3>' + graficoAgua(hoy) + '</div>';
   h += '<p class="sa-nota">Meta tomada de las reglas del plan: ' + esc(SA.META.texto) + ' de líquido al día. Suman agua, infusiones, las dos tazas de café y la gaseosa light permitida. El contador vuelve a cero a medianoche, hora de Guayaquil.</p></section>';
+
+  /* ----- ejercicio ----- */
+  h += secEjercicio(hoy);
 
   /* ----- peso y medidas ----- */
   var fm = U.fm || hoy, m = SS.medidas.filter(function(x){ return x.f === fm; })[0] || {};
@@ -27104,6 +27418,21 @@ function accionSalud(t){
     if(!SA.deshacer(SS, hoy)) return;
     guardarSalud();
   } else if(a === 'rango'){ U.rango = +p[1]; }
+  else if(a === 'ejver'){
+    if(S.vista !== 'salud') ir('salud');
+    U.ejDia = ''; render();
+    var se = document.getElementById('sa-ejercicio'); if(se) se.scrollIntoView({block:'start'});
+    return;
+  } else if(a === 'ejempezar'){ SA.empezarEj(SS, hoy); U.ejDia = ''; guardarSalud(); }
+  else if(a === 'ejreiniciar'){
+    if(window.confirm && !window.confirm('¿Volver a la semana 1 desde esta semana? Las sesiones ya marcadas se conservan.')) return;
+    SA.empezarEj(SS, hoy); guardarSalud();
+  } else if(a === 'ejdia'){ U.ejDia = p[1]; }
+  else if(a === 'ejmarcar'){
+    if(!SA.semanaEj(SS, hoy)) SA.empezarEj(SS, hoy);
+    if(!SA.marcarEj(SS, p[1], p[2])) return;
+    guardarSalud(); avisar('Sesión marcada. Anota el esfuerzo abajo si quieres.', null);
+  } else if(a === 'ejquitar'){ if(!SA.desmarcarEj(SS, p[1], p[2])) return; guardarSalud(); }
   else if(a === 'mededitar'){ U.fm = p[1]; render(); var mf = document.getElementById('medForm'); if(mf) mf.scrollIntoView({block:'center'}); return; }
   else if(a === 'medborrar'){
     if(window.confirm && !window.confirm('¿Borrar el registro del ' + fechaSa(p[1]) + '?')) return;
@@ -27134,6 +27463,12 @@ function enviarSalud(f){
   if(f.id === 'aguaLibre'){
     if(SA.registrar(SS, SA.hoyISO(), get('t'), get('ml'), SA.horaGYE())) guardarSalud();
     render(); var n = document.querySelector('#aguaLibre input'); if(n) n.focus({preventScroll:true});
+    return;
+  }
+  if(f.id === 'ejForm'){
+    var fe = f.dataset.f;
+    if(fe && fe <= SA.hoyISO() && SA.marcarEj(SS, fe, get('s'), get('min'), get('esf'))){ guardarSalud(); U.msg = ''; }
+    render(); var es = document.getElementById('ejSes'); if(es) es.scrollIntoView({block:'nearest'});
     return;
   }
   if(f.id === 'medForm'){
@@ -27414,7 +27749,7 @@ document.addEventListener('keydown', function(e){
 document.getElementById('marca').addEventListener('click', function(){ ir('inicio'); });
 document.getElementById('main').addEventListener('submit', function(e){
   var f = e.target;
-  if(f.id === 'aguaLibre' || f.id === 'medForm' || f.id === 'exForm'){ e.preventDefault(); enviarSalud(f); }
+  if(f.id === 'aguaLibre' || f.id === 'medForm' || f.id === 'exForm' || f.id === 'ejForm'){ e.preventDefault(); enviarSalud(f); }
   if(f.id === 'nubeForm'){ e.preventDefault(); conectarConClave(f.clave.value); }
 });
 document.getElementById('main').addEventListener('click', function(e){

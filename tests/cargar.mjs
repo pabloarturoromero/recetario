@@ -21,13 +21,16 @@ export function semilla() {
   const m = /var SEMILLA = (\{[\s\S]*?\n\});/.exec(html);
   return Function('return ' + m[1])();
 }
-export function salud(D = datos()) {
+export function ejercicio() {
+  return JSON.parse(/<script type="application\/json" id="ejercicio">([\s\S]*?)<\/script>/.exec(html)[1]);
+}
+export function salud(D = datos(), P = ejercicio()) {
   const m = /<script id="salud">([\s\S]*?)<\/script>/.exec(html);
   const ctx = { globalThis: {} };
   ctx.globalThis = ctx;
   vm.createContext(ctx);
   vm.runInContext(m[1], ctx);
-  return { SA: ctx.RecetarioSalud.crear(D), mod: ctx.RecetarioSalud };
+  return { SA: ctx.RecetarioSalud.crear(D, P), mod: ctx.RecetarioSalud };
 }
 export function chat(D = datos()) {
   const db = JSON.parse(/<script type="application\/json" id="chat">([\s\S]*?)<\/script>/.exec(html)[1]);

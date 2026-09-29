@@ -1,0 +1,148 @@
+// Pruebas del plan de ejercicio de Salud: programa, progresión, registro y la interfaz a varios anchos.
+// Uso: node --test tests/ejercicio.test.mjs
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { datos, salud, ejercicio } from './cargar.mjs';
+
+const D = datos();
+const P = ejercicio();
+const { SA } = salud(D, P);
+const plano = (o) => JSON.parse(JSON.stringify(o));
+
+test('el programa está completo: cada día tiene sesión y cada sesión cuatro semanas', () => {
+  for (let d = 0; d < 7; d++) assert.ok(P.sesiones[P.semana_tipo[String(d)]], `día ${d}`);
+  const princ = Object.values(P.semana_tipo).filter((s) => P.sesiones[s].principal);
+  assert.equal(princ.length, 4, 'dos de fuerza y dos caminatas');
+  assert.equal(princ.filter((s) => P.sesiones[s].tipo === 'fuerza').length, 2);
+  for (const [id, s] of Object.entries(P.sesiones)) {
+    assert.equal(s.min.length, P.semanas, `${id}: minutos por semana`);
+    for (const e of s.ej || []) {
+      assert.ok(e.reps.length === 1 || e.reps.length === P.semanas, `${id}: ${e.n}`);
+      assert.ok(e.c && e.v, `${id}: ${e.n} trae indicación y video`);
+    }
+  }
+  assert.ok(P.seguridad.some((x) => /respiración/.test(x)), 'no aguantar la respiración');
+  assert.ok(P.seguridad.some((x) => /pecho/.test(x)), 'señales para detenerse');
+});
+
+test('la semana del plan cuenta desde el lunes y el nivel se detiene en la semana 4', () => {
+  const st = SA.vacio();
+  assert.equal(SA.semanaEj(st, '2026-09-30'), 0, 'sin empezar');
+  assert.equal(SA.empezarEj(st, '2026-09-30'), '2026-09-28', 'un miércoles empieza en su lunes');
+  assert.equal(SA.semanaEj(st, '2026-10-04'), 1);
+  assert.equal(SA.semanaEj(st, '2026-10-05'), 2);
+  assert.equal(SA.semanaEj(st, '2026-11-02'), 6);
+  assert.equal(SA.nivelEj(st, '2026-11-02'), 4);
+  assert.equal(SA.sesionDia('2026-09-28'), 'fa');
+  assert.equal(SA.sesionDia('2026-10-04'), 'desc');
+});
+
+test('la progresión sube minutos, vueltas y repeticiones', () => {
+  const c1 = SA.detalleSesion('cam', 1), c4 = SA.detalleSesion('cam', 4);
+  assert.ok(c4.min > c1.min);
+  const f1 = SA.detalleSesion('fa', 1), f3 = SA.detalleSesion('fa', 3);
+  assert.equal(f1.vueltas, 2); assert.equal(f3.vueltas, 3);
+  assert.equal(f1.ej[0].reps, '10');
+  assert.equal(SA.detalleSesion('fa', 2).ej[0].reps, '12');
+  assert.equal(SA.detalleSesion('mov', 3).ej[0].reps, P.sesiones.mov.ej[0].reps[0], 'una sola cantidad vale para todas las semanas');
+  assert.equal(SA.detalleSesion('fa', 9).vueltas, 3, 'fuera de rango usa la última semana');
+});
+
+test('marcar, reemplazar y desmarcar sesiones; el resumen semanal cuenta las principales', () => {
+  const st = SA.vacio();
+  SA.empezarEj(st, '2026-09-28');
+  assert.ok(SA.marcarEj(st, '2026-09-28', 'fa'));
+  assert.equal(SA.hechaEj(st, '2026-09-28', 'fa').min, 30, 'sin minutos, los del plan');
+  assert.ok(SA.marcarEj(st, '2026-09-28', 'fa', 40, 6));
+  assert.equal(st.ejercicio.hechas.length, 1, 'la misma sesión el mismo día se reemplaza');
+  assert.equal(SA.marcarEj(st, '2026-09-28', 'desc'), false, 'el descanso no se marca');
+  assert.equal(SA.marcarEj(st, '2026-09-28', 'yoga'), false, 'solo sesiones del plan');
+  assert.equal(SA.marcarEj(st, '2026-09-28', 'cam', 0), false);
+  assert.ok(SA.marcarEj(st, '2026-09-29', 'cam', 35, 12), 'un esfuerzo fuera de escala se descarta');
+  assert.equal(SA.hechaEj(st, '2026-09-29', 'cam').esf, null);
+  SA.marcarEj(st, '2026-10-01', 'cam', 30);   // jueves de fuerza B: caminó en su lugar
+  const R = SA.semanaResumenEj(st, '2026-10-01');
+  assert.equal(R.principales, 4);
+  assert.equal(R.hechasPrincipales, 2);
+  assert.equal(R.extras, 1);
+  assert.equal(R.minutos, 105);
+  assert.equal(R.dias[3].hecha, false); assert.equal(R.dias[3].hechas.length, 1);
+  assert.ok(SA.desmarcarEj(st, '2026-10-01', 'cam'));
+  assert.equal(SA.desmarcarEj(st, '2026-10-01', 'cam'), false);
+});
+
+test('el ejercicio viaja en el respaldo y en el resumen para el médico', () => {
+  const st = SA.vacio();
+  SA.empezarEj(st, '2026-09-28');
+  SA.marcarEj(st, '2026-09-28', 'fa', 30, 5);
+  SA.marcarEj(st, '2026-09-29', 'cam', 30, 4);
+  const back = SA.importar(SA.exportar(st));
+  assert.deepEqual(plano(back.ejercicio), plano(st.ejercicio));
+  assert.match(SA.textoResumen(st, '2026-09-30'), /Ejercicio, últimos 7 días: 2 sesiones, 60 min \(semana 1/);
+  const viejo = SA.normalizar({ v: 1, agua: {}, medidas: [], examenes: [] });
+  assert.deepEqual(plano(viejo.ejercicio), { inicio: '', hechas: [] }, 'un estado anterior sigue abriendo');
+  const soloEx = SA.normalizar({ examenes: [{ f: '2026-09-01', valores: { glucosa: 90 } }], ejercicio: { hechas: [{ f: '2026-09-02', s: 'cam', min: 30 }] } });
+  assert.equal(SA.soloExamenes(soloEx), false, 'un respaldo con ejercicio no se suma como si fuera solo de exámenes');
+});
+
+function cargarPlaywright() {
+  const req = createRequire(import.meta.url);
+  try { return req('playwright'); } catch {}
+  try { return req(execSync('npm root -g').toString().trim() + '/playwright'); } catch {}
+  return null;
+}
+const pw = cargarPlaywright();
+const URL_APP = 'file://' + fileURLToPath(new URL('../index.html', import.meta.url));
+const saltar = pw ? false : 'Playwright no está disponible';
+let browser;
+test.before(async () => { if (pw) browser = await pw.chromium.launch(); });
+test.after(async () => { if (browser) await browser.close(); });
+
+for (const ancho of [320, 390, 1280]) {
+  test(`ejercicio a ${ancho} px: empezar, ver la rutina, marcar y registrar persiste tras recargar`, { skip: saltar }, async () => {
+    const ctx = await browser.newContext({ viewport: { width: ancho, height: 844 } });
+    const page = await ctx.newPage();
+    const errores = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await page.route(/fonts\.(googleapis|gstatic)/, (r) => r.abort());
+    await page.goto(URL_APP);
+    assert.match(await page.textContent('.ej-mini'), /Plan de ejercicio en casa/);
+    await page.click('.ej-mini [data-sa="ejver"]');
+    assert.equal(await page.getAttribute('nav.main button[data-v="salud"]', 'aria-selected'), 'true');
+    assert.ok(await page.locator('#sa-ejercicio details[open]').count() >= 1, 'la seguridad se ve abierta antes de empezar');
+    await page.click('[data-sa="ejempezar"]');
+    assert.match(await page.textContent('#sa-ejercicio .sa-stat'), /1\s*de 4/);
+    assert.equal(await page.locator('.ej-dia').count(), 7);
+    // Lunes de esta semana: Fuerza A con su circuito.
+    await page.locator('.ej-dia').first().click();
+    assert.match(await page.textContent('#ejSes h3'), /Fuerza A/);
+    assert.equal(await page.locator('#ejSes .ej-list li').count(), 6);
+    await page.locator('.ej-dia').first().click();
+    const lunesMarcable = await page.locator('#ejSes [data-sa^="ejmarcar|"]').count();
+    if (lunesMarcable) {
+      await page.click('#ejSes [data-sa^="ejmarcar|"]');
+      assert.match(await page.textContent('#ejSes'), /Hecha · 30 min/);
+    }
+    // Hoy: registrar una caminata con minutos y esfuerzo.
+    await page.click('.ej-dia.hoy');
+    await page.selectOption('#ejForm [name=s]', 'cam');
+    await page.fill('#ejForm [name=min]', '35');
+    await page.selectOption('#ejForm [name=esf]', '5');
+    await page.click('#ejForm [type=submit]');
+    const ov = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    assert.ok(ov <= 0, `sin desborde horizontal (${ov} px)`);
+    await page.reload();
+    const g = await page.evaluate(() => JSON.parse(localStorage.getItem('recetario.salud')).ejercicio);
+    assert.ok(g.inicio);
+    assert.ok(g.hechas.some((h) => h.s === 'cam' && h.min === 35 && h.esf === 5));
+    assert.equal(g.hechas.length, lunesMarcable ? (g.hechas.some((h) => h.s === 'fa') ? 2 : 1) : 1);
+    assert.match(await page.textContent('#sa-ejercicio'), /Último esfuerzo\s*5/);
+    await page.click('#marca');
+    assert.ok(await page.locator('.ej-mini').count() === 1);
+    assert.deepEqual(errores, []);
+    await ctx.close();
+  });
+}
