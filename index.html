@@ -878,6 +878,9 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .sa-tomas li{display:flex; align-items:center; justify-content:space-between; gap:var(--s3); flex-wrap:wrap; padding:8px 0; border-bottom:1px solid var(--line); font-size:13.5px}
 .sa-tomas li:last-child{border-bottom:0}
 .sa-tomas .acts{display:flex; gap:var(--s1)}
+.sa-tomas .ex-notas{flex-basis:100%}
+.sa-tomas .ex-notas summary{cursor:pointer; font-weight:600; color:var(--brand-ink)}
+.sa-tomas .ex-notas div{white-space:pre-wrap; overflow-wrap:anywhere; margin-top:6px; line-height:1.5}
 .sa-nota{font-size:12.5px; color:var(--ink-3); margin-top:var(--s3); line-height:1.5}
 .sa-btns{display:flex; flex-wrap:wrap; gap:var(--s3)}
 .sa-borrador{background:var(--warn-bg); border-color:transparent; font-size:13.5px; line-height:1.5; margin-bottom:var(--s3)}
@@ -995,7 +998,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.14.0",
+    "version": "2.14.1",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -26790,7 +26793,8 @@ function vSalud(){
     h += '<div class="panel" style="margin-top:var(--s3)"><h3>Tomas registradas</h3><ul class="sa-tomas">' + SS.examenes.slice().reverse().map(function(x){
       var n = Object.keys(x.valores).length + x.otros.length;
       return '<li><span><b>' + esc(fechaSa(x.f)) + '</b> · ' + n + (n === 1 ? ' valor' : ' valores') + (x.notas.trim() ? ' · con notas' : '') + '</span>' +
-        '<span class="acts"><button class="btn gh sm" data-sa="exeditar|' + esc(x.id) + '">Editar</button><button class="btn gh sm" data-sa="exborrar|' + esc(x.id) + '">Borrar</button></span></li>';
+        '<span class="acts"><button class="btn gh sm" data-sa="exeditar|' + esc(x.id) + '">Editar</button><button class="btn gh sm" data-sa="exborrar|' + esc(x.id) + '">Borrar</button></span>' +
+        (x.notas.trim() ? '<details class="ex-notas"><summary>Resultado</summary><div>' + esc(x.notas.trim()) + '</div></details>' : '') + '</li>';
     }).join('') + '</ul></div>';
   }
   h += '<p class="sa-nota">Los rangos son generales de adultos y solo orientativos: no son un diagnóstico. El laboratorio imprime sus propios rangos y la interpretación corresponde a tu médico tratante.</p></section>';
