@@ -137,7 +137,7 @@ test('migra el estado guardado de la v2.3 sin perder marcas', { skip: saltar }, 
   };
   const { page, ctx, errores } = await abrir({ init: `if(!sessionStorage.getItem('x')){sessionStorage.setItem('x','1');localStorage.setItem('recetario.menu', ${JSON.stringify(JSON.stringify(viejo))});}` });
   const st = await guardado(page);
-  assert.equal(st.v, 3);
+  assert.equal(st.v, 4);
   assert.equal(st.comensales, 2);
   assert.equal(st.semana.lun.almuerzo, 'L13');
   assert.equal(st.semana.lun.dulce, '');

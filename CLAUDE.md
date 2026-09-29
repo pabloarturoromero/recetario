@@ -30,7 +30,7 @@ Cloudflare Pages (proyecto `recetario-intercambiable`) está conectado a este re
 
 ## Datos del usuario
 
-Fuera de Claude, el plan semanal y las compras se guardan en el `localStorage` del navegador de cada persona. No cambiar la clave `recetario.menu` ni la estructura de `S.semana` sin migrar los datos existentes. El estado guardado lleva `v: 3`; la función `migrarEstado` del motor convierte las versiones anteriores y conserva las marcas antiguas en `comprasLegado`.
+Fuera de Claude, el plan semanal y las compras se guardan en el `localStorage` del navegador de cada persona. No cambiar la clave `recetario.menu` ni la estructura de `S.semana` sin migrar los datos existentes. El estado guardado lleva `v: 4`; la función `migrarEstado` del motor convierte las versiones anteriores y conserva las marcas antiguas en `comprasLegado`. El desayuno por defecto es D7 (huevos rancheros con frejol negro, `DESAYUNO_POR_DEFECTO`): la semana base lo usa los siete días y, al pasar de `v: 3` a `v: 4`, los desayunos que seguían siendo los de la semana base anterior se cambiaron a D7; los elegidos por la persona se respetan.
 
 Los enlaces directos a recetas usan `#receta/ID` (por ejemplo `#receta/L64`) y se comparten por WhatsApp. No renombrar ids de recetas existentes: romperían los enlaces ya enviados.
 

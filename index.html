@@ -1008,7 +1008,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.15.0",
+    "version": "2.15.1",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -23753,7 +23753,11 @@ var COMIDAS = [
 var NOMBRE_COMIDA = {desayuno:'Desayuno', almuerzo:'Almuerzo', cena:'Cena', guarnicion:'Guarnición', dulce:'Dulce'};
 var FUERA = {proteina_g:40, fibra_g:6, kcal_aprox:700};
 var DULCE_ESTIMADO_KCAL = 145;
-var VERSION_ESTADO = 3;
+var VERSION_ESTADO = 4;
+/* v4: el desayuno por defecto pasa a ser D7 (huevos rancheros con frejol negro). Al migrar, un desayuno
+   que sigue siendo el de la semana base anterior se cambia; el que la persona eligió se respeta. */
+var DESAYUNO_POR_DEFECTO = 'D7';
+var DESAYUNO_BASE_V3 = {lun:'D2', mar:'D1', mie:'D8', jue:'D1', vie:'D1', sab:'D10', dom:'D1'};
 var EPS = 1e-6;
 
 function diaDe(k){ for(var i=0;i<DIAS.length;i++) if(DIAS[i].k === k) return DIAS[i]; return null; }
@@ -24334,6 +24338,12 @@ function crear(D){
     var st = {v:VERSION_ESTADO, semana:null, comensales:1, compras:{}, comprasLegado:{}, prep:{}, fase:1};
     if(!o || typeof o !== 'object') return st;
     st.semana = o.semana ? normalizarSemana(o.semana) : null;
+    if(st.semana && (o.v || 0) < 4){
+      Object.keys(DESAYUNO_BASE_V3).forEach(function(k){
+        var d = st.semana[k];
+        if(d && (!d.desayuno || d.desayuno === DESAYUNO_BASE_V3[k])) d.desayuno = DESAYUNO_POR_DEFECTO;
+      });
+    }
     var c = parseInt(o.comensales, 10);
     st.comensales = c >= 1 && c <= 12 ? c : 1;
     st.fase = o.fase === 2 ? 2 : 1;
@@ -25010,13 +25020,13 @@ var ICO = {
 function ico(n){ return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + ICO[n] + '</svg>'; }
 
 var SEMILLA = {
-  lun:{desayuno:'D2', almuerzo:'L13', cena:'C24', guarnicion:'', fuera:false},
-  mar:{desayuno:'D1', almuerzo:'',    cena:'C50', guarnicion:'', fuera:true},
-  mie:{desayuno:'D8', almuerzo:'L7',  cena:'C31', guarnicion:'', fuera:false},
-  jue:{desayuno:'D1', almuerzo:'',    cena:'C27', guarnicion:'', fuera:true},
-  vie:{desayuno:'D1', almuerzo:'L37', cena:'C47', guarnicion:'', fuera:false},
-  sab:{desayuno:'D10', almuerzo:'L40', cena:'C23', guarnicion:'', fuera:false},
-  dom:{desayuno:'D1', almuerzo:'L14', cena:'C42', guarnicion:'', fuera:false}
+  lun:{desayuno:'D7', almuerzo:'L13', cena:'C24', guarnicion:'', fuera:false},
+  mar:{desayuno:'D7', almuerzo:'',    cena:'C50', guarnicion:'', fuera:true},
+  mie:{desayuno:'D7', almuerzo:'L7',  cena:'C31', guarnicion:'', fuera:false},
+  jue:{desayuno:'D7', almuerzo:'',    cena:'C27', guarnicion:'', fuera:true},
+  vie:{desayuno:'D7', almuerzo:'L37', cena:'C47', guarnicion:'', fuera:false},
+  sab:{desayuno:'D7', almuerzo:'L40', cena:'C23', guarnicion:'', fuera:false},
+  dom:{desayuno:'D7', almuerzo:'L14', cena:'C42', guarnicion:'', fuera:false}
 };
 
 function hoyKey(){

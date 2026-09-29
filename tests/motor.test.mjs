@@ -5,7 +5,14 @@ import { datos, motor, semilla } from './cargar.mjs';
 
 const D = datos();
 const M = motor(D);
-const SEM = () => M.normalizarSemana(semilla());
+// Semana de ejemplo de las pruebas: la semana base con los desayunos anteriores a la v4 (D2, D1, D8…),
+// que cubren lenteja, huevo y la base P3. La semana base real desayuna D7 los siete días.
+const DESAYUNOS_EJEMPLO = { lun: 'D2', mar: 'D1', mie: 'D8', jue: 'D1', vie: 'D1', sab: 'D10', dom: 'D1' };
+const SEM = () => {
+  const s = semilla();
+  for (const k in DESAYUNOS_EJEMPLO) s[k].desayuno = DESAYUNOS_EJEMPLO[k];
+  return M.normalizarSemana(s);
+};
 const receta = (pred) => D.recetas.find(pred);
 const conForma = (item, cat) => receta((r) => (!cat || r.categoria === cat) && r.ingredientes.some((i) => i.item === item));
 const linea = (pl, nombre, estado = '') => pl.lineas.filter((l) => l.nombre === nombre && l.estado === estado);
@@ -287,6 +294,10 @@ test('tiempos: distingue cocina y espera; una receta de la noche anterior no es 
 
 test('migración de marcas de la v2.3: sin pérdidas ni asociaciones incorrectas', () => {
   const s = SEM();
+  // Desayunos elegidos por la persona (ninguno es el de la semana base de su día), para que la v4 no los cambie.
+  Object.assign(s.lun, { desayuno: 'D1' }); Object.assign(s.mar, { desayuno: 'D2' }); Object.assign(s.jue, { desayuno: 'D10' });
+  Object.assign(s.vie, { desayuno: 'D8' }); Object.assign(s.sab, { desayuno: 'D1' }); Object.assign(s.dom, { desayuno: 'D8' });
+  Object.assign(s.mie, { desayuno: 'D1' });
   // Reproduce las claves antiguas del menú.
   const antiguas = {};
   M.platos(s).forEach((p) => p.receta.ingredientes.forEach((i) => {
@@ -311,7 +322,7 @@ test('migración de marcas de la v2.3: sin pérdidas ni asociaciones incorrectas
   assert.equal(e.s, 'c');
   assert.equal(e.parcial, arroz.cant > st.compras[arroz.clave].q + 0.5, 'si ahora hace falta más, la marca queda parcial');
   assert.equal(Object.keys(st.comprasLegado).length, Object.keys(antiguas).length, 'se conservan todas las marcas antiguas');
-  assert.equal(st.v, 3);
+  assert.equal(st.v, 4);
   assert.ok(M.DIAS.every((d) => st.semana[d.k].dulce === ''), 'días existentes quedan con dulce pendiente');
 });
 
@@ -385,4 +396,21 @@ test('aleatorio: respeta el almuerzo fuera de casa y no toca la semana original'
   assert.equal(nueva[k].almuerzo, '');
   assert.notEqual(nueva[k].desayuno, sem[k].desayuno);
   assert.notEqual(nueva[k].cena, sem[k].cena);
+});
+
+test('v4: el desayuno por defecto es D7 y la migración respeta los elegidos', () => {
+  const M = motor();
+  assert.ok(M.DIAS.every((d) => semilla()[d.k].desayuno === 'D7'), 'la semana base desayuna D7');
+  const st = M.migrarEstado({ v: 3, semana: {
+    lun: { desayuno: 'D2', almuerzo: 'L13', cena: 'C24', guarnicion: '', fuera: false },
+    mar: { desayuno: 'D5', almuerzo: '', cena: 'C50', guarnicion: '', fuera: true },
+    jue: { desayuno: 'D1', almuerzo: '', cena: 'C27', guarnicion: '', fuera: true }
+  } });
+  assert.equal(st.v, 4);
+  assert.equal(st.semana.lun.desayuno, 'D7', 'el de la semana base se cambia');
+  assert.equal(st.semana.jue.desayuno, 'D7');
+  assert.equal(st.semana.mar.desayuno, 'D5', 'el elegido se respeta');
+  assert.equal(st.semana.lun.almuerzo, 'L13');
+  const st4 = M.migrarEstado({ v: 4, semana: { lun: { desayuno: 'D1', almuerzo: '', cena: '', guarnicion: '', fuera: false } } });
+  assert.equal(st4.semana.lun.desayuno, 'D1', 'un estado v4 no se toca');
 });
