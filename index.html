@@ -1102,7 +1102,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.18.1",
+    "version": "2.18.2",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -24507,7 +24507,51 @@ function crear(D){
     return {costo:paq * p.precio, precio:p.precio, nombre:p.nombre, peso:false, paquetes:paq, exacto:conv && !l.sinCantidad, nota:p.nota || ''};
   }
 
+  /* ---------- menú entre dispositivos ---------- */
+  /* Fusión a tres bandas del estado del menú: de cada campo (día, comida, marca de compra, preparación)
+     queda lo que cambió este dispositivo respecto de lo último visto en la nube; lo demás, lo de la nube.
+     Así una marca hecha en el teléfono y otra en la computadora se conservan las dos. */
+  var CAMPOS_ESTADO = ['semana', 'comensales', 'fase', 'compras', 'comprasLegado', 'prep'];
+  function esObj(x){ return !!x && typeof x === 'object' && !Array.isArray(x); }
+  function igualVal(a, b){
+    if(a === b) return true;
+    if(esObj(a) && esObj(b)){
+      var ka = Object.keys(a), kb = Object.keys(b);
+      if(ka.length !== kb.length) return false;
+      return ka.every(function(k){ return Object.prototype.hasOwnProperty.call(b, k) && igualVal(a[k], b[k]); });
+    }
+    if(Array.isArray(a) && Array.isArray(b))
+      return a.length === b.length && a.every(function(x, i){ return igualVal(x, b[i]); });
+    return false;
+  }
+  function fusion3(b, l, r){
+    if(igualVal(l, b)) return r;
+    if(igualVal(r, b) || igualVal(l, r)) return l;
+    if(esObj(l) && esObj(r)){
+      var bo = esObj(b) ? b : {}, out = {}, ks = {};
+      Object.keys(l).concat(Object.keys(r), Object.keys(bo)).forEach(function(k){ ks[k] = 1; });
+      Object.keys(ks).forEach(function(k){
+        var v = fusion3(bo[k], l[k], r[k]);
+        if(v !== undefined) out[k] = v;
+      });
+      return out;
+    }
+    return l;   /* ambos cambiaron el mismo valor: gana el cambio de este dispositivo, que es el más reciente */
+  }
+  function fusionarEstado(base, local, remoto){
+    var l = migrarEstado(local), r = migrarEstado(remoto), st = {v:VERSION_ESTADO};
+    if(!base) return r;
+    var b = migrarEstado(base);
+    CAMPOS_ESTADO.forEach(function(k){ st[k] = copia(fusion3(b[k], l[k], r[k])); });
+    return st;
+  }
+  function igualEstado(a, b){
+    var x = migrarEstado(a), y = migrarEstado(b);
+    return CAMPOS_ESTADO.every(function(k){ return igualVal(x[k], y[k]); });
+  }
+
   return {
+    fusionarEstado:fusionarEstado, igualEstado:igualEstado,
     DIAS:DIAS, COMIDAS:COMIDAS, NOMBRE_COMIDA:NOMBRE_COMIDA, FUERA:FUERA, DULCE_ESTIMADO_KCAL:DULCE_ESTIMADO_KCAL,
     VERSION_ESTADO:VERSION_ESTADO, FASES:FASES, pendientesConfig:pendientesConfig,
     byId:byId, preps:P, dulces:DU, catalogo:CAT,
@@ -25375,11 +25419,27 @@ try{
     ultimoRaw = localStorage.getItem('recetario.menu');
   }
 }catch(e){}
+/* baseMenu: lo último que este dispositivo vio en la nube (recetario.menu.base). Con ella, lo que se cambia
+   aquí se suma a lo que llegó de otro dispositivo en vez de pisarlo o perderse (M.fusionarEstado). */
+var baseMenu = null, subiendoMenu = false;
+try{ var rawBM = localStorage.getItem('recetario.menu.base'); if(rawBM) baseMenu = JSON.parse(rawBM); }catch(e){}
+function fijarBaseMenu(o){
+  baseMenu = M.migrarEstado(o);
+  try{ localStorage.setItem('recetario.menu.base', JSON.stringify(baseMenu)); }catch(e){}
+}
 function subir(){
   if(!dbRef) return;
+  clearTimeout(tmr); tmr = null;
+  var c = cuerpo(), enviado = JSON.parse(JSON.stringify(c));
+  subiendoMenu = true;
   marcaSync('sincronizando');
-  dbRef.set(cuerpo()).then(function(){ marcaSync('sincronizado'); })
-    .catch(function(){ marcaSync('error'); });
+  dbRef.set(c).then(function(r){
+    subiendoMenu = false;
+    if(r && r.conflicto) return;   /* la nube respondió con lo suyo: onSnapshot ya fusionó y vuelve a subir */
+    fijarBaseMenu(enviado);
+    if(tmr) return;                /* hubo cambios mientras subía: sale otra subida */
+    marcaSync('sincronizado');
+  }).catch(function(){ subiendoMenu = false; marcaSync('error'); });
 }
 function guardar(){
   try{ ultimoRaw = JSON.stringify(cuerpo()); localStorage.setItem('recetario.menu', ultimoRaw); localOk = true; }
@@ -25524,8 +25584,9 @@ function nubeDb(){
         return fetch(url, opcionesNube({method:'PUT', headers:{'content-type':'application/json'},
           body:JSON.stringify({base:ver, data:data})})).then(function(r){
           if(r.status === 409) return r.json().then(function(j){
-            /* Otro dispositivo guardó antes: no se pisa. Salud fusiona ambos lados y vuelve a subir;
-               el menú toma lo del otro dispositivo. */
+            /* Otro dispositivo guardó antes: no se pisa. Menú y Salud fusionan ambos lados y vuelven a subir.
+               Una respuesta atrasada (copia vieja de otra región) no hace retroceder: queda como error y se reintenta. */
+            if(ver !== null && !(j.version > ver)) throw new Error('nube atrasada');
             ver = j.version; emitir({exists:true, data:j.data});
             if(!ref.fusiona) avisar('Había cambios más recientes de otro dispositivo; se cargaron esos.', null);
             return {conflicto:true};
@@ -25580,6 +25641,7 @@ if(fuenteDb){
   fuenteDb.then(function(db){
     if(!db){ marcaSync('local'); return; }
     dbRef = db.doc('menu/actual');
+    dbRef.fusiona = true;
     conectarSalud(db);
     if(db === NUBE.db) render();   /* muestra «Conectada» y el correo en cuanto la nube responde */
     var primera = true;
@@ -25593,13 +25655,18 @@ if(fuenteDb){
       primera = false;
       var d2 = sn.data();
       if(!d2) return;
-      var migrado = aplicar(d2);
+      /* Si aquí hay algo que la nube aún no tiene (sin subir, subiendo o hecho sin conexión), se fusiona y se sube. */
+      var local = cuerpo();
+      var propio = tmr || subiendoMenu || (baseMenu && !M.igualEstado(local, baseMenu));
+      var migrado = aplicar(propio ? M.fusionarEstado(baseMenu, local, d2) : d2);
+      fijarBaseMenu(d2);
       try{ ultimoRaw = JSON.stringify(cuerpo()); localStorage.setItem('recetario.menu', ultimoRaw); localOk = true; }catch(e){ localOk = false; }
       var sel = document.getElementById('comensales');
       if(sel) sel.value = String(S.comensales);
       var fs = document.getElementById('fase');
       if(fs) fs.value = String(S.fase);
-      if(migrado) subir(); else marcaSync('sincronizado');
+      if(migrado || !M.igualEstado(cuerpo(), d2)){ marcaSync('pendiente'); clearTimeout(tmr); tmr = setTimeout(subir, 50); }
+      else if(!subiendoMenu) marcaSync('sincronizado');
       render();
     }, function(){ marcaSync('error'); });
   }).catch(function(){ marcaSync('local'); });

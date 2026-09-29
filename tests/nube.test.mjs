@@ -17,7 +17,7 @@ const CLAVE = 'abcde-fghjk-mnpqr-stuvw';
 
 function kv() {
   const m = new Map();
-  return { m, async get(k, t) { const v = m.get(k); return v === undefined ? null : (t === 'json' ? JSON.parse(v) : v); }, async put(k, v) { m.set(k, v); } };
+  return { m, async get(k, t) { const v = m.get(k); const tipo = t && typeof t === 'object' ? t.type : t; return v === undefined ? null : (tipo === 'json' ? JSON.parse(v) : v); }, async put(k, v) { m.set(k, v); } };
 }
 const envCon = (DATOS = kv(), extra = {}) => ({ DATOS, CLAVE_NUBE: CLAVE, ...extra });
 
@@ -72,6 +72,15 @@ test('documentos con versión y conflicto; rutas y cuerpos inválidos rechazados
   assert.equal((await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: { base: null, data: [1] } })).status, 400);
   assert.equal((await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: '{roto' })).status, 400);
   assert.deepEqual([...env.DATOS.m.keys()], ['u:principal:salud/actual']);
+});
+
+test('una copia de KV atrasada en otra región no rechaza al dispositivo que ya vio una versión más nueva', async () => {
+  const env = envCon(), clave = CLAVE;
+  env.DATOS.m.set('u:principal:menu/actual', JSON.stringify({ version: 3, data: { v: 4, fase: 1 } }));
+  let r = await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: { base: 5, data: { v: 4, fase: 2 } } });
+  assert.equal(r.status, 200); assert.equal((await r.json()).version, 6);
+  r = await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: { base: null, data: { v: 4, fase: 1 } } });
+  assert.equal(r.status, 409, 'sin versión no se pisa lo guardado');
 });
 
 /* ---------- la app con la nube, en el navegador ---------- */
@@ -211,6 +220,26 @@ test('conflicto: si otro dispositivo guardó antes, se suman ambos registros sin
   assert.equal(Object.values(g.agua)[0].length, 3, 'en la nube quedan los tres registros');
   await a.page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await agua(a.page, '^1,0 ');
+  await Promise.all([a.ctx.close(), b.ctx.close()]);
+});
+
+test('menú: cambios hechos a la vez en dos dispositivos se suman y ninguno se pierde', { skip: saltar }, async () => {
+  estado.env = envCon();
+  const a = await dispositivo(CLAVE), b = await dispositivo(CLAVE, 1280);
+  await a.page.goto(BASE); await sincronizado(a.page);
+  await b.page.goto(BASE); await sincronizado(b.page);
+  await a.page.selectOption('#comensales', '3'); await sincronizado(a.page);
+  // b aún no ha consultado la nube: su cambio sale con una versión atrasada (409) y se fusiona.
+  await b.page.selectOption('#fase', '2');
+  await b.page.waitForFunction(() => document.getElementById('comensales').value === '3', null, { timeout: 8000 });
+  await sincronizado(b.page);
+  assert.equal(await b.page.inputValue('#fase'), '2', 'el cambio propio no se pierde');
+  const g = JSON.parse(estado.env.DATOS.m.get('u:principal:menu/actual')).data;
+  assert.equal(g.comensales, 3); assert.equal(g.fase, 2);
+  await a.page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await a.page.waitForFunction(() => document.getElementById('fase').value === '2', null, { timeout: 8000 });
+  assert.equal(await a.page.inputValue('#comensales'), '3');
+  assert.deepEqual([...a.errores, ...b.errores], []);
   await Promise.all([a.ctx.close(), b.ctx.close()]);
 });
 

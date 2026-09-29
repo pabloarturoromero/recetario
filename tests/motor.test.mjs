@@ -414,3 +414,19 @@ test('v4: el desayuno por defecto es D7 y la migración respeta los elegidos', (
   const st4 = M.migrarEstado({ v: 4, semana: { lun: { desayuno: 'D1', almuerzo: '', cena: '', guarnicion: '', fuera: false } } });
   assert.equal(st4.semana.lun.desayuno, 'D1', 'un estado v4 no se toca');
 });
+
+test('menú entre dispositivos: la fusión a tres bandas conserva los cambios de ambos lados', () => {
+  const dia = (d, a) => ({ desayuno: d, almuerzo: a, cena: '', guarnicion: '', fuera: false });
+  const base = { v: 4, comensales: 1, fase: 1, semana: { lun: dia('D7', 'L1'), mar: dia('D7', 'L2') }, compras: { x: { s: 'c', q: null } } };
+  const local = { v: 4, comensales: 1, fase: 2, semana: { lun: dia('D7', 'L3'), mar: dia('D7', 'L2') }, compras: { x: { s: 'c', q: null }, y: { s: 't', q: 2 } } };
+  const remoto = { v: 4, comensales: 2, fase: 1, semana: { lun: dia('D7', 'L1'), mar: dia('D1', 'L2') }, compras: {} };
+  const f = M.fusionarEstado(base, local, remoto);
+  assert.equal(f.comensales, 2, 'lo del otro dispositivo');
+  assert.equal(f.fase, 2, 'lo de este dispositivo');
+  assert.equal(f.semana.lun.almuerzo, 'L3');
+  assert.equal(f.semana.mar.desayuno, 'D1');
+  assert.deepEqual(Object.keys(f.compras), ['y'], 'la marca quitada en el otro se quita; la nueva de aquí queda');
+  assert.ok(M.igualEstado(M.fusionarEstado(base, base, remoto), remoto), 'sin cambios propios queda lo de la nube');
+  assert.ok(M.igualEstado({ ...local, actualizado: 'otro' }, local), 'la fecha de guardado no cuenta como cambio');
+  assert.ok(M.igualEstado(M.fusionarEstado(null, local, remoto), remoto), 'sin base, manda la nube');
+});
