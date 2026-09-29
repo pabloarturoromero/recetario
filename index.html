@@ -963,6 +963,18 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .ej-list .ej-r{font-size:12.5px; font-weight:600; color:var(--brand-ink); font-variant-numeric:tabular-nums}
 .ej-list p{font-size:13px; color:var(--ink-2); line-height:1.5; margin:2px 0}
 .ej-form select{max-width:100%}
+.ej-prog{margin:var(--s3) 0; padding:var(--s3); border-radius:var(--r2); background:var(--surface-2); display:flex; flex-direction:column; gap:var(--s2)}
+.ej-prog-tx{display:flex; justify-content:space-between; gap:var(--s2) var(--s3); flex-wrap:wrap; align-items:baseline; font-size:13px}
+.ej-prog-tx span{color:var(--ink-2); font-variant-numeric:tabular-nums}
+.ej-prog .sa-nota{margin:0}
+.ej-mini .track{margin-top:6px}
+.ej-pasos{display:flex; flex-wrap:wrap; gap:6px; margin:var(--s2) 0 2px}
+.ej-paso{display:inline-flex; align-items:center; gap:6px; min-height:36px; padding:0 12px 0 8px; border-radius:99px; border:1.5px solid var(--line-2);
+  background:var(--surface); color:var(--ink-2); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer}
+.ej-paso span{display:inline-grid; place-items:center; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--line-2); font-size:12px; line-height:1}
+.ej-paso.ok{border-color:var(--ok); background:var(--ok-bg); color:var(--ok)}
+.ej-paso.ok span{background:var(--ok); border-color:var(--ok); color:var(--surface)}
+.ej-paso:disabled{cursor:default}
 .ej-ul{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:6px}
 @media (max-width:640px){
   .ej-form select, .ej-form input{flex:1 1 130px}
@@ -1072,7 +1084,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.16.1",
+    "version": "2.17.0",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -24616,6 +24628,8 @@ function crear(D, P){
     var ej = o.ejercicio && typeof o.ejercicio === 'object' ? o.ejercicio : {};
     if(esISO(ej.inicio)) st.ejercicio.inicio = ej.inicio;
     (Array.isArray(ej.hechas) ? ej.hechas : []).forEach(function(h){ if(h) marcarEj(st, h.f, h.s, h.min, h.esf); });
+    var cu = cursoValido(st, ej.curso);
+    if(cu && cu.m.length && !hechaEj(st, cu.f, cu.s)) st.ejercicio.curso = cu;
     if(typeof o.actualizado === 'string') st.actualizado = o.actualizado;
     return st;
   }
@@ -24928,7 +24942,7 @@ function crear(D, P){
 
   /* ---------- ejercicio ---------- */
   /* P es el programa del bloque JSON «ejercicio»: sesiones por día de la semana y progresión de cuatro semanas.
-     Lo guardado es mínimo: la fecha de inicio (un lunes) y las sesiones hechas, {f, s, min, esf}. */
+     Lo guardado es mínimo: la fecha de inicio (un lunes), las sesiones hechas, {f, s, min, esf}, y la sesión en curso. */
   var PLAN = P && P.sesiones && P.semana_tipo ? P : null;
   var NSEM = PLAN ? PLAN.semanas || 4 : 4;
   var MAX_HECHAS = 600;
@@ -24974,7 +24988,8 @@ function crear(D, P){
     return true;
   }
   function desmarcarEj(st, f, s){
-    var n = st.ejercicio.hechas.length;
+    var n = st.ejercicio.hechas.length, c = st.ejercicio.curso;
+    if(c && c.f === f && c.s === s) delete st.ejercicio.curso;
     st.ejercicio.hechas = st.ejercicio.hechas.filter(function(h){ return !(h.f === f && h.s === s); });
     return st.ejercicio.hechas.length < n;
   }
@@ -25000,7 +25015,83 @@ function crear(D, P){
     }
     return r;
   }
-  function conEjercicio(st){ return !!st.ejercicio.inicio || st.ejercicio.hechas.length > 0; }
+  function conEjercicio(st){ return !!st.ejercicio.inicio || st.ejercicio.hechas.length > 0 || !!st.ejercicio.curso; }
+
+  /* Sesión en curso: lo que se va haciendo, ejercicio por ejercicio y vuelta por vuelta, en ejercicio.curso
+     {f, s, m}, con m como lista de «vuelta.ejercicio» (desde 1). Hay una sola a la vez; al completar la última,
+     la sesión se marca hecha con los minutos del plan. El pie de cardio no tiene lista: se marca de una vez. */
+  function pasosSesion(st, f, s){
+    var d = detalleSesion(s, nivelEj(st, f));
+    if(!d || !d.ej.length || (d.tipo !== 'fuerza' && d.tipo !== 'yoga')) return null;
+    var v = Math.max(1, d.vueltas || 1), l = [];
+    for(var i=1;i<=v;i++) for(var j=1;j<=d.ej.length;j++) l.push(i + '.' + j);
+    return l;
+  }
+  function cursoValido(st, c){
+    if(!c || typeof c !== 'object' || !esISO(c.f) || !sesionValida(c.s) || !Array.isArray(c.m)) return null;
+    var todos = pasosSesion(st, c.f, c.s);
+    if(!todos) return null;
+    var m = todos.filter(function(k){ return c.m.indexOf(k) >= 0; });
+    return {f:c.f, s:c.s, m:m};
+  }
+  function progresoEj(st, f, s){
+    var todos = pasosSesion(st, f, s);
+    if(!todos) return null;
+    var c = st.ejercicio.curso, m = c && c.f === f && c.s === s ? c.m : [];
+    if(hechaEj(st, f, s)) m = todos.slice();
+    return {total:todos.length, hechos:m.length, m:m, completa:m.length === todos.length, pct:Math.round(m.length / todos.length * 100)};
+  }
+  /* Marca o desmarca un paso; al completar todos, marca la sesión. Devuelve el progreso o null si no aplica. */
+  function pasoEj(st, f, s, k){
+    var todos = pasosSesion(st, f, s);
+    if(!esISO(f) || !todos || todos.indexOf(k) < 0 || hechaEj(st, f, s)) return null;
+    var c = st.ejercicio.curso;
+    if(!c || c.f !== f || c.s !== s) c = st.ejercicio.curso = {f:f, s:s, m:[]};
+    var i = c.m.indexOf(k);
+    if(i >= 0) c.m.splice(i, 1); else c.m.push(k);
+    c.m = todos.filter(function(x){ return c.m.indexOf(x) >= 0; });
+    var p = progresoEj(st, f, s);
+    if(p.completa){ marcarEj(st, f, s); delete st.ejercicio.curso; p = progresoEj(st, f, s); p.recien = true; }
+    return p;
+  }
+
+  /* ---------- fusión entre dispositivos ---------- */
+  /* Tres vías: base es lo último que este dispositivo vio en la nube, local lo que tiene ahora y remoto lo que
+     trae la nube. Se conserva lo que cada lado añadió o quitó respecto de base: dos dispositivos que registran
+     agua, marcan sesiones o anotan medidas a la vez no se pisan. Si ambos cambian lo mismo, gana lo local. */
+  function k(x){ return JSON.stringify(x); }
+  function mezclarLista(b, l, r){
+    b = b || []; l = l || []; r = r || [];
+    var cuenta = function(a){ var o = {}; a.forEach(function(x){ var q = k(x); o[q] = (o[q] || 0) + 1; }); return o; };
+    var cb = cuenta(b), cl = cuenta(l), quitar = {}, res = [];
+    Object.keys(cb).forEach(function(q){ var d = cb[q] - (cl[q] || 0); if(d > 0) quitar[q] = d; });
+    r.forEach(function(x){ var q = k(x); if(quitar[q]){ quitar[q]--; return; } res.push(x); });
+    var usados = {};
+    l.forEach(function(x){ var q = k(x); usados[q] = (usados[q] || 0) + 1; if(usados[q] > (cb[q] || 0)) res.push(x); });
+    return res;
+  }
+  function fusionar(base, local, remoto){
+    var b = normalizar(base || {}), l = normalizar(local), r = normalizar(remoto);
+    var o = {v:VERSION_SALUD, agua:{}, medidas:mezclarLista(b.medidas, l.medidas, r.medidas),
+      examenes:mezclarLista(b.examenes, l.examenes, r.examenes), ejercicio:{}};
+    var dias = {};
+    [b, l, r].forEach(function(x){ Object.keys(x.agua).forEach(function(f){ dias[f] = 1; }); });
+    Object.keys(dias).forEach(function(f){ o.agua[f] = mezclarLista(b.agua[f], l.agua[f], r.agua[f]); });
+    var be = b.ejercicio, le = l.ejercicio, re = r.ejercicio;
+    o.ejercicio.inicio = le.inicio !== be.inicio ? le.inicio : re.inicio;
+    o.ejercicio.hechas = mezclarLista(be.hechas, le.hechas, re.hechas);
+    var bc = be.curso || null, lc = le.curso || null, rc = re.curso || null;
+    if(lc && rc && lc.f === rc.f && lc.s === rc.s)
+      o.ejercicio.curso = {f:lc.f, s:lc.s, m:mezclarLista(bc && bc.f === lc.f && bc.s === lc.s ? bc.m : [], lc.m, rc.m)};
+    else { var cu = k(lc) !== k(bc) ? lc : rc; if(cu) o.ejercicio.curso = cu; }
+    /* normalizar ordena, quita repetidos (la última versión de cada día, toma o sesión gana) y descarta la sesión
+       en curso si ya quedó marcada como hecha. */
+    return normalizar(o);
+  }
+  function igualSalud(a, b){
+    var q = function(x){ return k({agua:x.agua, medidas:x.medidas, examenes:x.examenes, ejercicio:x.ejercicio}); };
+    return q(a) === q(b);
+  }
 
   /* ---------- respaldo ---------- */
   function exportar(st){
@@ -25064,6 +25155,7 @@ function crear(D, P){
     PLAN:PLAN, empezarEj:empezarEj, reiniciarEj:reiniciarEj, semanaEj:semanaEj, nivelEj:nivelEj, sesionDia:sesionDia,
     detalleSesion:detalleSesion, marcarEj:marcarEj, desmarcarEj:desmarcarEj, hechaEj:hechaEj, hechasDia:hechasDia,
     semanaResumenEj:semanaResumenEj, historialEj:historialEj, conEjercicio:conEjercicio, lunesDe:lunesDe,
+    pasosSesion:pasosSesion, progresoEj:progresoEj, pasoEj:pasoEj, fusionar:fusionar, igualSalud:igualSalud,
     exportar:exportar, importar:importar, textoResumen:textoResumen,
     hoyISO:hoyISO, horaGYE:horaGYE, sumarDias:sumarDias, difDias:difDias, diaSemana:diaSemana
   };
@@ -25284,32 +25376,53 @@ function guardar(){
 var SA = window.RecetarioSalud.crear(D, JSON.parse(document.getElementById('ejercicio').textContent));
 var SS = SA.vacio();
 var dbSalud = null, tmrSalud = null, ultimoRawSalud = null, saludHoy = null;
+/* baseSalud: lo último que este dispositivo vio en la nube, para fusionar sin pisar (SA.fusionar).
+   Se guarda aparte, en recetario.salud.base, para que un cambio hecho sin conexión se sume al volver. */
+var baseSalud = null, subiendoSalud = false;
 function cuerpoSalud(){
   return {v:SA.VERSION, agua:SS.agua, medidas:SS.medidas, examenes:SS.examenes, ejercicio:SS.ejercicio, actualizado:new Date().toISOString()};
 }
 function saludConDatos(o){ return !!o && (Object.keys(o.agua).length || o.medidas.length || o.examenes.length || SA.conEjercicio(o)); }
 function leerSalud(raw){ SS = SA.podar(SA.normalizar(JSON.parse(raw)), SA.hoyISO()); ultimoRawSalud = raw; }
+function fijarBaseSalud(o){
+  baseSalud = SA.normalizar(JSON.parse(JSON.stringify(o)));
+  try{ localStorage.setItem('recetario.salud.base', JSON.stringify(baseSalud)); }catch(e){}
+}
 try{
   var rawS = localStorage.getItem('recetario.salud');
   if(rawS) leerSalud(rawS);
+  var rawB = localStorage.getItem('recetario.salud.base');
+  if(rawB) baseSalud = SA.normalizar(JSON.parse(rawB));
 }catch(e){}
-function subirSalud(){
-  if(!dbSalud) return;
-  marcaSync('sincronizando');
-  dbSalud.set(cuerpoSalud()).then(function(){ marcaSync('sincronizado'); })
-    .catch(function(){ marcaSync('error'); });
-}
-function guardarSalud(){
-  SA.podar(SS, SA.hoyISO());
+function guardarSaludLocal(){
   try{ ultimoRawSalud = JSON.stringify(cuerpoSalud()); localStorage.setItem('recetario.salud', ultimoRawSalud); localOk = true; }
   catch(e){ localOk = false; }
+}
+function subirSalud(){
+  if(!dbSalud) return;
+  clearTimeout(tmrSalud); tmrSalud = null;
+  var c = cuerpoSalud(), enviado = JSON.parse(JSON.stringify(c));
+  subiendoSalud = true;
+  marcaSync('sincronizando');
+  dbSalud.set(c).then(function(r){
+    subiendoSalud = false;
+    if(r && r.conflicto) return;   /* la nube respondió con lo suyo: onSnapshot ya fusionó y vuelve a subir */
+    fijarBaseSalud(enviado);
+    if(tmrSalud) return;           /* hubo cambios mientras subía: sale otra subida */
+    marcaSync('sincronizado');
+  }).catch(function(){ subiendoSalud = false; marcaSync('error'); });
+}
+function guardarSalud(inmediato){
+  SA.podar(SS, SA.hoyISO());
+  guardarSaludLocal();
   if(!dbSalud){ pintarSync(); return; }
   marcaSync('pendiente');
   clearTimeout(tmrSalud);
-  tmrSalud = setTimeout(subirSalud, 500);
+  tmrSalud = setTimeout(subirSalud, inmediato ? 50 : 500);
 }
 function conectarSalud(db){
   dbSalud = db.doc('salud/actual');
+  dbSalud.fusiona = true;
   dbSalud.onSnapshot(function(sn){
     if(sn.metadata && sn.metadata.hasPendingWrites) return;
     if(!sn.exists){
@@ -25319,9 +25432,17 @@ function conectarSalud(db){
     }
     var d2 = sn.data();
     if(!d2) return;
-    SS = SA.podar(SA.normalizar(d2), SA.hoyISO());
-    try{ ultimoRawSalud = JSON.stringify(cuerpoSalud()); localStorage.setItem('recetario.salud', ultimoRawSalud); }catch(e){}
-    if(S.vista === 'salud' || S.vista === 'inicio') render();
+    var remoto = SA.podar(SA.normalizar(d2), SA.hoyISO());
+    /* Si aquí hay algo que la nube aún no tiene (sin subir, subiendo o hecho sin conexión), se fusiona y se sube. */
+    var propio = tmrSalud || subiendoSalud || (baseSalud ? !SA.igualSalud(SS, baseSalud) : (SS.actualizado || '') > (remoto.actualizado || ''));
+    var nuevo = propio ? SA.podar(SA.fusionar(baseSalud, SS, remoto), SA.hoyISO()) : remoto;
+    fijarBaseSalud(remoto);
+    var cambio = !SA.igualSalud(nuevo, SS);
+    SS = nuevo;
+    guardarSaludLocal();
+    if(!SA.igualSalud(SS, remoto)) guardarSalud(true);
+    else if(!tmrSalud && !subiendoSalud) marcaSync('sincronizado');
+    if(cambio && (S.vista === 'salud' || S.vista === 'inicio')) render();
   }, function(){ marcaSync('error'); });
 }
 /* ---------- nube propia (Cloudflare Pages Functions + KV, con clave personal) ---------- */
@@ -25331,6 +25452,7 @@ function conectarSalud(db){
    NUBE.estado: 'no' (sin nube o sin configurar), 'clave' (falta la clave o es incorrecta), 'ok'. */
 var NUBE = {estado:'no', db:null, error:'', generada:''};
 var MIN_CLAVE = 20;
+var NUBE_CADA = 15000;
 function leerClave(){ try{ return localStorage.getItem('recetario.clave') || ''; }catch(e){ return ''; } }
 function guardarClave(c){ try{ if(c) localStorage.setItem('recetario.clave', c); else localStorage.removeItem('recetario.clave'); }catch(e){} }
 /* Enlace para conectar otro dispositivo: #nube=<clave>. El fragmento no llega al servidor y se borra al leerlo. */
@@ -25384,9 +25506,11 @@ function nubeDb(){
         return fetch(url, opcionesNube({method:'PUT', headers:{'content-type':'application/json'},
           body:JSON.stringify({base:ver, data:data})})).then(function(r){
           if(r.status === 409) return r.json().then(function(j){
-            /* Otro dispositivo guardó antes: se toma lo suyo en lugar de pisarlo. */
+            /* Otro dispositivo guardó antes: no se pisa. Salud fusiona ambos lados y vuelve a subir;
+               el menú toma lo del otro dispositivo. */
             ver = j.version; emitir({exists:true, data:j.data});
-            avisar('Había cambios más recientes de otro dispositivo; se cargaron esos.', null);
+            if(!ref.fusiona) avisar('Había cambios más recientes de otro dispositivo; se cargaron esos.', null);
+            return {conflicto:true};
           });
           if(rechazada(r)) throw new Error('clave rechazada');
           if(!r.ok) throw new Error('nube ' + r.status);
@@ -27098,7 +27222,9 @@ function ejercicioInicio(){
     tx = '<b>Ejercicio de hoy</b><span>Día libre · semana ' + w + ' del plan</span>';
     act = '<button class="link" data-sa="ejver">Ver semana</button>';
   } else {
-    tx = '<b>Ejercicio de hoy: ' + esc(d.n) + '</b><span id="ejMiniTx">' + d.min + ' min · semana ' + w + (d.principal ? '' : ' · opcional') + (hecha ? ' · hecha' : '') + '</span>';
+    var pr = SA.progresoEj(SS, hoy, s), enCurso = pr && pr.hechos && !pr.completa;
+    tx = '<b>Ejercicio de hoy: ' + esc(d.n) + '</b><span id="ejMiniTx">' + d.min + ' min · semana ' + w + (d.principal ? '' : ' · opcional') + (hecha ? ' · hecha' : '') +
+      (enCurso ? ' · en curso, ' + pr.hechos + ' de ' + pr.total : '') + '</span>' + (enCurso ? trackEj(pr) : '');
     act = (hecha ? '<span class="chip-s ok">Hecha</span>' : '<button class="btn pri sm" data-sa="ejmarcar|' + hoy + '|' + s + '">Marcar hecha</button>') +
       '<button class="link" data-sa="ejver">Ver rutina</button>';
   }
@@ -27175,11 +27301,34 @@ function abrirVideoEj(t, id){
     'allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
   box.hidden = false; t.setAttribute('aria-expanded', 'true'); t.textContent = 'Cerrar video';
 }
-function listaEj(d, vueltas){
-  return '<ol class="ej-list">' + d.ej.map(function(e){
+/* pr: progreso de la sesión (SA.progresoEj) para marcar cada ejercicio en cada vuelta mientras se hace. */
+function listaEj(d, vueltas, pr, f){
+  var nv = Math.max(1, d.vueltas || 1);
+  return '<ol class="ej-list">' + d.ej.map(function(e, j){
+    var pasos = '';
+    if(pr){
+      var b = [];
+      for(var i=1;i<=nv;i++){
+        var key = i + '.' + (j + 1), ok = pr.m.indexOf(key) >= 0;
+        b.push('<button class="ej-paso' + (ok ? ' ok' : '') + '" data-sa="ejpaso|' + f + '|' + d.id + '|' + key + '" aria-pressed="' + ok + '"' +
+          (pr.completa ? ' disabled' : '') + ' aria-label="' + esc(e.n) + (nv > 1 ? ', vuelta ' + i : '') + (ok ? ', hecho' : '') + '">' +
+          '<span aria-hidden="true">' + (ok ? '✓' : '') + '</span>' + (nv > 1 ? 'Vuelta ' + i : 'Hecho') + '</button>');
+      }
+      pasos = '<div class="ej-pasos">' + b.join('') + '</div>';
+    }
     return '<li>' + figuraEj(e.fig, e.n) + '<div class="ej-tx"><div class="ej-n"><b>' + esc(e.n) + '</b><span class="ej-r">' + (vueltas ? vueltas + ' × ' : '') + esc(e.reps) + '</span></div>' +
-      '<p>' + esc(e.c) + '</p>' + videoEj(e) + '</div></li>';
+      '<p>' + esc(e.c) + '</p>' + pasos + videoEj(e) + '</div></li>';
   }).join('') + '</ol>';
+}
+function trackEj(pr){
+  return '<div class="track" role="progressbar" aria-label="Progreso de la sesión" aria-valuemin="0" aria-valuemax="' + pr.total + '" aria-valuenow="' + pr.hechos + '">' +
+    '<div class="fill' + (pr.completa ? ' ok' : '') + '" style="width:' + pr.pct + '%"></div></div>';
+}
+function barraEj(pr){
+  var sync = NUBE.db || dbSalud ? ' · se ve en tus otros dispositivos' : '';
+  return '<div class="ej-prog" id="ejProg"><div class="ej-prog-tx"><b>' + (pr.completa ? 'Sesión completa' : 'Tu progreso') + '</b><span>' +
+    pr.hechos + ' de ' + pr.total + ' · ' + pr.pct + ' %' + sync + '</span></div>' +
+    trackEj(pr) + (pr.completa ? '' : '<p class="sa-nota">Toca cada ejercicio al terminarlo. Al completar el último, la sesión queda marcada sola.</p>') + '</div>';
 }
 function secEjercicio(hoy){
   var P = SA.PLAN, U = S.salud;
@@ -27215,14 +27364,15 @@ function secEjercicio(hoy){
 
   /* sesión del día elegido */
   var hecha = SA.hechaEj(SS, dia, sd), futuro = dia > hoy;
+  var pr = w && !futuro ? SA.progresoEj(SS, dia, sd) : null;
   h += '<div class="panel ej-ses" id="ejSes"><h3>' + esc(d.n) + ' <em>' + esc(fechaSa(dia)) + (dia === hoy ? ', hoy' : '') + (d.min ? ' · ' + d.min + ' min' : '') + (d.principal || sd === 'desc' ? '' : ' · opcional') + '</em></h3>';
   if(d.tipo === 'fuerza'){
     h += '<p class="txt2"><b>Calentamiento.</b> ' + esc(d.calentamiento) + '</p>' +
-      '<p class="txt2"><b>' + d.vueltas + ' vueltas</b> del circuito, en orden. ' + esc(d.descanso) + '</p>' + listaEj(d, 0) +
+      '<p class="txt2"><b>' + d.vueltas + ' vueltas</b> del circuito, en orden. ' + esc(d.descanso) + '</p>' + (pr ? barraEj(pr) : '') + listaEj(d, 0, pr, dia) +
       '<p class="txt2"><b>Vuelta a la calma.</b> ' + esc(d.calma) + '</p>';
   } else if(d.tipo === 'yoga'){
     h += '<p class="txt2">' + esc(d.c) + '</p><p class="txt2"><b>Para empezar.</b> ' + esc(d.calentamiento) + '</p>' +
-      '<p class="txt2"><b>' + (d.vueltas > 1 ? d.vueltas + ' vueltas' : 'Una vuelta') + '</b> a la secuencia, en orden, sobre una colchoneta o toalla gruesa.</p>' + listaEj(d, 0) +
+      '<p class="txt2"><b>' + (d.vueltas > 1 ? d.vueltas + ' vueltas' : 'Una vuelta') + '</b> a la secuencia, en orden, sobre una colchoneta o toalla gruesa.</p>' + (pr ? barraEj(pr) : '') + listaEj(d, 0, pr, dia) +
       '<p class="txt2">' + esc(d.calma) + '</p>';
   } else if(d.tipo === 'cardio'){
     h += '<div class="ej-card">' + figuraEj(d.fig, d.n) + '<div class="ej-tx"><p class="txt2"><b>' + esc(d.detalle) + '</b></p><p class="txt2">' + esc(d.c) + '</p>' + videoEj(d) + '</div></div>';
@@ -27449,6 +27599,13 @@ function accionSalud(t){
     if(!SA.marcarEj(SS, p[1], p[2])) return;
     guardarSalud(); avisar('Sesión marcada. Anota el esfuerzo abajo si quieres.', null);
   } else if(a === 'ejquitar'){ if(!SA.desmarcarEj(SS, p[1], p[2])) return; guardarSalud(); }
+  else if(a === 'ejpaso'){
+    if(!SA.semanaEj(SS, hoy)) SA.empezarEj(SS, hoy);
+    var pg = SA.pasoEj(SS, p[1], p[2], p[3]);
+    if(!pg) return;
+    guardarSalud(true);
+    if(pg.recien) avisar('¡Sesión completa! Quedó marcada. Anota el esfuerzo abajo si quieres.', null);
+  }
   else if(a === 'mededitar'){ U.fm = p[1]; render(); var mf = document.getElementById('medForm'); if(mf) mf.scrollIntoView({block:'center'}); return; }
   else if(a === 'medborrar'){
     if(window.confirm && !window.confirm('¿Borrar el registro del ' + fechaSa(p[1]) + '?')) return;
@@ -27673,6 +27830,9 @@ window.addEventListener('pageshow', function(e){ if(e.persisted) alVolver(); });
 window.addEventListener('focus', alVolver);
 window.addEventListener('storage', function(e){ if(e.key === 'recetario.menu' || e.key === 'recetario.salud') alVolver(); });
 setInterval(function(){ if(!document.hidden && (NUBE.db || hoyPintado !== hoyKey() || saludHoy !== SA.hoyISO())) alVolver(); }, 60000);
+/* Con la nube propia, mientras la app está a la vista se consulta cada 15 s: lo que marcas en el teléfono
+   aparece en la computadora (y al revés) sin recargar. Solo se vuelve a pintar si algo cambió. */
+setInterval(function(){ if(!document.hidden && NUBE.db) NUBE.db.refrescar(); }, NUBE_CADA);
 /* #salud abre la sección directamente; al salir de ella el enlace se limpia sin tocar el historial. */
 function hashSalud(){
   try{

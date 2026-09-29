@@ -169,3 +169,61 @@ for (const ancho of [320, 390, 1280]) {
     await ctx.close();
   });
 }
+
+test('sesión en curso: cada ejercicio por vuelta; al completar el último queda marcada', () => {
+  const st = SA.vacio();
+  SA.empezarEj(st, '2026-09-28');
+  assert.equal(SA.progresoEj(st, '2026-09-28', 'cam'), null, 'la caminata se marca de una vez');
+  const todos = SA.pasosSesion(st, '2026-09-28', 'fa');
+  assert.equal(todos.length, 12, 'semana 1: dos vueltas de seis ejercicios');
+  let p = SA.pasoEj(st, '2026-09-28', 'fa', '1.1');
+  assert.equal(p.hechos, 1); assert.equal(p.completa, false);
+  p = SA.pasoEj(st, '2026-09-28', 'fa', '1.1');
+  assert.equal(p.hechos, 0, 'tocar otra vez lo desmarca');
+  assert.equal(SA.pasoEj(st, '2026-09-28', 'fa', '9.9'), null);
+  todos.slice(0, -1).forEach((k) => SA.pasoEj(st, '2026-09-28', 'fa', k));
+  assert.equal(SA.hechaEj(st, '2026-09-28', 'fa'), null);
+  const back = SA.normalizar(plano(st));
+  assert.equal(back.ejercicio.curso.m.length, 11, 'lo hecho a medias se guarda y se sincroniza');
+  p = SA.pasoEj(st, '2026-09-28', 'fa', todos[todos.length - 1]);
+  assert.ok(p.completa && p.recien);
+  assert.equal(SA.hechaEj(st, '2026-09-28', 'fa').min, 30);
+  assert.equal(st.ejercicio.curso, undefined);
+  assert.equal(SA.progresoEj(st, '2026-09-28', 'fa').completa, true);
+  assert.equal(SA.pasoEj(st, '2026-09-28', 'fa', '1.1'), null, 'ya hecha: no se toca');
+});
+
+test('fusión entre dispositivos: lo que cada uno hizo se suma y lo borrado no vuelve', () => {
+  const base = SA.vacio();
+  SA.empezarEj(base, '2026-09-28');
+  SA.marcarEj(base, '2026-09-28', 'fa', 30, 5);
+  SA.registrar(base, '2026-09-29', 'agua', 250, '08:00');
+  const tel = SA.normalizar(plano(base)), pc = SA.normalizar(plano(base));
+  // En el teléfono: yoga de hoy a medias, un vaso más y borra la fuerza del lunes.
+  SA.pasoEj(tel, '2026-09-29', 'yoga', '1.1'); SA.pasoEj(tel, '2026-09-29', 'yoga', '1.2');
+  SA.registrar(tel, '2026-09-29', 'agua', 250, '09:00');
+  SA.desmarcarEj(tel, '2026-09-28', 'fa');
+  // En la computadora, a la vez: otro paso del yoga, un café y una caminata del domingo.
+  SA.pasoEj(pc, '2026-09-29', 'yoga', '1.3');
+  SA.registrar(pc, '2026-09-29', 'cafe', 200, '09:05');
+  SA.marcarEj(pc, '2026-09-27', 'larga', 40, 3);
+  SA.guardarMedida(pc, { f: '2026-09-29', kg: 84.2 });
+  const r = SA.fusionar(base, tel, pc);
+  assert.deepEqual(plano(r.ejercicio.curso.m), ['1.1', '1.2', '1.3']);
+  assert.equal(r.agua['2026-09-29'].length, 3);
+  assert.equal(SA.hechaEj(r, '2026-09-28', 'fa'), null, 'lo desmarcado no reaparece');
+  assert.ok(SA.hechaEj(r, '2026-09-27', 'larga'));
+  assert.equal(r.medidas[0].kg, 84.2);
+  // Sin cambios propios, queda lo remoto; y la misma sesión editada en ambos lados, gana lo local.
+  assert.ok(SA.igualSalud(SA.fusionar(base, base, pc), SA.normalizar(plano(pc))));
+  const a = SA.normalizar(plano(base)), b = SA.normalizar(plano(base));
+  SA.marcarEj(a, '2026-09-28', 'fa', 35, 6); SA.marcarEj(b, '2026-09-28', 'fa', 40, 7);
+  assert.equal(SA.hechaEj(SA.fusionar(base, a, b), '2026-09-28', 'fa').min, 35);
+  // Si en un lado la sesión en curso se completó, no queda a medias.
+  const c = SA.normalizar(plano(base)), d = SA.normalizar(plano(base));
+  SA.pasoEj(c, '2026-09-29', 'yoga', '1.1');
+  SA.pasosSesion(d, '2026-09-29', 'yoga').forEach((k) => SA.pasoEj(d, '2026-09-29', 'yoga', k));
+  const e = SA.fusionar(base, c, d);
+  assert.ok(SA.hechaEj(e, '2026-09-29', 'yoga'));
+  assert.equal(e.ejercicio.curso, undefined);
+});

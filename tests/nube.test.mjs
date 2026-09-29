@@ -196,7 +196,7 @@ test('dos dispositivos con la misma clave comparten menú y Salud; el enlace con
   await Promise.all([tel.ctx.close(), pc.ctx.close()]);
 });
 
-test('conflicto: si otro dispositivo guardó antes, se cargan sus datos y se avisa', { skip: saltar }, async () => {
+test('conflicto: si otro dispositivo guardó antes, se suman ambos registros sin pisar ninguno', { skip: saltar }, async () => {
   estado.env = envCon();
   const a = await dispositivo(CLAVE), b = await dispositivo(CLAVE);
   await a.page.goto(BASE + '#salud'); await sincronizado(a.page);
@@ -205,9 +205,41 @@ test('conflicto: si otro dispositivo guardó antes, se cargan sus datos y se avi
   await agua(b.page, '^0,25 ');
   await a.page.click('[data-sa="agua|agua|500"]'); await sincronizado(a.page);
   await b.page.click('[data-sa="agua|infusion|250"]');
-  await b.page.waitForFunction(() => /otro dispositivo/.test(document.getElementById('aviso').textContent), null, { timeout: 8000 });
-  assert.match(await b.page.textContent('#aguaTot'), /^0,75 /, 'queda lo guardado por el otro dispositivo, no se pisa');
+  await agua(b.page, '^1,0 ');
+  await sincronizado(b.page);
+  const g = JSON.parse(estado.env.DATOS.m.get('u:principal:salud/actual')).data;
+  assert.equal(Object.values(g.agua)[0].length, 3, 'en la nube quedan los tres registros');
+  await a.page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await agua(a.page, '^1,0 ');
   await Promise.all([a.ctx.close(), b.ctx.close()]);
+});
+
+test('ejercicio en vivo: lo que marcas en el teléfono aparece solo en la computadora, y viceversa', { skip: saltar }, async () => {
+  estado.env = envCon();
+  const tel = await dispositivo(CLAVE), pc = await dispositivo(CLAVE, 1280);
+  await tel.page.goto(BASE + '#salud'); await sincronizado(tel.page);
+  await tel.page.click('[data-sa="ejempezar"]'); await sincronizado(tel.page);
+  await pc.page.goto(BASE + '#salud'); await sincronizado(pc.page);
+  // Lunes de esta semana: Fuerza A, con su lista de pasos (el lunes nunca es futuro).
+  for (const p of [tel.page, pc.page]) await p.locator('.ej-dia').first().click();
+  const pasos = await tel.page.locator('#ejSes .ej-paso').count();
+  assert.ok(pasos >= 12, 'un botón por ejercicio y vuelta');
+  await tel.page.locator('#ejSes .ej-paso').nth(0).click(); await sincronizado(tel.page);
+  await pc.page.locator('#ejSes .ej-paso').nth(1).click(); await sincronizado(pc.page);
+  // Sin tocar nada más: la consulta periódica trae el paso del otro dispositivo.
+  const dos = (p) => p.waitForFunction(() => /^2 de /.test(document.querySelector('#ejProg .ej-prog-tx span').textContent), null, { timeout: 25000 });
+  await Promise.all([dos(tel.page), dos(pc.page)]);
+  // Completar desde la computadora marca la sesión en ambos.
+  const faltan = await pc.page.locator('#ejSes .ej-paso:not(.ok)').count();
+  for (let i = 0; i < faltan; i++) { await pc.page.locator('#ejSes .ej-paso:not(.ok)').first().click(); }
+  await pc.page.waitForSelector('#ejSes >> text=Sesión completa');
+  await sincronizado(pc.page);
+  await tel.page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await tel.page.waitForSelector('#ejSes .chip-s.ok >> text=Hecha', { timeout: 8000 });
+  const g = JSON.parse(estado.env.DATOS.m.get('u:principal:salud/actual')).data.ejercicio;
+  assert.equal(g.hechas.length, 1); assert.equal(g.curso, undefined);
+  assert.deepEqual([...tel.errores, ...pc.errores], []);
+  await Promise.all([tel.ctx.close(), pc.ctx.close()]);
 });
 
 test('si cambias la clave en Cloudflare, la app la vuelve a pedir sin perder lo local', { skip: saltar }, async () => {
