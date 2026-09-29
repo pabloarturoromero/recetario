@@ -29,9 +29,35 @@ export async function verificarClave(request, env) {
   return { usuario: 'principal' };
 }
 
+// La app de ruso (ruso-recepciones.pages.dev y sus vistas previas) guarda su progreso en esta misma
+// nube, con la misma clave, desde otro origen: solo a ese origen se le permite CORS. ORIGENES_NUBE
+// (lista separada por comas) añade otros, por ejemplo para pruebas locales.
+const ORIGEN_RUSO = /^https:\/\/([a-z0-9-]+\.)?ruso-recepciones\.pages\.dev$/;
+export function origenPermitido(origen, env) {
+  if (!origen) return false;
+  if (ORIGEN_RUSO.test(origen)) return true;
+  return String(env.ORIGENES_NUBE || '').split(',').map((x) => x.trim()).filter(Boolean).includes(origen);
+}
+function conCors(res, origen) {
+  const r = new Response(res.body, res);
+  r.headers.set('Access-Control-Allow-Origin', origen);
+  r.headers.set('Vary', 'Origin');
+  return r;
+}
+
 export async function onRequest(context) {
-  const v = await verificarClave(context.request, context.env);
-  if (v.error) return respuesta({ ok: false, error: v.error }, v.status);
-  context.data.usuario = v.usuario;
-  return context.next();
+  const { request, env } = context;
+  const origen = request.headers.get('Origin');
+  const cors = origen && origenPermitido(origen, env) ? origen : null;
+  if (request.method === 'OPTIONS') {
+    if (!cors) return new Response(null, { status: 403 });
+    return new Response(null, { status: 204, headers: {
+      'Access-Control-Allow-Origin': cors, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, PUT',
+      'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Max-Age': '86400' } });
+  }
+  const v = await verificarClave(request, env);
+  let res;
+  if (v.error) res = respuesta({ ok: false, error: v.error }, v.status);
+  else { context.data.usuario = v.usuario; res = await context.next(); }
+  return cors ? conCors(res, cors) : res;
 }

@@ -22,8 +22,9 @@ function kv() {
 const envCon = (DATOS = kv(), extra = {}) => ({ DATOS, CLAVE_NUBE: CLAVE, ...extra });
 
 /* Ejecuta middleware + ruta como lo haría Pages. */
-async function llamar(env, metodo, ruta, { clave, auth, cuerpo } = {}) {
+async function llamar(env, metodo, ruta, { clave, auth, cuerpo, origen } = {}) {
   const headers = new Headers();
+  if (origen) headers.set('Origin', origen);
   if (auth !== undefined) headers.set('Authorization', auth);
   else if (clave !== undefined) headers.set('Authorization', 'Bearer ' + clave);
   if (cuerpo !== undefined) headers.set('content-type', 'application/json');
@@ -81,6 +82,28 @@ test('una copia de KV atrasada en otra región no rechaza al dispositivo que ya 
   assert.equal(r.status, 200); assert.equal((await r.json()).version, 6);
   r = await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: { base: null, data: { v: 4, fase: 1 } } });
   assert.equal(r.status, 409, 'sin versión no se pisa lo guardado');
+});
+
+test('la app de ruso usa la misma nube desde su sitio: CORS solo para ese origen y su documento propio', async () => {
+  const env = envCon(), RU = 'https://ruso-recepciones.pages.dev';
+  let r = await llamar(env, 'OPTIONS', '/api/doc/ruso/progreso', { origen: RU });
+  assert.equal(r.status, 204);
+  assert.equal(r.headers.get('Access-Control-Allow-Origin'), RU);
+  assert.match(r.headers.get('Access-Control-Allow-Headers'), /Authorization/);
+  assert.equal((await llamar(env, 'OPTIONS', '/api/doc/ruso/progreso', { origen: 'https://malicioso.example' })).status, 403);
+  r = await llamar(env, 'OPTIONS', '/api/nube', { origen: 'https://rama.ruso-recepciones.pages.dev' });
+  assert.equal(r.status, 204, 'las vistas previas de ramas también');
+  assert.equal((await llamar(env, 'OPTIONS', '/api/nube', { origen: 'https://ruso-recepciones.pages.dev.malicioso.example' })).status, 403);
+  r = await llamar(env, 'PUT', '/api/doc/ruso/progreso', { clave: CLAVE, origen: RU, cuerpo: { base: null, data: { v: 2, progress: { 1: { A: true } } } } });
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get('Access-Control-Allow-Origin'), RU);
+  r = await llamar(env, 'GET', '/api/doc/ruso/progreso', { clave: 'mala-clave-de-veinte-caract', origen: RU });
+  assert.equal(r.status, 401);
+  assert.equal(r.headers.get('Access-Control-Allow-Origin'), RU, 'el 401 también es legible para pedir la clave');
+  r = await llamar(env, 'GET', '/api/nube', { clave: CLAVE, origen: 'https://malicioso.example' });
+  assert.equal(r.headers.get('Access-Control-Allow-Origin'), null);
+  r = await llamar(env, 'GET', '/api/doc/ruso/progreso', { clave: CLAVE });
+  assert.equal((await r.json()).data.progress[1].A, true);
 });
 
 /* ---------- la app con la nube, en el navegador ---------- */
