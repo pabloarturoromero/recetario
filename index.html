@@ -934,8 +934,31 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .ej-dia[aria-selected="true"] :is(.l,.s,.m){color:var(--on-brand)}
 .ej-ses{margin-top:var(--s3)}
 .ej-ses .txt2{margin-top:var(--s2)}
-.ej-list{margin:var(--s3) 0; padding-left:1.3em; display:flex; flex-direction:column; gap:var(--s3)}
-.ej-list li{padding-left:2px}
+.ej-list{margin:var(--s3) 0; padding:0; list-style:none; counter-reset:ej; display:flex; flex-direction:column; gap:var(--s4)}
+.ej-list li{counter-increment:ej; display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s3) var(--s4); align-items:start;
+  padding-bottom:var(--s4); border-bottom:1px solid var(--line)}
+.ej-list li:last-child{border-bottom:0; padding-bottom:0}
+.ej-list .ej-n b::before{content:counter(ej) ". "; color:var(--brand-ink)}
+.ej-card{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s3) var(--s4); align-items:start; margin-top:var(--s3)}
+.ej-tx{min-width:0}
+.ej-fig{display:flex; gap:6px}
+.ej-fig figure{margin:0; text-align:center}
+.ej-fig figcaption{font-size:10.5px; color:var(--ink-3); margin-top:2px}
+.fg{width:104px; height:104px; display:block; background:var(--surface-2); border-radius:var(--r2)}
+.fg *{stroke-linecap:round; stroke-linejoin:round}
+.fg-suelo{stroke:var(--line-2); stroke-width:1}
+.fg-prop{stroke:var(--ink-3); stroke-width:2.2; fill:var(--surface)}
+.fg-prop .fg-mat{fill:var(--line-2); stroke:none}
+.fg-far{stroke:var(--brand); opacity:.38; stroke-width:4.6; fill:none}
+.fg-cerca{stroke:var(--brand); stroke-width:4.6; fill:none}
+.fg-torso{stroke-width:7.5}
+.fg-cabeza{fill:var(--brand)}
+.fg-db{stroke:var(--ink); stroke-width:2; fill:var(--ink)}
+.ej-vid{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s3); margin-top:var(--s2)}
+.ej-player{margin-top:var(--s2); position:relative; aspect-ratio:16 / 9; width:100%; max-width:560px; border-radius:var(--r2); overflow:hidden; background:#000}
+.ej-player[hidden]{display:none}
+.ej-player iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.ej-cred{font-size:11px; color:var(--ink-3); margin-top:4px; overflow-wrap:anywhere}
 .ej-list .ej-n{display:flex; justify-content:space-between; gap:var(--s3); flex-wrap:wrap; align-items:baseline}
 .ej-list .ej-r{font-size:12.5px; font-weight:600; color:var(--brand-ink); font-variant-numeric:tabular-nums}
 .ej-list p{font-size:13px; color:var(--ink-2); line-height:1.5; margin:2px 0}
@@ -943,6 +966,8 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 .ej-ul{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:6px}
 @media (max-width:640px){
   .ej-form select, .ej-form input{flex:1 1 130px}
+  .ej-list li, .ej-card{grid-template-columns:minmax(0,1fr)}
+  .fg{width:112px; height:112px}
   .ej-dia .s{font-size:10px}
 }
 @media (max-width:360px){
@@ -24464,89 +24489,7 @@ function crear(D){
 root.RecetarioMotor = {crear:crear, semanaPrep:semanaPrep};
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
-<script type="application/json" id="ejercicio">{
-  "titulo": "Plan de ejercicio en casa, 4 semanas",
-  "version": 1,
-  "semanas": 4,
-  "equipo": "Una mancuerna de 10 libras (4,5 kg), una silla firme, una mesa o encimera y un escalón bajo.",
-  "semana_tipo": {"1": "fa", "2": "cam", "3": "mov", "4": "fb", "5": "cam", "6": "larga", "0": "desc"},
-  "sesiones": {
-    "fa": {
-      "n": "Fuerza A", "tipo": "fuerza", "principal": true,
-      "min": [30, 30, 35, 35],
-      "vueltas": [2, 2, 3, 3],
-      "descanso": "60 a 90 segundos entre ejercicios; 2 minutos entre vueltas.",
-      "calentamiento": "5 minutos: marcha en el sitio, círculos de hombros y de cadera, 10 sentadillas a la silla sin peso.",
-      "vuelta_a_la_calma": "5 minutos: caminar despacio y estirar pantorrilla, muslo y pecho, 20 a 30 segundos cada uno, sin rebotes.",
-      "ej": [
-        {"n": "Sentadilla a la silla con mancuerna al pecho", "reps": ["10", "12", "10", "12"], "c": "Pies al ancho de la cadera; siéntate apenas tocando la silla y levántate empujando con los talones. Sopla al subir.", "v": "sentadilla a la silla con mancuerna goblet principiantes"},
-        {"n": "Remo a una mano apoyado en la silla", "reps": ["10 por lado", "12 por lado", "10 por lado", "12 por lado"], "c": "Mano y rodilla libres sobre la silla, espalda recta; lleva el codo hacia la cadera y baja despacio.", "v": "remo a una mano con mancuerna apoyado en silla"},
-        {"n": "Flexión de brazos inclinada en la mesa", "reps": ["8", "10", "10", "12"], "c": "Manos en el borde de una mesa firme o encimera, cuerpo en línea; baja el pecho y empuja soltando el aire. Si cuesta, hazla en la pared.", "v": "flexiones inclinadas en mesa principiantes"},
-        {"n": "Peso muerto rumano con mancuerna", "reps": ["10", "12", "10", "12"], "c": "Rodillas un poco flexionadas; lleva la cadera atrás con la espalda recta y la mancuerna cerca de las piernas, hasta media espinilla.", "v": "peso muerto rumano con una mancuerna tecnica"},
-        {"n": "Puente de glúteo", "reps": ["12", "15", "12", "15"], "c": "Boca arriba, rodillas dobladas; sube la cadera apretando glúteos, sostén un segundo y baja. La mancuerna sobre la cadera desde la semana 3.", "v": "puente de gluteo principiantes"},
-        {"n": "Plancha inclinada en la mesa", "reps": ["20 s", "25 s", "30 s", "30 s"], "c": "Antebrazos en la mesa, cuerpo en línea; respira todo el tiempo, sin aguantar el aire.", "v": "plancha inclinada principiantes"}
-      ]
-    },
-    "fb": {
-      "n": "Fuerza B", "tipo": "fuerza", "principal": true,
-      "min": [30, 30, 35, 35],
-      "vueltas": [2, 2, 3, 3],
-      "descanso": "60 a 90 segundos entre ejercicios; 2 minutos entre vueltas.",
-      "calentamiento": "5 minutos: marcha en el sitio, balanceo de brazos, 10 elevaciones de talón y 5 zancadas cortas por lado apoyándote en la silla.",
-      "vuelta_a_la_calma": "5 minutos: caminar despacio y estirar cadera, muslo posterior y hombros, 20 a 30 segundos cada uno.",
-      "ej": [
-        {"n": "Subida al escalón", "reps": ["8 por lado", "10 por lado", "8 por lado", "10 por lado"], "c": "Escalón bajo y firme, junto a una pared o baranda; sube con todo el pie y baja controlando. La mancuerna en la mano desde la semana 3.", "v": "subida al escalon step up principiantes"},
-        {"n": "Press de hombro sentado a una mano", "reps": ["8 por lado", "10 por lado", "10 por lado", "12 por lado"], "c": "Sentado con la espalda recta; empuja la mancuerna hacia arriba soplando y baja despacio hasta la altura de la oreja.", "v": "press de hombro sentado una mancuerna"},
-        {"n": "Zancada estática con apoyo en la silla", "reps": ["6 por lado", "8 por lado", "8 por lado", "10 por lado"], "c": "Un pie adelante y otro atrás; baja recto como un ascensor, solo hasta donde estés cómodo, con una mano en la silla.", "v": "zancada estatica con apoyo principiantes"},
-        {"n": "Remo a una mano apoyado en la silla", "reps": ["10 por lado", "12 por lado", "10 por lado", "12 por lado"], "c": "El mismo de la Fuerza A: la espalda se trabaja dos veces por semana.", "v": "remo a una mano con mancuerna apoyado en silla"},
-        {"n": "Curl de bíceps a una mano", "reps": ["10 por lado", "12 por lado", "10 por lado", "12 por lado"], "c": "Codo pegado al cuerpo; sube sin balancear y baja en tres tiempos.", "v": "curl de biceps con mancuerna tecnica"},
-        {"n": "Bicho muerto", "reps": ["6 por lado", "8 por lado", "8 por lado", "10 por lado"], "c": "Boca arriba, brazos al techo y rodillas a 90 grados; estira brazo y pierna contrarios sin despegar la espalda baja del piso.", "v": "dead bug bicho muerto ejercicio principiantes"}
-      ]
-    },
-    "cam": {
-      "n": "Caminata a paso ligero", "tipo": "cardio", "principal": true,
-      "min": [30, 35, 40, 45],
-      "detalle": ["5 min suave, 20 min a paso ligero, 5 min suave.", "5 min suave, 25 min a paso ligero, 5 min suave.", "5 min suave, 30 min a paso ligero, 5 min suave.", "5 min suave, 35 min a paso ligero, 5 min suave."],
-      "c": "Paso ligero es el que te deja hablar en frases completas pero no cantar (esfuerzo 4 a 5 de 10). En Guayaquil, mejor antes de las 9:00 o después de las 17:00, con agua y en terreno plano; en un centro comercial si llueve o hace mucho calor."
-    },
-    "larga": {
-      "n": "Caminata larga suave", "tipo": "cardio", "principal": false,
-      "min": [30, 35, 40, 45],
-      "detalle": ["30 min a paso cómodo.", "35 min a paso cómodo.", "40 min a paso cómodo.", "45 min a paso cómodo."],
-      "c": "Opcional. Paso de paseo, con conversación fácil (esfuerzo 3 a 4 de 10). Sirve un paseo en familia, por el Malecón o por el parque."
-    },
-    "mov": {
-      "n": "Movilidad y equilibrio", "tipo": "movilidad", "principal": false,
-      "min": [15, 15, 15, 15],
-      "c": "Opcional y suave: ayuda a recuperarse de la fuerza del día anterior.",
-      "ej": [
-        {"n": "Círculos de hombros y brazos", "reps": ["10 adelante y 10 atrás"], "c": "Amplios y lentos.", "v": "circulos de hombros movilidad"},
-        {"n": "Gato y vaca", "reps": ["8 lentos"], "c": "En cuatro apoyos, redondea y arquea la espalda con la respiración.", "v": "gato vaca ejercicio movilidad"},
-        {"n": "Estiramiento de cadera en zancada", "reps": ["30 s por lado"], "c": "Rodilla de atrás en el piso sobre un cojín; lleva la cadera adelante sin arquear la espalda.", "v": "estiramiento flexor de cadera arrodillado"},
-        {"n": "Equilibrio en un pie con apoyo", "reps": ["30 s por lado, 2 veces"], "c": "Junto a la silla, tocándola con los dedos; suelta la mano solo si te sientes estable.", "v": "ejercicio equilibrio en un pie adultos"},
-        {"n": "Respiración diafragmática", "reps": ["2 minutos"], "c": "Boca arriba o sentado: inhala por la nariz en 4 tiempos inflando el abdomen y exhala en 6.", "v": "respiracion diafragmatica tutorial"}
-      ]
-    },
-    "desc": {"n": "Descanso", "tipo": "descanso", "principal": false, "min": [0, 0, 0, 0], "c": "Día libre. Un paseo tranquilo también vale, sin contarlo como sesión."}
-  },
-  "progresion": "Cada semana sube un poco: minutos de caminata, repeticiones y, desde la semana 3, una vuelta más de fuerza. Si una semana costó mucho (esfuerzo de 8 o más), repítela antes de avanzar. Después de la semana 4, mantén ese nivel y conversa con tu cardiólogo antes de subir la intensidad.",
-  "seguridad": [
-    "Tu cardiólogo autorizó el ejercicio de fuerza. Si te dio un rango de pulso o alguna indicación, esa manda sobre este plan.",
-    "Guíate por el esfuerzo percibido de 0 a 10: la fuerza entre 5 y 6 (las dos últimas repeticiones cuestan, pero salen con buena técnica) y la caminata entre 4 y 5. Algunos medicamentos del corazón bajan el pulso, por eso el esfuerzo es mejor guía que el reloj.",
-    "Nunca aguantes la respiración al hacer fuerza: sopla al subir o empujar y toma aire al bajar.",
-    "Siempre calentamiento de 5 minutos antes y vuelta a la calma después; no te sientes ni te acuestes de golpe al terminar.",
-    "Espera una a dos horas después del almuerzo o la cena antes de la fuerza o la caminata a paso ligero. Un paseo suave de 10 minutos después de comer sí está bien.",
-    "Detente y busca atención médica si aparece dolor, presión u opresión en el pecho, el brazo, el cuello o la mandíbula, falta de aire que no corresponde al esfuerzo, mareo, palpitaciones o latidos irregulares, o sudor frío.",
-    "No entrenes con fiebre, gripe o si dormiste muy mal: ese día toca descanso o solo movilidad.",
-    "Toma agua antes, durante y después; el vaso de la caminata se registra en el medidor de agua."
-  ],
-  "con_la_comida": [
-    "El plan no cambia las porciones en los días de ejercicio: las tres tomas de 35 a 40 g de proteína del menú ya cubren la recuperación muscular.",
-    "Si entrenas en la mañana, hazlo después del desayuno esperando una hora, o antes con un vaso de agua si te sientes bien en ayunas.",
-    "El piso de 150 g de carbohidrato al día sostiene la energía para entrenar: no lo recortes los días de fuerza.",
-    "En las semanas 3 y 4 del plan de comidas, con menos kcal, el ejercicio de fuerza ayuda a conservar el músculo mientras baja el peso."
-  ]
-}</script>
+<script type="application/json" id="ejercicio">{"titulo":"Plan de ejercicio en casa, 4 semanas","version":1,"semanas":4,"equipo":"Una mancuerna de 10 libras (4,5 kg), una silla firme, una mesa o encimera y un escalón bajo.","semana_tipo":{"1":"fa","2":"yoga","3":"cam","4":"fb","5":"yoga","6":"larga","0":"desc"},"sesiones":{"fa":{"n":"Fuerza A","tipo":"fuerza","principal":true,"min":[30,30,35,35],"vueltas":[2,2,3,3],"descanso":"60 a 90 segundos entre ejercicios; 2 minutos entre vueltas.","calentamiento":"5 minutos: marcha en el sitio, círculos de hombros y de cadera, 10 sentadillas a la silla sin peso.","vuelta_a_la_calma":"5 minutos: caminar despacio y estirar pantorrilla, muslo y pecho, 20 a 30 segundos cada uno, sin rebotes.","ej":[{"n":"Sentadilla a la silla con mancuerna al pecho","reps":["10","12","10","12"],"c":"Pies al ancho de la cadera; siéntate apenas tocando la silla y levántate empujando con los talones. Sopla al subir.","v":"sentadilla a la silla con mancuerna goblet principiantes","vid":{"id":"7l8LyvpXpLs","t":"Sentadilla goblet a una silla","canal":"Aida MR","dur":"1:09"},"fig":{"props":[{"t":"silla","x":24,"w":18,"r":0}],"a":{"n":[50,25],"p":[50,52],"e":[55,40],"w":[56,31],"E":[53,40],"W":[55,31],"k":[51,71],"a":[51,90],"K":[49,71],"A":[48,90],"db":"w"},"b":{"n":[48,43],"p":[38,67],"e":[53,55],"w":[56,47],"E":[51,55],"W":[55,47],"k":[56,69],"a":[53,90],"K":[54,69],"A":[51,90],"db":"w"}}},{"n":"Remo a una mano apoyado en la silla","reps":["10 por lado","12 por lado","10 por lado","12 por lado"],"c":"Mano y rodilla libres sobre la silla, espalda recta; lleva el codo hacia la cadera y baja despacio.","v":"remo a una mano con mancuerna apoyado en silla","vid":{"id":"mBZYSlQtgTo","t":"Remo unilateral con mancuerna (Casa) - Dumbbell Single arm Row (Home)","canal":"Valverde Fitness","dur":"0:24"},"fig":{"props":[{"t":"silla","x":44,"w":30,"r":1}],"a":{"n":[68,50],"p":[42,54],"e":[67,61],"w":[66,71],"E":[70,60],"W":[71,69],"k":[40,72],"a":[39,90],"K":[51,69],"A":[45,69],"FT":[44,66],"db":"w"},"b":{"n":[68,50],"p":[42,54],"e":[55,44],"w":[60,55],"E":[70,60],"W":[71,69],"k":[40,72],"a":[39,90],"K":[51,69],"A":[45,69],"FT":[44,66],"db":"w"}}},{"n":"Flexión de brazos inclinada en la mesa","reps":["8","10","10","12"],"c":"Manos en el borde de una mesa firme o encimera, cuerpo en línea; baja el pecho y empuja soltando el aire. Si cuesta, hazla en la pared.","v":"flexiones inclinadas en mesa principiantes","vid":{"id":"uaLRu1_aMuc","t":"Flexiones de brazos en mesa [ Tutorial Simple ] - Entrenador Wellness","canal":"Entrenador Wellness","dur":"1:57"},"fig":{"props":[{"t":"mesa","x":72,"w":26}],"a":{"n":[62,38],"p":[46,60],"k":[35,75],"a":[24,90],"e":[70,47],"w":[76,57],"E":[69,47],"W":[75,57],"ft":[26,92],"K":[35,75],"A":[24,90]},"b":{"n":[66,46],"p":[47,64],"k":[33,77],"a":[20,90],"e":[63,58],"w":[76,57],"E":[62,58],"W":[75,57],"ft":[22,92],"K":[33,77],"A":[20,90]}}},{"n":"Peso muerto rumano con mancuerna","reps":["10","12","10","12"],"c":"Rodillas un poco flexionadas; lleva la cadera atrás con la espalda recta y la mancuerna cerca de las piernas, hasta media espinilla.","v":"peso muerto rumano con una mancuerna tecnica","vid":{"id":"x7W2BOKWWKs","t":"PESO MUERTO RUMANO CON MANCUERNAS","canal":"CARLOS Online Coach","dur":"0:25"},"fig":{"props":[],"a":{"n":[50,25],"p":[50,52],"e":[52,39],"w":[54,52],"E":[51,39],"W":[53,52],"k":[51,71],"a":[51,90],"K":[49,71],"A":[48,90],"db":"w"},"b":{"n":[64,37],"p":[42,52],"e":[64,50],"w":[64,64],"E":[63,50],"W":[63,64],"k":[47,71],"a":[48,90],"K":[46,71],"A":[46,90],"db":"w"}}},{"n":"Puente de glúteo","reps":["12","15","12","15"],"c":"Boca arriba, rodillas dobladas; sube la cadera apretando glúteos, sostén un segundo y baja. La mancuerna sobre la cadera desde la semana 3.","v":"puente de gluteo principiantes","vid":{"id":"uuiN9NRFMBo","t":"¿Cómo hacer Puente de Glúteos? Aquí te explico 💪🏻","canal":"Meli Cardenas","dur":"1:14"},"fig":{"props":[{"t":"mat","x":10,"w":80}],"a":{"h":[21,85],"n":[30,86],"p":[54,86],"e":[40,89],"w":[50,89],"E":[40,89],"W":[50,89],"k":[66,72],"a":[74,89],"K":[65,72],"A":[73,89]},"b":{"h":[21,85],"n":[31,85],"p":[56,72],"e":[40,89],"w":[50,89],"E":[40,89],"W":[50,89],"k":[73,69],"a":[75,89],"K":[72,69],"A":[74,89]}}},{"n":"Plancha inclinada en la mesa","reps":["20 s","25 s","30 s","30 s"],"c":"Antebrazos en la mesa, cuerpo en línea; respira todo el tiempo, sin aguantar el aire.","v":"plancha inclinada principiantes","vid":{"id":"BXnjFn-b9f0","t":"COMO HACER PLANCHA INCLINADA","canal":"entrenador de habitos","dur":"0:49"},"fig":{"props":[{"t":"mesa","x":70,"w":28}],"a":{"n":[70,45],"p":[50,64],"k":[36,77],"a":[22,90],"ft":[24,92],"K":[36,77],"A":[22,90],"e":[72,56],"w":[86,56],"E":[71,56],"W":[85,56]}}}]},"fb":{"n":"Fuerza B","tipo":"fuerza","principal":true,"min":[30,30,35,35],"vueltas":[2,2,3,3],"descanso":"60 a 90 segundos entre ejercicios; 2 minutos entre vueltas.","calentamiento":"5 minutos: marcha en el sitio, balanceo de brazos, 10 elevaciones de talón y 5 zancadas cortas por lado apoyándote en la silla.","vuelta_a_la_calma":"5 minutos: caminar despacio y estirar cadera, muslo posterior y hombros, 20 a 30 segundos cada uno.","ej":[{"n":"Subida al escalón","reps":["8 por lado","10 por lado","8 por lado","10 por lado"],"c":"Escalón bajo y firme, junto a una pared o baranda; sube con todo el pie y baja controlando. La mancuerna en la mano desde la semana 3.","v":"subida al escalon step up principiantes","vid":{"id":"CpKJ1B4iNwc","t":"STEP UPS - TÉCNICA CORRECTA EXPLICADA- Galvistrainer","canal":"Galvistrainer","dur":"4:16"},"fig":{"props":[{"t":"escalon","x":56,"w":26,"alto":12}],"a":{"n":[52,25],"p":[49,52],"e":[52,39],"w":[53,52],"E":[50,39],"W":[50,52],"k":[63,63],"a":[63,79],"ft":[69,80],"K":[48,71],"A":[46,90]},"b":{"n":[66,14],"p":[65,41],"e":[66,28],"w":[67,41],"E":[64,28],"W":[64,41],"k":[66,60],"a":[65,79],"ft":[71,80],"K":[64,60],"A":[63,79],"FT":[69,80]}}},{"n":"Press de hombro sentado a una mano","reps":["8 por lado","10 por lado","10 por lado","12 por lado"],"c":"Sentado con la espalda recta; empuja la mancuerna hacia arriba soplando y baja despacio hasta la altura de la oreja.","v":"press de hombro sentado una mancuerna","vid":{"id":"GELRUlUSxeI","t":"Técnica Press de Hombros con Mancuernas","canal":"Dra. Isabel Junio","dur":"1:56"},"fig":{"props":[{"t":"silla","x":28,"w":20,"r":0}],"a":{"n":[40,41],"p":[40,67],"e":[46,50],"w":[46,37],"E":[42,53],"W":[50,60],"k":[58,67],"a":[58,90],"K":[57,67],"A":[56,90],"db":"w"},"b":{"n":[40,41],"p":[40,67],"e":[42,28],"w":[43,14],"E":[42,53],"W":[50,60],"k":[58,67],"a":[58,90],"K":[57,67],"A":[56,90],"db":"w"}}},{"n":"Zancada estática con apoyo en la silla","reps":["6 por lado","8 por lado","8 por lado","10 por lado"],"c":"Un pie adelante y otro atrás; baja recto como un ascensor, solo hasta donde estés cómodo, con una mano en la silla.","v":"zancada estatica con apoyo principiantes","vid":{"id":"7oLYkMoaVLk","t":"Zancada estática (Static Lunge)","canal":"Clínica Fisioterapia Rubén Redondo ","dur":"0:30"},"fig":{"props":[{"t":"silla","x":14,"w":18,"r":1}],"a":{"n":[50,23],"p":[50,50],"e":[56,36],"w":[53,47],"E":[42,31],"W":[32,46],"k":[58,69],"a":[62,90],"K":[42,69],"A":[36,87],"FT":[41,91]},"b":{"n":[48,37],"p":[48,64],"e":[54,50],"w":[51,61],"E":[40,44],"W":[32,46],"k":[66,66],"a":[64,90],"K":[40,83],"A":[25,85],"FT":[30,91]}}},{"n":"Remo a una mano apoyado en la silla","reps":["10 por lado","12 por lado","10 por lado","12 por lado"],"c":"El mismo de la Fuerza A: la espalda se trabaja dos veces por semana.","v":"remo a una mano con mancuerna apoyado en silla","vid":{"id":"mBZYSlQtgTo","t":"Remo unilateral con mancuerna (Casa) - Dumbbell Single arm Row (Home)","canal":"Valverde Fitness","dur":"0:24"},"fig":{"props":[{"t":"silla","x":44,"w":30,"r":1}],"a":{"n":[68,50],"p":[42,54],"e":[67,61],"w":[66,71],"E":[70,60],"W":[71,69],"k":[40,72],"a":[39,90],"K":[51,69],"A":[45,69],"FT":[44,66],"db":"w"},"b":{"n":[68,50],"p":[42,54],"e":[55,44],"w":[60,55],"E":[70,60],"W":[71,69],"k":[40,72],"a":[39,90],"K":[51,69],"A":[45,69],"FT":[44,66],"db":"w"}}},{"n":"Curl de bíceps a una mano","reps":["10 por lado","12 por lado","10 por lado","12 por lado"],"c":"Codo pegado al cuerpo; sube sin balancear y baja en tres tiempos.","v":"curl de biceps con mancuerna tecnica","vid":{"id":"OLF39uJo9YM","t":"Bíceps Alterno con Mancuernas","canal":"Zonapablo","dur":"2:02"},"fig":{"props":[],"a":{"n":[50,25],"p":[50,52],"e":[50,39],"w":[51,53],"E":[49,39],"W":[48,52],"k":[51,71],"a":[51,90],"K":[49,71],"A":[48,90],"db":"w"},"b":{"n":[50,25],"p":[50,52],"e":[50,39],"w":[60,30],"E":[49,39],"W":[48,52],"k":[51,71],"a":[51,90],"K":[49,71],"A":[48,90],"db":"w"}}},{"n":"Bicho muerto","reps":["6 por lado","8 por lado","8 por lado","10 por lado"],"c":"Boca arriba, brazos al techo y rodillas a 90 grados; estira brazo y pierna contrarios sin despegar la espalda baja del piso.","v":"dead bug bicho muerto ejercicio principiantes","vid":{"id":"0JFVLaTLzHg","t":"DEAD BUG ( BICHO MUERTO) 🔝👌 correcciones y variantes👍","canal":"FisioVanguardia","dur":"7:38"},"fig":{"props":[{"t":"mat","x":2,"w":94}],"a":{"h":[21,85],"n":[30,86],"p":[54,86],"e":[31,72],"w":[31,58],"E":[33,72],"W":[33,58],"k":[55,67],"a":[74,67],"ft":[75,61],"K":[57,68],"A":[76,68],"FT":[77,62]},"b":{"h":[21,85],"n":[30,86],"p":[54,86],"e":[17,82],"w":[5,81],"E":[33,72],"W":[33,58],"k":[55,67],"a":[74,67],"ft":[75,61],"K":[72,79],"A":[90,85],"FT":[93,80]}}}]},"yoga":{"n":"Yoga para principiantes","tipo":"yoga","principal":true,"min":[20,20,25,30],"vueltas":[1,1,1,2],"c":"Suave y sin prisa: cada postura se sostiene respirando por la nariz, sin forzar ni aguantar el aire. Sin posturas invertidas. Desde la semana 4, dos vueltas a la secuencia.","calentamiento":"2 minutos sentado o de pie: hombros arriba y abajo, cuello de lado a lado muy despacio y respiración tranquila.","vuelta_a_la_calma":"La relajación final cierra la sesión: levántate de lado y despacio.","ej":[{"n":"Montaña con respiración","reps":["5 respiraciones","6 respiraciones","8 respiraciones","8 respiraciones"],"c":"De pie, pies al ancho de la cadera; al inhalar sube los brazos por los lados y al exhalar bájalos. Hombros lejos de las orejas.","v":"postura de la montaña tadasana yoga principiantes","vid":{"id":"aEQVYMb9P6U","t":"Tadasana: la postura de la montaña | Yoga","canal":"SIKANA Español","dur":"1:42"},"fig":{"props":[],"a":{"n":[50,25],"p":[50,52],"e":[51,39],"w":[52,52],"E":[49,39],"W":[48,52],"k":[51,71],"a":[51,90],"K":[49,71],"A":[48,90]},"b":{"n":[50,25],"p":[50,52],"e":[55,12],"w":[57,-1],"E":[53,12],"W":[55,-1],"k":[51,71],"a":[51,90],"K":[49,71],"A":[48,90]}}},{"n":"Gato y vaca","reps":["6 veces","8 veces","8 veces","10 veces"],"c":"En cuatro apoyos, manos bajo los hombros y rodillas bajo la cadera: al inhalar hunde la espalda y mira al frente; al exhalar redondéala y mira al ombligo.","v":"gato vaca yoga principiantes","vid":{"id":"NVNoJph0fw0","t":"Postura de Yoga: Gato- Vaca","canal":"Happy Yoga Sangha","dur":"1:38"},"fig":{"props":[{"t":"mat","x":6,"w":84}],"a":{"e":[66,76],"w":[66,89],"E":[64,76],"W":[64,89],"k":[38,89],"a":[20,89],"ft":[16,89],"K":[36,89],"A":[18,89],"FT":[14,89],"n":[66,63],"p":[38,63],"c":[52,71],"h":[74,54]},"b":{"e":[66,76],"w":[66,89],"E":[64,76],"W":[64,89],"k":[38,89],"a":[20,89],"ft":[16,89],"K":[36,89],"A":[18,89],"FT":[14,89],"n":[66,64],"p":[38,64],"c":[52,52],"h":[72,72]}}},{"n":"Perro boca abajo con manos en la silla","reps":["3 respiraciones","4 respiraciones","5 respiraciones","5 respiraciones"],"c":"Manos en el respaldo de una silla firme contra la pared; camina hacia atrás hasta que la espalda quede larga, con las rodillas un poco flexionadas. La cabeza no baja del nivel del corazón.","v":"perro boca abajo en silla yoga principiantes","vid":{"id":"EDEa583X8Us","t":"Perro Boca Abajo bien hecho | Sin forzar la espalda ni las piernas","canal":"Yoga con Vir","dur":"3:52"},"fig":{"props":[{"t":"silla","x":70,"w":18,"r":1},{"t":"pared","x":90}],"a":{"n":[66,58],"p":[40,52],"h":[75,61],"e":[76,54],"w":[87,49],"E":[75,54],"W":[86,49],"k":[42,71],"a":[40,90],"K":[41,71],"A":[39,90]}}},{"n":"Guerrero II","reps":["3 respiraciones por lado","4 respiraciones por lado","5 respiraciones por lado","5 respiraciones por lado"],"c":"Piernas separadas, pie de adelante mirando al frente y el de atrás de lado; dobla la rodilla de adelante sobre el tobillo y abre los brazos a la altura de los hombros.","v":"guerrero 2 yoga principiantes","vid":{"id":"-8hKpr5dxFM","t":"Guerrero II - Virabhadrasana II","canal":"yogaes","dur":"1:23"},"fig":{"props":[{"t":"mat","x":14,"w":72}],"a":{"n":[50,31],"p":[50,58],"h":[50,22],"e":[64,31],"w":[78,31],"E":[36,31],"W":[22,31],"k":[64,72],"a":[66,90],"K":[38,73],"A":[27,89],"FT":[21,90]}}},{"n":"Árbol con apoyo","reps":["3 respiraciones por lado","4 respiraciones por lado","5 respiraciones por lado","5 respiraciones por lado"],"c":"Junto a la silla, con una mano en el respaldo: apoya la planta del pie en el tobillo o la pantorrilla de la otra pierna, nunca en la rodilla.","v":"postura del arbol con apoyo silla yoga principiantes","vid":{"id":"6g5zC1B2EDQ","t":"El árbol - Vrksasana","canal":"yogaes","dur":"1:29"},"fig":{"props":[{"t":"silla","x":12,"w":18,"r":1}],"a":{"n":[48,25],"p":[48,52],"h":[48,16],"e":[57,37],"w":[50,34],"E":[39,36],"W":[30,46],"k":[62,63],"a":[50,76],"ft":[49,79],"K":[48,71],"A":[48,90]}}},{"n":"Esfinge","reps":["3 respiraciones","4 respiraciones","5 respiraciones","5 respiraciones"],"c":"Boca abajo, codos bajo los hombros y antebrazos en el piso; alarga el pecho hacia adelante sin apretar la espalda baja.","v":"postura de la esfinge yoga principiantes","vid":{"id":"K1HEmIfmOEQ","t":"Como realizar la postura de la esfinge","canal":"Penta BIENestar","dur":"2:48"},"fig":{"props":[{"t":"mat","x":6,"w":88}],"a":{"n":[70,76],"p":[48,87],"h":[77,67],"e":[70,89],"w":[84,89],"E":[69,89],"W":[83,89],"k":[32,89],"a":[16,89],"ft":[11,88],"K":[32,89],"A":[16,89],"FT":[11,88]}}},{"n":"Postura del niño","reps":["5 respiraciones","6 respiraciones","8 respiraciones","8 respiraciones"],"c":"De rodillas, siéntate sobre los talones y lleva el pecho hacia los muslos con los brazos adelante; si molesta, pon un cojín bajo la frente o entre glúteos y talones.","v":"postura del niño balasana yoga principiantes","vid":{"id":"CLlAUN_r75k","t":"BALASANA - POSTURA DEL NIÑO | Yoga para Principiantes","canal":"DaleYogaATuVida","dur":"4:15"},"fig":{"props":[{"t":"mat","x":16,"w":80}],"a":{"n":[66,84],"p":[40,80],"c":[54,75],"h":[73,87],"e":[80,87],"w":[92,88],"E":[79,87],"W":[91,88],"k":[58,88],"a":[38,89],"ft":[33,88],"K":[57,88],"A":[37,89],"FT":[32,88]}}},{"n":"Relajación final","reps":["3 minutos","3 minutos","4 minutos","5 minutos"],"c":"Boca arriba, brazos a los lados y palmas hacia arriba; inhala en 4 tiempos y exhala en 6. Para levantarte, gira de lado primero.","v":"savasana relajacion final yoga principiantes","vid":{"id":"u2txVGmvIks","t":"Savasana guiada. 5 min de relajación profunda","canal":"Yoginah","dur":"4:18"},"fig":{"props":[{"t":"mat","x":6,"w":88}],"a":{"h":[17,85],"n":[26,86],"p":[52,86],"e":[37,89],"w":[47,90],"E":[37,89],"W":[47,90],"k":[68,87],"a":[84,87],"ft":[87,81],"K":[68,87],"A":[84,87],"FT":[87,81]}}}]},"cam":{"n":"Caminata a paso ligero","tipo":"cardio","principal":false,"min":[30,35,40,45],"detalle":["5 min suave, 20 min a paso ligero, 5 min suave.","5 min suave, 25 min a paso ligero, 5 min suave.","5 min suave, 30 min a paso ligero, 5 min suave.","5 min suave, 35 min a paso ligero, 5 min suave."],"c":"Opcional. Paso ligero es el que te deja hablar en frases completas pero no cantar (esfuerzo 4 a 5 de 10). En Guayaquil, mejor antes de las 9:00 o después de las 17:00, con agua y en terreno plano; en un centro comercial si llueve o hace mucho calor.","v":"como caminar a paso ligero para principiantes","vid":{"id":"HCZLKhp6I3I","t":"Ejercicio de Caminar!, La Forma indicada de hacerlo!!! 🤩","canal":"Fisioterapia para la gente","dur":"11:11"},"fig":{"props":[],"a":{"n":[52,25],"p":[50,52],"e":[45,38],"w":[43,50],"E":[57,37],"W":[62,47],"k":[58,70],"a":[61,89],"K":[45,70],"A":[37,86],"FT":[41,91]},"b":{"n":[52,25],"p":[50,52],"e":[57,37],"w":[62,47],"E":[45,38],"W":[43,50],"k":[45,70],"a":[37,86],"ft":[41,91],"K":[58,70],"A":[61,89]}}},"larga":{"n":"Caminata larga suave","tipo":"cardio","principal":false,"min":[30,35,40,45],"detalle":["30 min a paso cómodo.","35 min a paso cómodo.","40 min a paso cómodo.","45 min a paso cómodo."],"c":"Opcional. Paso de paseo, con conversación fácil (esfuerzo 3 a 4 de 10). Sirve un paseo en familia, por el Malecón o por el parque.","v":"como caminar a paso ligero para principiantes","vid":{"id":"HCZLKhp6I3I","t":"Ejercicio de Caminar!, La Forma indicada de hacerlo!!! 🤩","canal":"Fisioterapia para la gente","dur":"11:11"},"fig":{"props":[],"a":{"n":[52,25],"p":[50,52],"e":[45,38],"w":[43,50],"E":[57,37],"W":[62,47],"k":[58,70],"a":[61,89],"K":[45,70],"A":[37,86],"FT":[41,91]},"b":{"n":[52,25],"p":[50,52],"e":[57,37],"w":[62,47],"E":[45,38],"W":[43,50],"k":[45,70],"a":[37,86],"ft":[41,91],"K":[58,70],"A":[61,89]}}},"desc":{"n":"Descanso","tipo":"descanso","principal":false,"min":[0,0,0,0],"c":"Día libre. Un paseo tranquilo también vale, sin contarlo como sesión."}},"progresion":"Cada semana sube un poco: repeticiones de fuerza y, desde la semana 3, una vuelta más del circuito; respiraciones en el yoga y, en la semana 4, dos vueltas a la secuencia; minutos de caminata si decides caminar. Si una semana costó mucho (esfuerzo de 8 o más), repítela antes de avanzar. Después de la semana 4, mantén ese nivel y conversa con tu cardiólogo antes de subir la intensidad.","seguridad":["Tu cardiólogo autorizó el ejercicio de fuerza. Si te dio un rango de pulso o alguna indicación, esa manda sobre este plan.","Guíate por el esfuerzo percibido de 0 a 10: la fuerza entre 5 y 6 (las dos últimas repeticiones cuestan, pero salen con buena técnica), el yoga entre 2 y 4 y la caminata entre 4 y 5. Algunos medicamentos del corazón bajan el pulso, por eso el esfuerzo es mejor guía que el reloj.","Nunca aguantes la respiración al hacer fuerza: sopla al subir o empujar y toma aire al bajar.","En el yoga, nada de posturas invertidas ni de cabeza abajo por mucho rato; sal de cada postura despacio y, si te mareas al levantarte, siéntate un momento.","Siempre calentamiento de 5 minutos antes y vuelta a la calma después; no te sientes ni te acuestes de golpe al terminar.","Espera una a dos horas después del almuerzo o la cena antes de la fuerza o la caminata a paso ligero. Un paseo suave de 10 minutos después de comer sí está bien.","Detente y busca atención médica si aparece dolor, presión u opresión en el pecho, el brazo, el cuello o la mandíbula, falta de aire que no corresponde al esfuerzo, mareo, palpitaciones o latidos irregulares, o sudor frío.","No entrenes con fiebre, gripe o si dormiste muy mal: ese día toca descanso o solo movilidad.","Toma agua antes, durante y después; el vaso de cada sesión se registra en el medidor de agua."],"con_la_comida":["El plan no cambia las porciones en los días de ejercicio: las tres tomas de 35 a 40 g de proteína del menú ya cubren la recuperación muscular.","Si entrenas en la mañana, hazlo después del desayuno esperando una hora, o antes con un vaso de agua si te sientes bien en ayunas.","El piso de 150 g de carbohidrato al día sostiene la energía para entrenar: no lo recortes los días de fuerza.","En las semanas 3 y 4 del plan de comidas, con menos kcal, el ejercicio de fuerza ayuda a conservar el músculo mientras baja el peso."]}</script>
 <script id="salud">
 /* Motor de Salud: agua, peso, exámenes y ejercicio. Funciones puras, sin DOM: la interfaz y las pruebas usan las mismas.
    Se guarda aparte del menú, en la clave recetario.salud, con su propia versión. */
@@ -25005,8 +24948,8 @@ function crear(D, P){
     n = Math.max(1, Math.min(NSEM, n || 1));
     return {id:id, n:x.n, tipo:x.tipo, principal:!!x.principal, min:deNivel(x.min, n), vueltas:deNivel(x.vueltas, n) || 0,
       detalle:deNivel(x.detalle, n) || '', c:x.c || '', descanso:x.descanso || '', calentamiento:x.calentamiento || '',
-      calma:x.vuelta_a_la_calma || '',
-      ej:(x.ej || []).map(function(e){ return {n:e.n, reps:deNivel(e.reps, n), c:e.c || '', v:e.v || ''}; })};
+      calma:x.vuelta_a_la_calma || '', v:x.v || '', vid:x.vid || null, fig:x.fig || null,
+      ej:(x.ej || []).map(function(e){ return {n:e.n, reps:deNivel(e.reps, n), c:e.c || '', v:e.v || '', vid:e.vid || null, fig:e.fig || null}; })};
   }
   function marcarEj(st, f, s, min, esf){
     if(!esISO(f) || !sesionValida(s)) return false;
@@ -27132,7 +27075,7 @@ function formExamen(ex){
   return h;
 }
 /* ---------- ejercicio ---------- */
-var EJ_CORTO = {fa:'Fuerza A', fb:'Fuerza B', cam:'Caminar', larga:'Paseo', mov:'Movilidad', desc:'Libre'};
+var EJ_CORTO = {fa:'Fuerza A', fb:'Fuerza B', yoga:'Yoga', cam:'Caminar', larga:'Paseo', desc:'Libre'};
 var DIA_LETRA = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
 var ESFUERZO = {1:'muy suave', 3:'suave', 5:'moderado', 7:'fuerte', 9:'muy fuerte', 10:'máximo'};
 function ytEj(q){ return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q); }
@@ -27161,10 +27104,73 @@ function icoEj(s){
     '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>';
   return '<svg class="i" viewBox="0 0 24 24">' + p + '</svg>';
 }
+/* Figura de un ejercicio en un lienzo de 100 x 100 con el suelo en y=92: accesorios, extremidades lejanas en tono suave,
+   torso, cabeza y extremidades cercanas en el color de la marca, y la mancuerna en la mano que la lleva. */
+function svgPose(f, P, titulo){
+  function pt(a){ return a[0] + ' ' + a[1]; }
+  function uni(a, b){ var dx = a[0] - b[0], dy = a[1] - b[1], l = Math.sqrt(dx * dx + dy * dy) || 1; return [dx / l, dy / l]; }
+  function pie(a, k, t){ return t || [a[0] + 6, a[1] + 1.5]; }
+  function linea(l){ return '<polyline points="' + l.filter(Boolean).map(pt).join(' ') + '"/>'; }
+  var n = P.n, p = P.p, d = uni(n, p), h = P.h || [n[0] + d[0] * 9, n[1] + d[1] * 9];
+  var s = '<line class="fg-suelo" x1="0" y1="92.5" x2="100" y2="92.5"/><g class="fg-prop">';
+  (f.props || []).forEach(function(o){
+    var x = o.x, w = o.w || 20;
+    if(o.t === 'silla'){
+      var bx = o.r ? x + w - 1.5 : x + 1.5;
+      s += '<line x1="' + (x + 2) + '" y1="72" x2="' + (x + 2) + '" y2="92"/><line x1="' + (x + w - 2) + '" y1="72" x2="' + (x + w - 2) + '" y2="92"/>' +
+        '<line x1="' + bx + '" y1="70" x2="' + bx + '" y2="46"/><rect x="' + x + '" y="69" width="' + w + '" height="3.5" rx="1.2"/>';
+    } else if(o.t === 'mesa'){
+      s += '<line x1="' + (x + 3) + '" y1="59" x2="' + (x + 3) + '" y2="92"/><line x1="' + (x + w - 3) + '" y1="59" x2="' + (x + w - 3) + '" y2="92"/>' +
+        '<rect x="' + x + '" y="56" width="' + w + '" height="3.5" rx="1.2"/>';
+    } else if(o.t === 'escalon'){
+      s += '<rect x="' + x + '" y="' + (92 - (o.alto || 10)) + '" width="' + w + '" height="' + (o.alto || 10) + '" rx="1.5"/>';
+    } else if(o.t === 'mat'){
+      s += '<rect class="fg-mat" x="' + x + '" y="90.8" width="' + w + '" height="2.4" rx="1.2"/>';
+    } else if(o.t === 'pared'){
+      s += '<line class="fg-pared" x1="' + x + '" y1="10" x2="' + x + '" y2="92"/>';
+    }
+  });
+  s += '</g><g class="fg-far">' + linea([p, P.K, P.A, P.A && pie(P.A, P.K, P.FT)]) + linea([n, P.E, P.W]) + '</g>';
+  s += '<g class="fg-cerca"><path class="fg-torso" d="M' + pt(p) + (P.c ? ' Q' + pt(P.c) + ' ' : ' L') + pt(n) + '"/>' +
+    linea([p, P.k, P.a, P.a && pie(P.a, P.k, P.ft)]) + linea([n, P.e, P.w]) + '</g>' +
+    '<circle class="fg-cabeza" cx="' + h[0] + '" cy="' + h[1] + '" r="6.2"/>';
+  (P.db || '').split('').forEach(function(m){
+    var w = m === 'w' ? P.w : P.W, e = m === 'w' ? P.e : P.E;
+    if(!w || !e) return;
+    var u = uni(w, e), q = [-u[1] * 5, u[0] * 5], a = [w[0] + q[0], w[1] + q[1]], b = [w[0] - q[0], w[1] - q[1]];
+    s += '<g class="fg-db"><line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"/>' +
+      '<circle cx="' + a[0] + '" cy="' + a[1] + '" r="2.8"/><circle cx="' + b[0] + '" cy="' + b[1] + '" r="2.8"/></g>';
+  });
+  return '<svg class="fg" viewBox="0 -6 100 100" role="img" aria-label="' + esc(titulo) + '">' + s + '</svg>';
+}
+/* Ilustración (inicio y final, o la postura) y video de un ejercicio. El video se carga solo al pedirlo. */
+function figuraEj(f, n){
+  if(!f || !f.a) return '';
+  return '<div class="ej-fig">' + (f.b
+    ? '<figure>' + svgPose(f, f.a, n + ', posición inicial') + '<figcaption>Inicio</figcaption></figure>' +
+      '<figure>' + svgPose(f, f.b, n + ', posición final') + '<figcaption>Final</figcaption></figure>'
+    : '<figure>' + svgPose(f, f.a, n) + '<figcaption>Postura</figcaption></figure>') + '</div>';
+}
+function videoEj(x){
+  var h = '<div class="ej-vid">';
+  if(x.vid) h += '<button class="btn sec sm" data-sa="ejvideo|' + esc(x.vid.id) + '" aria-expanded="false">▶ Ver video</button>';
+  h += (x.vid ? '<a class="lnk" href="https://www.youtube.com/watch?v=' + esc(x.vid.id) + '" target="_blank" rel="noopener">Abrir en YouTube</a>' : '') +
+    (x.v ? '<a class="lnk" href="' + esc(ytEj(x.v)) + '" target="_blank" rel="noopener">Otros videos</a>' : '') + '</div>';
+  if(x.vid) h += '<div class="ej-player" data-vid="' + esc(x.vid.id) + '" hidden></div><p class="ej-cred">' + esc(x.vid.t) + ' · ' + esc(x.vid.canal) + (x.vid.dur ? ' · ' + esc(x.vid.dur) : '') + '</p>';
+  return h;
+}
+function abrirVideoEj(t, id){
+  var box = t.closest('li, .ej-ses').querySelector('.ej-player[data-vid="' + id + '"]');
+  if(!box) return;
+  if(!box.hidden){ box.hidden = true; box.innerHTML = ''; t.setAttribute('aria-expanded', 'false'); t.textContent = '▶ Ver video'; return; }
+  box.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&modestbranding=1&playsinline=1&autoplay=1" title="Video del ejercicio" ' +
+    'allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+  box.hidden = false; t.setAttribute('aria-expanded', 'true'); t.textContent = 'Cerrar video';
+}
 function listaEj(d, vueltas){
   return '<ol class="ej-list">' + d.ej.map(function(e){
-    return '<li><div class="ej-n"><b>' + esc(e.n) + '</b><span class="ej-r">' + (vueltas ? vueltas + ' × ' : '') + esc(e.reps) + '</span></div>' +
-      '<p>' + esc(e.c) + '</p>' + (e.v ? '<a class="lnk" href="' + esc(ytEj(e.v)) + '" target="_blank" rel="noopener">Ver cómo se hace</a>' : '') + '</li>';
+    return '<li>' + figuraEj(e.fig, e.n) + '<div class="ej-tx"><div class="ej-n"><b>' + esc(e.n) + '</b><span class="ej-r">' + (vueltas ? vueltas + ' × ' : '') + esc(e.reps) + '</span></div>' +
+      '<p>' + esc(e.c) + '</p>' + videoEj(e) + '</div></li>';
   }).join('') + '</ol>';
 }
 function secEjercicio(hoy){
@@ -27175,7 +27181,7 @@ function secEjercicio(hoy){
   var sd = SA.sesionDia(dia), d = SA.detalleSesion(sd, n);
   var h = '<section class="sa-sec" id="sa-ejercicio" aria-labelledby="saEjT"><h2 id="saEjT">Ejercicio</h2>';
   if(!w){
-    h += '<div class="panel ej-intro"><p class="txt2">' + esc(P.titulo) + ': dos días de fuerza con la mancuerna, dos caminatas a paso ligero y dos sesiones opcionales suaves. ' +
+    h += '<div class="panel ej-intro"><p class="txt2">' + esc(P.titulo) + ': dos días de fuerza con la mancuerna y dos de yoga para principiantes; las caminatas son opcionales. ' +
       'Cada semana sube un poco. Equipo: ' + esc(P.equipo) + '</p>' +
       '<div class="agua-acts"><button class="btn pri" data-sa="ejempezar">Empezar esta semana</button></div>' +
       '<p class="sa-nota">Lee antes las indicaciones de seguridad de abajo. La semana del plan cuenta desde el lunes de la semana en que empiezas.</p></div>';
@@ -27206,10 +27212,12 @@ function secEjercicio(hoy){
     h += '<p class="txt2"><b>Calentamiento.</b> ' + esc(d.calentamiento) + '</p>' +
       '<p class="txt2"><b>' + d.vueltas + ' vueltas</b> del circuito, en orden. ' + esc(d.descanso) + '</p>' + listaEj(d, 0) +
       '<p class="txt2"><b>Vuelta a la calma.</b> ' + esc(d.calma) + '</p>';
+  } else if(d.tipo === 'yoga'){
+    h += '<p class="txt2">' + esc(d.c) + '</p><p class="txt2"><b>Para empezar.</b> ' + esc(d.calentamiento) + '</p>' +
+      '<p class="txt2"><b>' + (d.vueltas > 1 ? d.vueltas + ' vueltas' : 'Una vuelta') + '</b> a la secuencia, en orden, sobre una colchoneta o toalla gruesa.</p>' + listaEj(d, 0) +
+      '<p class="txt2">' + esc(d.calma) + '</p>';
   } else if(d.tipo === 'cardio'){
-    h += '<p class="txt2"><b>' + esc(d.detalle) + '</b></p><p class="txt2">' + esc(d.c) + '</p>';
-  } else if(d.tipo === 'movilidad'){
-    h += '<p class="txt2">' + esc(d.c) + '</p>' + listaEj(d, 0);
+    h += '<div class="ej-card">' + figuraEj(d.fig, d.n) + '<div class="ej-tx"><p class="txt2"><b>' + esc(d.detalle) + '</b></p><p class="txt2">' + esc(d.c) + '</p>' + videoEj(d) + '</div></div>';
   } else h += '<p class="txt2">' + esc(d.c) + '</p>';
   if(futuro) h += '<p class="sa-nota">Se podrá marcar ese día.</p>';
   else if(w){
@@ -27222,7 +27230,7 @@ function secEjercicio(hoy){
     }).join('') + '</ul>';
     h += '<form class="agua-libre ej-form" id="ejForm" data-f="' + dia + '"><select name="s" aria-label="Sesión">' +
       Object.keys(P.sesiones).filter(function(k){ return k !== 'desc'; }).map(function(k){
-        return '<option value="' + k + '"' + (k === (sd === 'desc' ? 'cam' : sd) ? ' selected' : '') + '>' + esc(P.sesiones[k].n) + '</option>';
+        return '<option value="' + k + '"' + (k === (sd === 'desc' ? 'yoga' : sd) ? ' selected' : '') + '>' + esc(P.sesiones[k].n) + '</option>';
       }).join('') + '</select>' +
       '<input type="number" name="min" min="5" max="300" step="5" placeholder="min" aria-label="Minutos">' +
       '<select name="esf" aria-label="Esfuerzo percibido"><option value="">Esfuerzo, 0 a 10</option>' +
@@ -27754,6 +27762,7 @@ document.getElementById('main').addEventListener('submit', function(e){
 });
 document.getElementById('main').addEventListener('click', function(e){
   var t;
+  if((t = e.target.closest('[data-sa^="ejvideo|"]'))){ abrirVideoEj(t, t.dataset.sa.split('|')[1]); return; }
   if((t = e.target.closest('[data-sa]'))){ accionSalud(t); return; }
   if((t = e.target.closest('[data-nube]'))){ accionNube(t); return; }
   if((t = e.target.closest('[data-aleatorio]'))){ menuAleatorio(t.dataset.aleatorio); return; }

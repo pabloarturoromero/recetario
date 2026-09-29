@@ -15,13 +15,20 @@ const plano = (o) => JSON.parse(JSON.stringify(o));
 test('el programa está completo: cada día tiene sesión y cada sesión cuatro semanas', () => {
   for (let d = 0; d < 7; d++) assert.ok(P.sesiones[P.semana_tipo[String(d)]], `día ${d}`);
   const princ = Object.values(P.semana_tipo).filter((s) => P.sesiones[s].principal);
-  assert.equal(princ.length, 4, 'dos de fuerza y dos caminatas');
+  assert.equal(princ.length, 4, 'dos de fuerza y dos de yoga');
   assert.equal(princ.filter((s) => P.sesiones[s].tipo === 'fuerza').length, 2);
+  assert.equal(princ.filter((s) => P.sesiones[s].tipo === 'yoga').length, 2);
+  for (const s of Object.values(P.sesiones)) if (s.tipo === 'cardio') {
+    assert.equal(s.principal, false, 'la caminata es opcional');
+    assert.ok(s.vid && s.fig, `${s.n}: video e ilustración`);
+  }
   for (const [id, s] of Object.entries(P.sesiones)) {
     assert.equal(s.min.length, P.semanas, `${id}: minutos por semana`);
     for (const e of s.ej || []) {
       assert.ok(e.reps.length === 1 || e.reps.length === P.semanas, `${id}: ${e.n}`);
-      assert.ok(e.c && e.v, `${id}: ${e.n} trae indicación y video`);
+      assert.ok(e.c && e.v, `${id}: ${e.n} trae indicación y búsqueda de videos`);
+      assert.match(e.vid && e.vid.id, /^[\w-]{11}$/, `${id}: ${e.n} trae un video concreto`);
+      assert.ok(e.fig && e.fig.a && e.fig.a.n && e.fig.a.p, `${id}: ${e.n} trae ilustración`);
     }
   }
   assert.ok(P.seguridad.some((x) => /respiración/.test(x)), 'no aguantar la respiración');
@@ -37,6 +44,7 @@ test('la semana del plan cuenta desde el lunes y el nivel se detiene en la seman
   assert.equal(SA.semanaEj(st, '2026-11-02'), 6);
   assert.equal(SA.nivelEj(st, '2026-11-02'), 4);
   assert.equal(SA.sesionDia('2026-09-28'), 'fa');
+  assert.equal(SA.sesionDia('2026-09-29'), 'yoga');
   assert.equal(SA.sesionDia('2026-10-04'), 'desc');
 });
 
@@ -47,7 +55,9 @@ test('la progresión sube minutos, vueltas y repeticiones', () => {
   assert.equal(f1.vueltas, 2); assert.equal(f3.vueltas, 3);
   assert.equal(f1.ej[0].reps, '10');
   assert.equal(SA.detalleSesion('fa', 2).ej[0].reps, '12');
-  assert.equal(SA.detalleSesion('mov', 3).ej[0].reps, P.sesiones.mov.ej[0].reps[0], 'una sola cantidad vale para todas las semanas');
+  assert.equal(SA.detalleSesion('yoga', 3).vueltas, 1); assert.equal(SA.detalleSesion('yoga', 4).vueltas, 2);
+  assert.equal(SA.detalleSesion('yoga', 1).ej.length, 8);
+  assert.ok(SA.detalleSesion('fa', 1).ej[0].vid.id && SA.detalleSesion('cam', 1).fig, 'el detalle lleva video e ilustración');
   assert.equal(SA.detalleSesion('fa', 9).vueltas, 3, 'fuera de rango usa la última semana');
 });
 
@@ -59,10 +69,10 @@ test('marcar, reemplazar y desmarcar sesiones; el resumen semanal cuenta las pri
   assert.ok(SA.marcarEj(st, '2026-09-28', 'fa', 40, 6));
   assert.equal(st.ejercicio.hechas.length, 1, 'la misma sesión el mismo día se reemplaza');
   assert.equal(SA.marcarEj(st, '2026-09-28', 'desc'), false, 'el descanso no se marca');
-  assert.equal(SA.marcarEj(st, '2026-09-28', 'yoga'), false, 'solo sesiones del plan');
+  assert.equal(SA.marcarEj(st, '2026-09-28', 'pilates'), false, 'solo sesiones del plan');
   assert.equal(SA.marcarEj(st, '2026-09-28', 'cam', 0), false);
-  assert.ok(SA.marcarEj(st, '2026-09-29', 'cam', 35, 12), 'un esfuerzo fuera de escala se descarta');
-  assert.equal(SA.hechaEj(st, '2026-09-29', 'cam').esf, null);
+  assert.ok(SA.marcarEj(st, '2026-09-29', 'yoga', 35, 12), 'un esfuerzo fuera de escala se descarta');
+  assert.equal(SA.hechaEj(st, '2026-09-29', 'yoga').esf, null);
   SA.marcarEj(st, '2026-10-01', 'cam', 30);   // jueves de fuerza B: caminó en su lugar
   const R = SA.semanaResumenEj(st, '2026-10-01');
   assert.equal(R.principales, 4);
@@ -120,6 +130,19 @@ for (const ancho of [320, 390, 1280]) {
     await page.locator('.ej-dia').first().click();
     assert.match(await page.textContent('#ejSes h3'), /Fuerza A/);
     assert.equal(await page.locator('#ejSes .ej-list li').count(), 6);
+    assert.equal(await page.locator('#ejSes .ej-list li svg.fg').count(), 11, 'inicio y final de cada ejercicio; la plancha, una postura');
+    await page.locator('#ejSes [data-sa^="ejvideo|"]').first().click();
+    assert.match(await page.getAttribute('#ejSes .ej-player iframe', 'src'), /youtube-nocookie\.com\/embed\/[\w-]{11}/);
+    await page.locator('#ejSes [data-sa^="ejvideo|"]').first().click();
+    assert.equal(await page.locator('#ejSes .ej-player iframe').count(), 0, 'se cierra');
+    // Martes: yoga con ocho posturas; miércoles: caminata opcional con ilustración y video.
+    await page.locator('.ej-dia').nth(1).click();
+    assert.match(await page.textContent('#ejSes h3'), /Yoga/);
+    assert.equal(await page.locator('#ejSes .ej-list li').count(), 8);
+    await page.locator('.ej-dia').nth(2).click();
+    assert.match(await page.textContent('#ejSes h3'), /Caminata.*opcional/s);
+    assert.ok(await page.locator('#ejSes .ej-card svg.fg').count() === 2);
+    assert.ok(await page.locator('#ejSes [data-sa^="ejvideo|"]').count() === 1);
     await page.locator('.ej-dia').first().click();
     const lunesMarcable = await page.locator('#ejSes [data-sa^="ejmarcar|"]').count();
     if (lunesMarcable) {
