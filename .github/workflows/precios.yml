@@ -1,0 +1,30 @@
+# Actualiza cada semana los precios referenciales de Supermaxi del bloque «precios» de index.html.
+# Si cambian, hace commit en main y Cloudflare Pages publica solo.
+name: Precios Supermaxi
+on:
+  schedule:
+    - cron: '17 11 * * 0'   # domingos, 06:17 en Guayaquil
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: precios
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/precios-supermaxi.mjs
+      - run: node --test tests/motor.test.mjs tests/precios.test.mjs
+      - name: Commit si cambiaron
+        run: |
+          if git diff --quiet; then echo "Sin cambios de precio"; exit 0; fi
+          git config user.name "precios-supermaxi"
+          git config user.email "precios-supermaxi@users.noreply.github.com"
+          git commit -am "Precios de Supermaxi al $(date -u +%Y-%m-%d)"
+          git push origin main

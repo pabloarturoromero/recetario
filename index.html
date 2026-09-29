@@ -705,6 +705,16 @@ select.dsel.sm{margin-top:4px; font-size:12px}
 .sitem.tengo .nm, .sitem.tengo .q{color:var(--ink-3)}
 .sitem.tengo .nm::after{content:" · en casa"; font-size:12px; color:var(--ok)}
 .aviso-l{display:block; font-size:12px; color:var(--warn); margin-top:2px; line-height:1.4}
+.sitem .px{display:block; font-size:12px; color:var(--ink-2); margin-top:2px; line-height:1.4; font-variant-numeric:tabular-nums}
+.sitem.done .px, .sitem.tengo .px{display:none}
+.faltan{background:var(--surface); border-radius:var(--r4); box-shadow:var(--sh1); padding:var(--s4); margin-bottom:var(--s4);
+  display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3) var(--s4)}
+.faltan .tx{flex:1 1 260px; min-width:0}
+.faltan .tx b{display:block; font-size:15px}
+.faltan .tx .tot{font-size:22px; font-weight:700; color:var(--brand); font-variant-numeric:tabular-nums}
+.faltan .tx .mini{display:block; color:var(--ink-3); font-size:12px; line-height:1.45; margin-top:2px}
+.faltan .acc{display:flex; flex-wrap:wrap; gap:var(--s2); align-items:center}
+.faltan a.btn{text-decoration:none}
 .sitem .lim{display:block; font-size:11.5px; color:var(--ink-3); margin-top:2px; line-height:1.4}
 .sitem .lim::before{content:"Limitación: "; color:var(--warn)}
 details.orig{margin-top:2px}
@@ -998,7 +1008,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.14.1",
+    "version": "2.15.0",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -22914,6 +22924,133 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
     ]
   }
 }</script>
+<script type="application/json" id="precios">{
+ "fuente": "Supermaxi",
+ "web": "https://www.supermaxi.com",
+ "fecha": "2026-09-29",
+ "nota": "Precios referenciales publicados en supermaxi.com; pueden variar según el local. Los productos «al peso» se cobran por kilo. El script scripts/precios-supermaxi.mjs los actualiza.",
+ "productos": {
+  "aceite": {"sku":"1797973","link":"https://www.supermaxi.com/producto/aceite-comestible-de-girasol-con-omega-6-vivi-350-ml/","nombre":"Aceite Comestible De Girasol Con Omega 6 VIVI 350 Ml","precio":1.08,"tam":{"ml":350}},
+  "aceite_oliva": {"sku":"1580593","link":"https://www.supermaxi.com/producto/el-artesanal-aceite-oliva-extra-virgen-250-ml/","nombre":"Aceite De Oliva EL ARTESANAL 250 Ml","precio":3.58,"tam":{"ml":250}},
+  "aceite_sesamo": {"sku":"1230274","link":"https://www.supermaxi.com/producto/aceite-de-ajonjoli-extra-virgen-karay-250-ml/","nombre":"Aceite De Ajonjolí Extra Virgen KARAY 250 Ml","precio":6.76,"tam":{"ml":250}},
+  "aceituna_negra": {"sku":"1959213","link":"https://www.supermaxi.com/producto/aceitunas-negras-deshuesadas-la-explanada-350-g/","nombre":"Aceitunas Negras Deshuesadas LA EXPLANADA 350 G","precio":2.29,"tam":{"g":350}},
+  "acelga": {"sku":"1798720","link":"https://www.supermaxi.com/producto/acelga-fresca-la-original-400-g-3/","nombre":"Acelga Fresca LA ORIGINAL 400 G","precio":0.49,"tam":{"g":400}},
+  "aguacate": {"sku":"1951821","link":"https://www.supermaxi.com/producto/aguacate-hass-la-original-700-g-9/","nombre":"Aguacate Hass LA ORIGINAL 700 G","precio":0.99,"tam":{"g":700}},
+  "ajo": {"sku":"1853653","link":"https://www.supermaxi.com/producto/0-99-ajo-pelado/","nombre":"Ajo Pelado LA ORIGINAL 160 G","precio":0.99,"tam":{"g":160}},
+  "ajonjoli": {"sku":"942639","link":"https://www.supermaxi.com/producto/ajonjoli-en-frasco-supermaxi-85-g/","nombre":"Ajonjolí En Frasco SUPERMAXI 85 G","precio":2.99,"tam":{"g":85}},
+  "aji_fresco": {"sku":"1706298","link":"https://www.supermaxi.com/producto/aji-criollo-la-original-150-g-2/","nombre":"Ají Criollo LA ORIGINAL 150 G","precio":0.49,"tam":{"g":150}},
+  "aji_rojo_fresco": {"sku":"1706298","link":"https://www.supermaxi.com/producto/aji-criollo-la-original-150-g-2/","nombre":"Ají Criollo LA ORIGINAL 150 G","precio":0.49,"tam":{"g":150}},
+  "aji_verde": {"sku":"1706298","link":"https://www.supermaxi.com/producto/aji-criollo-la-original-150-g-2/","nombre":"Ají Criollo LA ORIGINAL 150 G","precio":0.49,"tam":{"g":150}},
+  "aji_seco_molido": {"sku":"1932622","link":"https://www.supermaxi.com/producto/aji-de-escamas-condimensa-30g/","nombre":"Ají De Escamas CONDIMENSA 30G","precio":0.99,"tam":{"g":30}},
+  "aji_seco_entero": {"sku":"1932622","link":"https://www.supermaxi.com/producto/aji-de-escamas-condimensa-30g/","nota":"En escamas","nombre":"Ají De Escamas CONDIMENSA 30G","precio":0.99,"tam":{"g":30}},
+  "albahaca": {"sku":"1955148","link":"https://www.supermaxi.com/producto/albahaca-fresca-la-original-60-g-2/","nombre":"Albahaca Fresca LA ORIGINAL 60 G","precio":0.55,"tam":{"g":60}},
+  "alcaparra": {"sku":"1126857","link":"https://www.supermaxi.com/producto/alcaparras-en-vinagre-helios-110-g/","nombre":"Alcaparras En Vinagre HELIOS 110 G","precio":2.45,"tam":{"g":110}},
+  "almendra": {"sku":"1995940","link":"https://www.supermaxi.com/producto/almendras-naturales-sin-cascara-el-artesanal-150-g/","nombre":"Almendras Naturales Sin Cascara EL ARTESANAL 150 G","precio":1.78,"tam":{"g":150}},
+  "almendra_fileteada": {"sku":"1995940","link":"https://www.supermaxi.com/producto/almendras-naturales-sin-cascara-el-artesanal-150-g/","nota":"Entera; se filetea en casa","nombre":"Almendras Naturales Sin Cascara EL ARTESANAL 150 G","precio":1.78,"tam":{"g":150}},
+  "anacardo": {"sku":"1445950","link":"https://www.supermaxi.com/producto/frutos-nuez-de-la-india-maranon-paqui-gourmet-250g/","nombre":"Frutos Nuez De La India Marañón PAQUI GOURMET 250g","precio":8.59,"tam":{"g":250}},
+  "anis_estrellado": {"sku":"348110","link":"https://www.supermaxi.com/producto/anis-estrellado-el-sabor-12-g-2/","nombre":"Anís Estrellado EL SABOR 12 G","precio":0.51,"tam":{"g":12}},
+  "apio": {"sku":"1701989","link":"https://www.supermaxi.com/producto/apio-fresco-la-original-750-g/","nombre":"Apio Fresco LA ORIGINAL 750 G","precio":0.69,"tam":{"g":750}},
+  "arroz_integral": {"sku":"1357943","link":"https://www.supermaxi.com/producto/arroz-gourmet-integral-casa-del-arroz-1000-g-2/","nombre":"Arroz Gourmet Integral CASA DEL ARROZ 1000 g","precio":1.64,"tam":{"g":1000}},
+  "arveja_verde": {"sku":"807121","link":"https://www.supermaxi.com/producto/arveja-verde-la-pradera-500-g/","nombre":"Arveja Verde LA PRADERA 500 G","precio":0.97,"tam":{"g":500}},
+  "atun_lata": {"sku":"1872777","link":"https://www.supermaxi.com/producto/atun-lomitos-lomitos-en-agua-el-artesanal-180-g/","nombre":"Atún Lomitos Lomitos En Agua EL ARTESANAL 180 G","precio":0.94,"tam":{"g":180}},
+  "avena": {"sku":"1893588","link":"https://www.supermaxi.com/producto/avena-en-hojuelas-entera-el-artesanal-500-g/","nombre":"Avena En Hojuelas Entera EL ARTESANAL 500 G","precio":0.64,"tam":{"g":500}},
+  "berenjena": {"sku":"1642657","link":"https://www.supermaxi.com/producto/berenjena-japonesa-morada-sembrao-250g/","nombre":"Berenjena Japonesa Morada SEMBRAO 250g","precio":1.18,"tam":{"g":250}},
+  "bulgur": {"sku":"355892","link":"https://www.supermaxi.com/producto/trigo-para-quippe-la-pradera-500-g-2/","nota":"Trigo para quipe","nombre":"Trigo Para Quippe LA PRADERA 500 G","precio":1.63,"tam":{"g":500}},
+  "cacao": {"sku":"1647599","link":"https://www.supermaxi.com/producto/cacao-en-polvo-100-ecuatoriano-ricacao-160-g/","nombre":"Cacao En Polvo 100% Ecuatoriano RICACAO 160 G","precio":1.37,"tam":{"g":160}},
+  "canela_rama": {"sku":"360439","link":"https://www.supermaxi.com/producto/canela-en-rama-la-cena-30-g/","nombre":"Canela En Rama LA CENA 30 G","precio":0.96,"tam":{"g":30}},
+  "canela_molida": {"sku":"1208962","link":"https://www.supermaxi.com/producto/canela-molida-condimensa-50g-2/","nombre":"Canela Molida CONDIMENSA 50g","precio":1.1,"tam":{"g":50}},
+  "canela_sin_forma": {"sku":"360439","link":"https://www.supermaxi.com/producto/canela-en-rama-la-cena-30-g/","nombre":"Canela En Rama LA CENA 30 G","precio":0.96,"tam":{"g":30}},
+  "cebolla": {"sku":"1760820","link":"https://www.supermaxi.com/producto/cebolla-paitena-roja-la-original-1200-g-19/","nombre":"Cebolla Paiteña Roja LA ORIGINAL 1200 G","precio":0.99,"tam":{"g":1200}},
+  "cebolla_morada": {"sku":"1760820","link":"https://www.supermaxi.com/producto/cebolla-paitena-roja-la-original-1200-g-19/","nombre":"Cebolla Paiteña Roja LA ORIGINAL 1200 G","precio":0.99,"tam":{"g":1200}},
+  "cebolla_paitena": {"sku":"1760820","link":"https://www.supermaxi.com/producto/cebolla-paitena-roja-la-original-1200-g-19/","nombre":"Cebolla Paiteña Roja LA ORIGINAL 1200 G","precio":0.99,"tam":{"g":1200}},
+  "cebollin": {"sku":"1431215","link":"https://www.supermaxi.com/producto/cebollin-fresco-cf-100-g/","nombre":"Cebollín Fresco CF 100 G","precio":0.61,"tam":{"g":100}},
+  "champinon": {"sku":"1805305","link":"https://www.supermaxi.com/producto/champinones-frescos-la-original-135-g/","nombre":"Champiñones Frescos LA ORIGINAL 135 G","precio":0.99,"tam":{"g":135}},
+  "chia": {"sku":"1028154","link":"https://www.supermaxi.com/producto/chia-life-natures-heart-250-g/","nombre":"Chía Life NATURE’S HEART 250 G","precio":4.64,"tam":{"g":250}},
+  "cilantro": {"sku":"1861427","link":"https://www.supermaxi.com/producto/culantro-fresco-la-original-80-g/","nombre":"Culantro Fresco LA ORIGINAL 80 G","precio":0.25,"tam":{"g":80}},
+  "clavo": {"sku":"348113","link":"https://www.supermaxi.com/producto/clavo-de-olor-natural-el-sabor-12-g/","nombre":"Clavo De Olor Natural EL SABOR 12 G","precio":0.55,"tam":{"g":12}},
+  "col_rizada": {"sku":"1999981","link":"https://www.supermaxi.com/producto/col-rizada-fresca-sembrao-600-g/","nombre":"Col Rizada Fresca SEMBRAO 600 G","precio":0.94,"tam":{"g":600}},
+  "repollo": {"sku":"1798699","link":"https://www.supermaxi.com/producto/col-blanca-la-original-1000-g-3/","nombre":"Col Blanca LA ORIGINAL 1000 G","precio":0.49,"tam":{"g":1000}},
+  "comino_molido": {"sku":"348046","link":"https://www.supermaxi.com/producto/comino-molido-supermaxi-50-g/","nombre":"Comino Molido SUPERMAXI 50 G","precio":0.64,"tam":{"g":50}},
+  "corvina": {"sku":"2001933","link":"https://www.supermaxi.com/producto/corvina-blanca-en-filete-congelada-supermaxi-454-g/","nombre":"Corvina Blanca En Filete Congelada SUPERMAXI 454 G","precio":5.22,"tam":{"g":454}},
+  "dorado": {"sku":"1715535","link":"https://www.supermaxi.com/producto/pescado-dorado-filetes-supermaxi-454-g/","nombre":"Pescado Dorado Filetes SUPERMAXI 454 G","precio":7.09,"tam":{"g":454}},
+  "picudo": {"sku":"350136","link":"https://www.supermaxi.com/producto/picudo-filete-aleman-fish-454-g/","nombre":"Picudo Filete ALEMAN FISH 454 G","precio":6.78,"tam":{"g":454}},
+  "curcuma": {"sku":"938211","link":"https://www.supermaxi.com/producto/curcuma-en-polvo-ile-50-g/","nombre":"Cúrcuma En Polvo ILE 50 G","precio":0.51,"tam":{"g":50}},
+  "eneldo": {"sku":"1404568","link":"https://www.supermaxi.com/producto/eneldo-fresco-ecua-hort-100-g/","nombre":"Eneldo Fresco ECUAHORT 100 g","precio":0.9,"tam":{"g":100}},
+  "espinaca": {"sku":"358478","link":"https://www.supermaxi.com/producto/espinaca-fresca-cf-250-g/","nombre":"Espinaca Fresca CF 250 G","precio":0.46,"tam":{"g":250}},
+  "frejol_blanco": {"sku":"350377","link":"https://www.supermaxi.com/producto/frejol-blanco-sin-gluten-mas-corona-500-g/","nombre":"Fréjol Blanco Sin Gluten MAS CORONA 500 G","precio":4.24,"tam":{"g":500}},
+  "frejol_negro": {"sku":"1903381","link":"https://www.supermaxi.com/producto/frejol-negro-el-artesanal-500-g/","nombre":"Fréjol Negro EL ARTESANAL 500 G","precio":0.89,"tam":{"g":500}},
+  "frejol_rojo": {"sku":"1903388","link":"https://www.supermaxi.com/producto/frejol-canario-el-artesanal-500-g/","nota":"Canario","nombre":"Fréjol Canario EL ARTESANAL 500 G","precio":1.54,"tam":{"g":500}},
+  "garbanzo": {"sku":"1953488","link":"https://www.supermaxi.com/producto/garbanzo-empacado-el-artesanal-500-g/","nombre":"Garbanzo Empacado EL ARTESANAL 500 G","precio":1.13,"tam":{"g":500}},
+  "harina_garbanzo": {"sku":"1075552","link":"https://www.supermaxi.com/producto/harina-de-garbanzo-sin-gluten-la-pastora-450-g-2/","nombre":"Harina De Garbanzo Sin Gluten LA PASTORA 450 G","precio":2.97,"tam":{"g":450}},
+  "harina_integral": {"sku":"1196414","link":"https://www.supermaxi.com/producto/harina-integral-de-trigo-ya-500-g/","nombre":"Harina Integral De Trigo YA 500 G","precio":1.35,"tam":{"g":500}},
+  "hierba_luisa": {"sku":"1431294","link":"https://www.supermaxi.com/producto/hierba-luisa-fresca-cf-100-g/","nombre":"Hierba Luisa Fresca CF 100 g","precio":0.44,"tam":{"g":100}},
+  "hierbabuena": {"sku":"1431289","link":"https://www.supermaxi.com/producto/hierba-buena-fresca-cf-100-g/","nombre":"Hierba Buena Fresca CF 100 G","precio":0.48,"tam":{"g":100}},
+  "huevo": {"sku":"1723147","link":"https://www.supermaxi.com/producto/huevos-medianos-supermaxi-x-12-uds-2/","nombre":"Huevos Medianos SUPERMAXI X 12 Uds","precio":2.29,"tam":{"u":12}},
+  "jengibre": {"sku":"1955387","link":"https://www.supermaxi.com/producto/jengibre-en-raiz-la-original-200-g/","nombre":"Jengibre En Raíz LA ORIGINAL 200 G","precio":0.49,"tam":{"g":200}},
+  "jengibre_polvo": {"sku":"1718833","link":"https://www.supermaxi.com/producto/jengibre-molido-en-polvo-supermaxi-35-g-2/","nombre":"Jengibre Molido SUPERMAXI 35 G","precio":1.02,"tam":{"g":35}},
+  "laurel": {"sku":"2007992","link":"https://www.supermaxi.com/producto/laurel-en-hoja-entera-seleccion-supermaxi-15-g/","nombre":"Laurel En Hoja Entera Selección SUPERMAXI 15 G","precio":0.49,"tam":{"g":15}},
+  "leche": {"sku":"2012964","link":"https://www.supermaxi.com/producto/leche-entera-entera-en-funda-el-artesanal-1000-ml/","nombre":"Leche Entera Entera En Funda EL ARTESANAL 1000 Ml","precio":0.78,"tam":{"ml":1000}},
+  "leche_coco": {"sku":"1965486","link":"https://www.supermaxi.com/producto/bebida-de-coco-enriquecida-con-calcio-y-vitaminas-natures-heart-400-ml/","nombre":"Leche De Coco Enriquecida Con Calcio Y Vitaminas NATURE’S HEART 400 Ml","precio":3.82,"tam":{"ml":400}},
+  "lenteja_parda": {"sku":"1743570","link":"https://www.supermaxi.com/producto/lenteja-seca-del-sur-454-g/","nombre":"Lenteja Seca DEL SUR 454 G","precio":2.05,"tam":{"g":454}},
+  "limon": {"sku":"1917283","link":"https://www.supermaxi.com/producto/limon-sutil-la-original-1200-g-10/","nombre":"Limón Sutil LA ORIGINAL 1200 G","precio":0.99,"tam":{"g":1200}},
+  "mani": {"sku":"1455774","link":"https://www.supermaxi.com/producto/mani-tostado-listo-y-sin-sal-la-pradera-400-g-2/","nombre":"Maní Tostado Listo Y Sin Sal LA PRADERA 400 G","precio":2.52,"tam":{"g":400}},
+  "maiz_tierno": {"sku":"1955389","link":"https://www.supermaxi.com/producto/choclo-tierno-la-original-500-g/","nombre":"Choclo Tierno LA ORIGINAL 500 G","precio":0.99,"tam":{"g":500}},
+  "cerdo_lomo": {"sku":"3158","link":"https://www.supermaxi.com/producto/chuleta-lomo-cerdo-supercarnes-al-peso/","nombre":"Chuleta Lomo Cerdo SUPERCARNES Al Peso","precio":9.34,"tam":{"peso":"kg"}},
+  "cerdo_lomo_pierna": {"sku":"3162","link":"https://www.supermaxi.com/producto/pierna-de-cerdo-con-hueso-sin-grasa-sin-cuero-supercarnes-al-peso/","nombre":"Pierna De Cerdo Con Hueso Sin Grasa Sin Cuero SUPERCARNES Al Peso","precio":7.33,"tam":{"peso":"kg"}},
+  "mozzarella": {"sku":"2009207","link":"https://www.supermaxi.com/producto/queso-mozzarella-fresco-milma-200-g/","nombre":"Queso Mozzarella Fresco MILMA 200 G","precio":2.44,"tam":{"g":200}},
+  "queso_o_mozzarella": {"sku":"1672827","link":"https://www.supermaxi.com/producto/queso-fresco-la-original-400-g/","nombre":"Queso Fresco LA ORIGINAL 400 G","precio":2.69,"tam":{"g":400}},
+  "queso_fresco": {"sku":"1672827","link":"https://www.supermaxi.com/producto/queso-fresco-la-original-400-g/","nombre":"Queso Fresco LA ORIGINAL 400 G","precio":2.69,"tam":{"g":400}},
+  "naranja": {"sku":"1676456","link":"https://www.supermaxi.com/producto/naranja-fresca-la-original-1200-g-16/","nombre":"Naranja Fresca LA ORIGINAL 1200 G","precio":0.99,"tam":{"g":1200}},
+  "nuez": {"sku":"1387462","link":"https://www.supermaxi.com/producto/nueces-nogal-peladas-100-natural-corfruit-125-g/","nombre":"Nueces Nogal Peladas 100% Natural CORFRUIT 125 G","precio":3.12,"tam":{"g":125}},
+  "nuez_moscada": {"sku":"1868935","link":"https://www.supermaxi.com/producto/nuez-moscada-molida-badia-14-20-g/","nombre":"Nuez Moscada Molida BADIA 14.20 G","precio":0.78,"tam":{"g":14.2}},
+  "oregano": {"sku":"1208959","link":"https://www.supermaxi.com/producto/oregano-en-hoja-condimensa-25-g/","nombre":"Orégano En Hoja CONDIMENSA 25 G","precio":0.39,"tam":{"g":25}},
+  "pan_pita": {"sku":"362977","link":"https://www.supermaxi.com/producto/pan-arabe-integral-pastelo-500-g/","nombre":"Pan Árabe Integral PASTELO 500 G","precio":2.74,"tam":{"g":500}},
+  "pan_rallado": {"sku":"989502","link":"https://www.supermaxi.com/producto/supermaxi-apanadura-250-g/","nota":"Apanadura; no es integral","nombre":"Apanadura Molida SUPERMAXI 250 G","precio":0.75,"tam":{"g":250}},
+  "papa": {"sku":"1600448","link":"https://www.supermaxi.com/producto/papa-malla-la-original-099-ctvs/","nombre":"Papa Fresca LA ORIGINAL 2000 G","precio":0.99,"tam":{"g":2000}},
+  "papaya": {"sku":"1957772","link":"https://www.supermaxi.com/producto/papaya-grande-fresca-la-original-1500-g-2/","nombre":"Papaya Grande Fresca LA ORIGINAL 1500 G","precio":0.99,"tam":{"g":1500}},
+  "papaya_o_frutilla": {"sku":"1957772","link":"https://www.supermaxi.com/producto/papaya-grande-fresca-la-original-1500-g-2/","nombre":"Papaya Grande Fresca LA ORIGINAL 1500 G","precio":0.99,"tam":{"g":1500}},
+  "parmesano": {"sku":"1896688","link":"https://www.supermaxi.com/producto/queso-parmesano-rallado-el-artesanal-100-g/","nombre":"Queso Parmesano Rallado EL ARTESANAL 100 G","precio":1.54,"tam":{"g":100}},
+  "pasta": {"sku":"1219120","link":"https://www.supermaxi.com/producto/pasta-integral-penne-rigate-de-cecco-500-g/","nombre":"Pasta Integral Penne Rigate DE CECCO 500 g","precio":3.74,"tam":{"g":500}},
+  "pasta_corta": {"sku":"1219120","link":"https://www.supermaxi.com/producto/pasta-integral-penne-rigate-de-cecco-500-g/","nombre":"Pasta Integral Penne Rigate DE CECCO 500 g","precio":3.74,"tam":{"g":500}},
+  "pera": {"sku":"1906685","link":"https://www.supermaxi.com/producto/pera-abate-la-original-800-g/","nombre":"Pera Abate LA ORIGINAL 800 G","precio":0.99,"tam":{"g":800}},
+  "perejil": {"sku":"1861426","link":"https://www.supermaxi.com/producto/perejil-fresco-la-original-80-g/","nombre":"Perejil Fresco LA ORIGINAL 80 G","precio":0.25,"tam":{"g":80}},
+  "pimenton_dulce": {"sku":"1932618","link":"https://www.supermaxi.com/producto/paprika-en-polvo-condimensa-40g/","nombre":"Paprika En Polvo CONDIMENSA 40G","precio":0.99,"tam":{"g":40}},
+  "pimenton_ahumado": {"sku":"1932618","link":"https://www.supermaxi.com/producto/paprika-en-polvo-condimensa-40g/","nota":"Paprika; no es ahumado","nombre":"Paprika En Polvo CONDIMENSA 40G","precio":0.99,"tam":{"g":40}},
+  "pimienta_negra": {"sku":"348050","link":"https://www.supermaxi.com/producto/pimienta-negra-supermaxi-50-g/","nombre":"Pimienta Negra SUPERMAXI 50 G","precio":0.81,"tam":{"g":50}},
+  "pimienta_molida": {"sku":"348050","link":"https://www.supermaxi.com/producto/pimienta-negra-supermaxi-50-g/","nombre":"Pimienta Negra SUPERMAXI 50 G","precio":0.81,"tam":{"g":50}},
+  "pimienta_olor": {"sku":"942638","link":"https://www.supermaxi.com/producto/pimienta-dulce-supermaxi-25-g/","nombre":"Pimienta Dulce SUPERMAXI 25 G","precio":0.84,"tam":{"g":25}},
+  "pimiento": {"sku":"1917594","link":"https://www.supermaxi.com/producto/pimiento-verde-la-original-800-g-39/","nombre":"Pimiento Verde LA ORIGINAL 800 G","precio":0.99,"tam":{"g":800}},
+  "pimiento_verde": {"sku":"1917594","link":"https://www.supermaxi.com/producto/pimiento-verde-la-original-800-g-39/","nombre":"Pimiento Verde LA ORIGINAL 800 G","precio":0.99,"tam":{"g":800}},
+  "pimiento_rojo": {"sku":"1617814","link":"https://www.supermaxi.com/producto/pimiento-rojo-organico-linda-organic-500-g/","nombre":"Pimiento Rojo Orgánico LINDA ORGANIC 500 G","precio":2.61,"tam":{"g":500}},
+  "platano_verde": {"sku":"1948843","link":"https://www.supermaxi.com/producto/platano-verde-la-original-1500-g-2/","nombre":"Plátano Verde LA ORIGINAL 1500 G","precio":0.99,"tam":{"g":1500}},
+  "pollo": {"sku":"2834","link":"https://www.supermaxi.com/producto/supermaxi-pechuga-sin-piel/","nombre":"Pechuga Sin Piel SUPERMAXI Al Peso","precio":7.22,"tam":{"peso":"kg"}},
+  "polenta": {"sku":"355921","link":"https://www.supermaxi.com/producto/maiz-molido-para-polenta-la-pradera-500-g/","nombre":"Maíz Molido Para Polenta LA PRADERA 500 G","precio":1.15,"tam":{"g":500}},
+  "res_guiso": {"sku":"3054","link":"https://www.supermaxi.com/producto/carne-de-res-para-sopa-sin-hueso-supercarnes-al-peso/","nombre":"Carne De Res Para Sopa Sin Hueso SUPERCARNES Al Peso","precio":7.06,"tam":{"peso":"kg"}},
+  "res_magra": {"sku":"3030","link":"https://www.supermaxi.com/producto/carne-de-res-top-round-pulpa-negra-supercarnes-al-peso/","nombre":"Carne De Res Top Round Pulpa Negra SUPERCARNES Al Peso","precio":13.88,"tam":{"peso":"kg"}},
+  "res_molida": {"sku":"3030","link":"https://www.supermaxi.com/producto/carne-de-res-top-round-pulpa-negra-supercarnes-al-peso/","nota":"Pulpa negra; se pide molida","nombre":"Carne De Res Top Round Pulpa Negra SUPERCARNES Al Peso","precio":13.88,"tam":{"peso":"kg"}},
+  "romero": {"sku":"1687856","link":"https://www.supermaxi.com/producto/romero-fresco-sembrao-50-g/","nombre":"Romero Fresco SEMBRAO 50 G","precio":0.78,"tam":{"g":50}},
+  "soya": {"sku":"1580545","link":"https://www.supermaxi.com/producto/salsa-de-soya-china-el-artesanal-150-ml/","nombre":"Salsa De Soya China EL ARTESANAL 150 Ml","precio":0.96,"tam":{"ml":150}},
+  "tamarindo": {"sku":"1512059","link":"https://www.supermaxi.com/producto/tamarindo-pulpa-doy-pack-el-sabor-200-g/","nombre":"Tamarindo Pulpa Doy Pack EL SABOR 200 G","precio":1.99,"tam":{"g":200}},
+  "tofu": {"sku":"1504891","link":"https://www.supermaxi.com/producto/tofu-laminado/","nombre":"Tofu Laminado TOFU 200 G","precio":3.96,"tam":{"g":200}},
+  "tomate": {"sku":"1987067","link":"https://www.supermaxi.com/producto/tomate-rinon-fresco-la-original-1100-g-46/","nombre":"Tomate Riñón Fresco LA ORIGINAL 1100 G","precio":0.99,"tam":{"g":1100}},
+  "tomate_triturado": {"sku":"338066","link":"https://www.supermaxi.com/producto/tomates-pelados-arcor-400-g/","nota":"Tomates pelados","nombre":"Tomates Pelados ARCOR 400 G","precio":1.58,"tam":{"g":400}},
+  "tomillo": {"sku":"349003","link":"https://www.supermaxi.com/producto/tomillo-especia-dona-petra-funda-2/","nombre":"Tomillo Hierbas Secas DOÑA PETRA 15 G","precio":0.94,"tam":{"g":15}},
+  "tortilla_maiz": {"sku":"761728","link":"https://www.supermaxi.com/producto/tortillas-de-maiz-maxipan-300-g/","nombre":"Tortillas De Maíz MAXIPAN 300 G","precio":1.8,"tam":{"g":300}},
+  "vainita": {"sku":"1729739","link":"https://www.supermaxi.com/producto/vainita-fresca-la-original-270-g/","nombre":"Vainita Fresca LA ORIGINAL 270 G","precio":0.49,"tam":{"g":270}},
+  "vinagre": {"sku":"1550279","link":"https://www.supermaxi.com/producto/vinagre-blanco-la-original-500-ml-2/","nombre":"Vinagre Blanco LA ORIGINAL 500 Ml","precio":0.74,"tam":{"ml":500}},
+  "yogur": {"sku":"1662105","link":"https://www.supermaxi.com/producto/yogurt-griego-natural-supermaxi-470-g-2/","nombre":"Yogurt Griego Natural SUPERMAXI 470 g","precio":3.05,"tam":{"g":470}},
+  "yuca": {"sku":"1969956","link":"https://www.supermaxi.com/producto/yuca-fresca-la-original-1200-g-6/","nombre":"Yuca Fresca LA ORIGINAL 1200 G","precio":0.99,"tam":{"g":1200}},
+  "zanahoria": {"sku":"1983056","link":"https://www.supermaxi.com/producto/zanahoria-fresca-la-original-1500-g/","nombre":"Zanahoria Fresca LA ORIGINAL 1500 G","precio":0.49,"tam":{"g":1500}},
+  "zapallo": {"sku":"1999945","link":"https://www.supermaxi.com/producto/zapallo-fresco-la-original-450-g-2/","nombre":"Zapallo Fresco LA ORIGINAL 450 G","precio":0.49,"tam":{"g":450}},
+  "zucchini": {"sku":"1435187","link":"https://www.supermaxi.com/producto/zucchini-crema-ecua-hort-600-900-g/","tam":{"g":750},"tam_fijo":true,"nombre":"Zucchini Crema ECUAHORT 600 – 900 G","precio":0.65},
+  "brocoli": {"sku":"1951783","link":"https://www.supermaxi.com/producto/brocoli-entero-la-original-450-g-2/","nombre":"Brócoli Entero LA ORIGINAL 450 G","precio":0.49,"tam":{"g":450}},
+  "coliflor": {"sku":"1845275","link":"https://www.supermaxi.com/producto/coliflor-fresco-la-original-450-g-2/","nombre":"Coliflor Fresco LA ORIGINAL 450 G","precio":0.49,"tam":{"g":450}},
+  "camote": {"sku":"1967642","link":"https://www.supermaxi.com/producto/camote-fresco-la-original-700-g/","nombre":"Camote Fresco LA ORIGINAL 700 G","precio":0.99,"tam":{"g":700}},
+  "camaron": {"sku":"587277","link":"https://www.supermaxi.com/producto/camarones-pelados-y-desvenados-grandes-supermaxi-454-g/","nombre":"Camarones Pelados Y Desvenados Grandes SUPERMAXI 454 G","precio":6.87,"tam":{"g":454}},
+  "cebada": {"sku":"355886","link":"https://www.supermaxi.com/producto/arroz-de-cebada-empacado-la-pradera-500-g/","nombre":"Arroz De Cebada Empacado LA PRADERA 500 G","precio":1.01,"tam":{"g":500}},
+  "eritritol": {"sku":"1521105","link":"https://www.supermaxi.com/producto/endulzante-de-eritritol-granulado-100-natural-biozukar-doypack-250-g-2/","nombre":"Endulzante De Eritritol Granulado 100% Natural BIOZUKAR Doypack 250 G","precio":7.14,"tam":{"g":250}}
+ }
+}</script>
 <script id="chat-motor">
 /* ================= CHAT «PREGÚNTALE A MAMÁ» =================
    Motor sin interfaz: interpreta el texto con la base del chat (bloque JSON id="chat") y contesta con las
@@ -24236,6 +24373,36 @@ function crear(D){
     return {semana:semanaActual, q:q};
   }
 
+  /* Lo que falta comprar: líneas sin marca y, de las marcadas con una cantidad menor a la actual, solo la diferencia. */
+  function faltantes(lineas, marcas){
+    var out = [];
+    lineas.forEach(function(l){
+      var e = estadoMarca(l, marcas);
+      if(e.s && !e.parcial) return;
+      out.push({l:l, cant:e.parcial ? e.falta : l.cant, parcial:e.parcial});
+    });
+    return out;
+  }
+  /* Costo aproximado de una línea con los precios de Supermaxi (bloque «precios»). Se compran paquetes enteros;
+     lo que se vende al peso se cobra por kilo. Si la unidad de la receta no se puede convertir (hojas, unidades
+     frente a gramos), se cuenta un paquete. Devuelve null cuando el producto no tiene precio. */
+  function costoLinea(l, cant, precios){
+    var p = precios && precios.productos && precios.productos[l.producto];
+    if(!p || !(p.precio > 0) || !p.tam) return null;
+    var t = p.tam, u = l.unidad, masa = u === 'g' || u === 'ml';
+    var q = cant > 0 ? cant : 0, paq = 1, costo, conv = true;
+    if(t.peso){
+      if(!masa || !q){ q = 1000; conv = masa; }
+      costo = q / 1000 * p.precio;
+      return {costo:costo, precio:p.precio, nombre:p.nombre, peso:true, kg:q / 1000, paquetes:0, exacto:conv && !l.sinCantidad, nota:p.nota || ''};
+    }
+    var tam = t.g || t.ml || 0;
+    if(tam && masa && q) paq = Math.max(1, Math.ceil((q - 0.5) / tam));
+    else if(t.u && u === 'unidad' && q) paq = Math.max(1, Math.ceil((q - 0.01) / t.u));
+    else conv = false;
+    return {costo:paq * p.precio, precio:p.precio, nombre:p.nombre, peso:false, paquetes:paq, exacto:conv && !l.sinCantidad, nota:p.nota || ''};
+  }
+
   return {
     DIAS:DIAS, COMIDAS:COMIDAS, NOMBRE_COMIDA:NOMBRE_COMIDA, FUERA:FUERA, DULCE_ESTIMADO_KCAL:DULCE_ESTIMADO_KCAL,
     VERSION_ESTADO:VERSION_ESTADO, FASES:FASES, pendientesConfig:pendientesConfig,
@@ -24248,7 +24415,8 @@ function crear(D){
     tiempo:tiempo, textoTiempo:textoTiempo, fmtMin:fmtMin,
     filtrar:filtrar, seleccion:seleccion,
     plan:plan, usosPrep:usosPrep, estadoMarca:estadoMarca, migrarMarcas:migrarMarcas, marcasAntiguasDe:marcasAntiguasDe,
-    claveAntigua:claveAntigua, migrarEstado:migrarEstado, estadoPrep:estadoPrep, marcaPrep:marcaPrep
+    claveAntigua:claveAntigua, migrarEstado:migrarEstado, estadoPrep:estadoPrep, marcaPrep:marcaPrep,
+    faltantes:faltantes, costoLinea:costoLinea
   };
 }
 
@@ -24749,6 +24917,9 @@ root.RecetarioSalud = {crear:crear, hoyISO:hoyISO, horaGYE:horaGYE};
 
 var D = JSON.parse(document.getElementById('datos').textContent);
 var M = window.RecetarioMotor.crear(D);
+/* Precios referenciales de Supermaxi: los actualiza scripts/precios-supermaxi.mjs. Sin el bloque, la lista funciona sin precios. */
+var PRECIOS = null;
+try{ PRECIOS = JSON.parse(document.getElementById('precios').textContent); }catch(e){ PRECIOS = null; }
 var R = D.recetas, byId = M.byId;
 var DIAS = M.DIAS, COMIDAS = M.COMIDAS, diaDe = M.diaDe, vacio = M.vacio;
 var GUARN = ['guarnicion','Guarnición','opcional, solo si sobra margen'];
@@ -25913,6 +26084,7 @@ function vCompras(){
     h += '<div class="empty">' + cocinera('vacio') + '<b>Nada que comprar todavía</b>Asigna platos en la semana y la lista se genera sola.</div>';
     return h;
   }
+  h += panelFaltan(pl);
   h += '<div class="shopcols">';
   SECCIONES.concat(Object.keys(por).filter(function(x){ return SECCIONES.indexOf(x) < 0; })).forEach(function(sec){
     var items = por[sec];
@@ -25942,6 +26114,61 @@ function vCompras(){
       'Las marcas se guardan solo en este dispositivo.') + '</p>';
   return h;
 }
+function dinero(v){ return '$' + v.toFixed(2).replace('.', ','); }
+function fechaPrecios(){
+  var f = PRECIOS && PRECIOS.fecha && /^(\d{4})-(\d{2})-(\d{2})$/.exec(PRECIOS.fecha);
+  return f ? f[3] + '/' + f[2] + '/' + f[1] : '';
+}
+function costoTxt(c){
+  var cuanto = c.peso ? String(Math.round(c.kg * 100) / 100).replace('.', ',') + ' kg a ' + dinero(c.precio) + ' el kilo' :
+    (c.paquetes > 1 ? c.paquetes + ' × ' : '') + c.nombre;
+  return '≈ ' + dinero(c.costo) + ' · ' + (c.peso ? c.nombre.replace(/\s*Al Peso\s*$/i, '') + ', ' : '') + cuanto + (c.nota ? ' (' + c.nota.toLowerCase() + ')' : '');
+}
+/* Resumen de lo que falta comprar, con el total aproximado y el texto para WhatsApp. */
+function resumenFaltan(pl){
+  var fal = M.faltantes(pl.lineas, S.compras), total = 0, sinPrecio = 0, por = {};
+  fal.forEach(function(f){
+    f.c = M.costoLinea(f.l, f.cant, PRECIOS);
+    if(f.c) total += f.c.costo; else sinPrecio++;
+    (por[f.l.seccion] = por[f.l.seccion] || []).push(f);
+  });
+  return {fal:fal, total:total, sinPrecio:sinPrecio, por:por};
+}
+function textoFaltan(r){
+  var t = '*Lista de compras · Amor de Mamá*\nLo que falta para el menú de la semana';
+  t += ' (' + r.fal.length + ' producto' + (r.fal.length === 1 ? '' : 's') + ', ' + S.comensales + ' porción' + (S.comensales > 1 ? 'es' : '') + ' por plato).\n';
+  SECCIONES.concat(Object.keys(r.por).filter(function(x){ return SECCIONES.indexOf(x) < 0; })).forEach(function(sec){
+    var items = r.por[sec];
+    if(!items || !items.length) return;
+    t += '\n*' + sec + '*\n';
+    items.forEach(function(f){
+      var est = ESTADO_TXT[f.l.estado] || f.l.estado;
+      var q = f.cant > 0 ? fmtQ(f.cant, f.l.unidad) : '';
+      if(f.l.sinCantidad) q = q ? q + ' y más' : 'cantidad no indicada';
+      t += '• ' + f.l.nombre + (est ? ' (' + est + ')' : '') + ': ' + q + (f.c ? ' · ≈ ' + dinero(f.c.costo) : '') + '\n';
+    });
+  });
+  if(r.total > 0){
+    t += '\n*Total aproximado en Supermaxi: ' + dinero(r.total) + '*\n';
+    t += 'Precios referenciales de supermaxi.com' + (fechaPrecios() ? ' al ' + fechaPrecios() : '') +
+      (r.sinPrecio ? '; ' + r.sinPrecio + ' producto' + (r.sinPrecio === 1 ? '' : 's') + ' sin precio' : '') + '.\n';
+  }
+  return t;
+}
+function panelFaltan(pl){
+  var r = resumenFaltan(pl);
+  if(!r.fal.length) return '<div class="faltan"><div class="tx"><b>No falta nada</b><span class="mini">Todo está marcado como comprado o en casa.</span></div></div>';
+  var h = '<div class="faltan"><div class="tx"><b>Falta comprar: ' + r.fal.length + ' producto' + (r.fal.length === 1 ? '' : 's') + '</b>';
+  if(r.total > 0) h += '<span class="tot">≈ ' + dinero(r.total) + '</span>';
+  h += '<span class="mini">' + (r.total > 0 ? 'Total aproximado en Supermaxi, con paquetes enteros' + (r.sinPrecio ? '; ' + r.sinPrecio + ' sin precio' : '') +
+    '. Precios referenciales' + (fechaPrecios() ? ' del ' + fechaPrecios() : '') + '; pueden variar según el local.' : 'Sin precios de referencia.') +
+    ' Lo marcado como «Comprado» o «Ya tengo» no se envía.</span></div>';
+  h += '<div class="acc"><a class="btn pri sm" id="waFaltan" href="' + esc('https://wa.me/?text=' + encodeURIComponent(textoFaltan(r))) +
+    '" target="_blank" rel="noopener">Enviar lo que falta por WhatsApp</a>' +
+    '<button class="btn sec sm" data-accion="copiarFaltan">Copiar lista</button>' +
+    '<span id="copiadoF" class="mini" role="status" aria-live="polite"></span></div></div>';
+  return h;
+}
 function itemCompra(l){
   var e = l.e, on = e.s === 'c' && !e.parcial, tengo = e.s === 't' && !e.parcial;
   var est = ESTADO_TXT[l.estado] || l.estado;
@@ -25950,6 +26177,8 @@ function itemCompra(l){
   var h = '<div class="sitem' + (on ? ' done' : '') + (tengo ? ' tengo' : '') + (e.parcial ? ' parcial' : '') + '">';
   h += '<button class="chk" data-buy="' + esc(l.clave) + '" aria-pressed="' + on + '" aria-label="' + esc((on ? 'Quitar marca de comprado: ' : 'Marcar como comprado: ') + l.nombre) + '"></button>';
   h += '<div class="n"><span class="nm">' + esc(l.nombre) + (est ? ' <i>· ' + esc(est) + '</i>' : '') + '</span>';
+  var cx = (!e.s || e.parcial) ? M.costoLinea(l, e.parcial ? e.falta : l.cant, PRECIOS) : null;
+  if(cx) h += '<span class="px">' + esc(costoTxt(cx)) + '</span>';
   if(e.parcial) h += '<span class="aviso-l">' + (e.s === 't' ? 'Tenías ' : 'Marcado para ') + esc(fmtQ(e.q, l.unidad)) + '; ahora hacen falta ' + esc(fmtQ(l.cant, l.unidad)) + '. Faltan ' + esc(fmtQ(e.falta, l.unidad)) + '.</span>';
   if(!e.s){
     var ant = M.marcasAntiguasDe(l, S.comprasLegado);
@@ -27250,6 +27479,12 @@ document.getElementById('main').addEventListener('click', function(e){
     if(a === 'limpiar'){
       if(window.confirm && !window.confirm('¿Quitar todas las marcas de «Comprado» y «Ya tengo»?')) return;
       S.compras = {}; S.comprasLegado = {}; guardar(); render();
+    }
+    if(a === 'copiarFaltan'){
+      copiarTexto(textoFaltan(resumenFaltan(planActual())), function(ok){
+        var el = document.getElementById('copiadoF');
+        if(el) el.textContent = ok ? 'Copiado al portapapeles' : 'No se pudo copiar';
+      });
     }
     if(a === 'copiar'){
       copiarTexto(textoSemana(), function(ok){

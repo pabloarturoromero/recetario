@@ -26,6 +26,16 @@ Fuera de Claude, el plan semanal, las marcas de compras y las preparaciones list
 
 La lista de compras y las preparaciones salen del mismo cálculo. El bloque `compras_catalogo` asigna cada forma de ingrediente a un producto de compra, y el campo `modelo` de cada preparación base define su rendimiento o su lote.
 
+## Precios de Supermaxi y lista para WhatsApp
+
+En Compras, el recuadro «Falta comprar» suma lo que no está marcado como «Comprado» ni «Ya tengo» (y, de lo marcado con menos cantidad de la necesaria, solo la diferencia), calcula el costo aproximado en Supermaxi con paquetes enteros y envía esa lista por WhatsApp o la copia. Cada línea pendiente muestra el paquete de referencia y su precio.
+
+Los precios están en el bloque `<script type="application/json" id="precios">` de `index.html`: para cada producto de `compras_catalogo`, su código (`sku`), su página en supermaxi.com, el nombre, el precio y el tamaño del paquete (`g`, `ml`, `u` o `peso: "kg"` para lo que se vende al peso, que se cobra por kilo). `tam_fijo` conserva un tamaño escrito a mano cuando el nombre no lo trae completo. Son precios referenciales publicados en la web y pueden variar según el local. Los productos sin equivalente en Supermaxi aparecen «sin precio».
+
+`node scripts/precios-supermaxi.mjs` vuelve a leer las páginas y actualiza precio, nombre y tamaño (`--seco` solo muestra los cambios). El flujo `.github/workflows/precios.yml` lo ejecuta cada domingo y, si algo cambió, hace commit en `main`. Para asignar un producto nuevo, se busca en supermaxi.com, se añade al bloque con `sku` y `link`, y se corre el script.
+
+Mi Comisariato no se incluye: su sitio rechaza las consultas automáticas y no tiene datos públicos.
+
 ## Chat «Pregúntale a Mamá»
 
 El chat busca recetas y contesta preguntas sobre ellas sin conexión. Su vocabulario está en el bloque `<script type="application/json" id="chat">` de `index.html`, separado del código: para que acepte otra manera de pedir algo, basta con añadir la frase a la lista `dice` de la categoría, cocina, ingrediente, tipo de plato o atributo, o a los patrones de `preguntas`. Las respuestas salen de `respuestas`, con variantes que se alternan.
@@ -35,12 +45,14 @@ El chat busca recetas y contesta preguntas sobre ellas sin conexión. Su vocabul
 Sin dependencias propias. El motor de cálculo (`<script id="motor">` en `index.html`) se prueba con Node 20 o superior; la interfaz, con Playwright si está instalado (local o global):
 
 ```
-node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs tests/cocinera.test.mjs tests/salud.test.mjs tests/nube.test.mjs tests/chat.test.mjs
+node --test tests/motor.test.mjs tests/ui.test.mjs tests/galeria.test.mjs tests/cocinera.test.mjs tests/salud.test.mjs tests/nube.test.mjs tests/chat.test.mjs tests/precios.test.mjs
 ```
 
 `galeria.test.mjs` cubre la galería de recetas, los filtros, las fichas, los enlaces directos `#receta/ID`, el mensaje de WhatsApp (sin enviarlo), «Añadir al menú», el intercambio con vista previa, «Deshacer» y los anchos de 375 y 390 px.
 
 `chat.test.mjs` cubre el chat «Pregúntale a Mamá»: búsquedas con ingredientes y negaciones, sinónimos y errores de escritura, refinamientos y preguntas sobre una receta.
+
+`precios.test.mjs` cubre el bloque de precios, el tamaño de los paquetes, el costo por línea y el mensaje de WhatsApp con solo lo que falta.
 
 Si Playwright no está disponible, las pruebas de interfaz se omiten y lo indican.
 
