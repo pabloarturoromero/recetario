@@ -2,7 +2,7 @@
 
 Antes «Recetario Intercambiable».
 
-Plan nutricional de cuatro semanas con 100 recetas intercambiables de 48 cocinas, con fotografía de referencia en las 100, organizadas en desayunos, almuerzos, cenas y guarniciones. Incluye armado de la semana con validación de proteína, fibra, energía y pescado marino, lista de compras generada automáticamente, preparaciones base y una sección Salud con el medidor de agua del día (meta de las reglas del plan, 2,5 a 3 L), el registro de peso y medidas y los exámenes de laboratorio.
+Plan nutricional de cuatro semanas con 129 recetas intercambiables de 48 cocinas, con fotografía de referencia en las 129, organizadas en desayunos, almuerzos, cenas y guarniciones. Incluye armado de la semana con validación de proteína, fibra, energía y pescado marino, lista de compras generada automáticamente, preparaciones base y una sección Salud con el medidor de agua del día (meta de las reglas del plan, 2,5 a 3 L), el registro de peso y medidas y los exámenes de laboratorio.
 
 Toda la aplicación vive en un solo archivo, `index.html`, sin dependencias ni paso de compilación. La interfaz sigue el diseño Savora: navegación inferior en el móvil, carrusel del menú de hoy y una galería de recetas con fotos, ficha compartible por WhatsApp y enlace directo por receta (`#receta/L64`).
 
