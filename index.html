@@ -1040,6 +1040,24 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 @media (max-width:620px){ .chat-d{height:92vh; height:92dvh} }
 </style>
 
+<style>
+/* ============ PANTALLA DE ENTRADA ============ */
+#entrada{position:fixed; inset:0; z-index:200; display:grid; place-items:center; align-content:center; gap:var(--s4);
+  background:var(--bg); pointer-events:none; transition:opacity .45s ease, visibility .45s;
+  animation:entradaFuera .45s ease 6s forwards}
+#entrada img{width:min(58vw,240px); height:auto; border-radius:50%; box-shadow:var(--sh2);
+  animation:entradaLogo .7s cubic-bezier(.2,.8,.2,1) both}
+#entrada p{font-size:14px; color:var(--ink-3); letter-spacing:.01em; animation:entradaTxt .6s ease .35s both}
+#entrada.fuera{opacity:0; visibility:hidden}
+@keyframes entradaLogo{from{opacity:0; transform:scale(.9)} to{opacity:1; transform:none}}
+@keyframes entradaTxt{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+@keyframes entradaFuera{to{opacity:0; visibility:hidden}}
+</style>
+<div id="entrada" aria-hidden="true">
+  <img src="img/logo.webp" width="512" height="512" alt="">
+  <p>¿Qué cocinamos hoy?</p>
+</div>
+
 <div class="top">
   <div class="top-in">
     <button class="marca" id="marca" aria-label="Amor de Mamá, ir a Inicio">
@@ -1084,7 +1102,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.17.0",
+    "version": "2.18.0",
     "fecha": "2026-09-29",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
@@ -28058,6 +28076,15 @@ document.getElementById('fase').value = String(S.fase);
   else if(location.hash === '#salud') S.vista = 'salud';
   render();
   if(id && !byId[id]){ S.vista = 'recetas'; render(); avisar('No existe la receta ' + id + ' en el recetario.', null); }
+})();
+/* La pantalla de entrada se ve al menos 1,4 s desde que empezó a cargar la página y luego se desvanece. */
+(function(){
+  var e = document.getElementById('entrada');
+  if(!e) return;
+  setTimeout(function(){
+    e.classList.add('fuera');
+    setTimeout(function(){ e.remove(); }, 500);
+  }, Math.max(0, 1400 - performance.now()));
 })();
 })();
 </script>
