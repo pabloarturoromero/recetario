@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { datos } from './cargar.mjs';
 
@@ -219,4 +220,49 @@ test('dulce pendiente: muestra la foto genérica con crédito, y el dulce elegid
   assert.equal(await page.locator('.dish.mk-dulce .pic img').count(), 0);
   assert.deepEqual(errores, []);
   await ctx.close();
+});
+
+test('viaje: añadir, marcar, editar, borrar y conservar la lista al recargar', { skip: saltar }, async () => {
+  const { page, ctx, errores } = await abrir({ ancho: 390, alto: 844 });
+  page.on('dialog', (d) => d.accept());
+  await page.click('nav.main button[data-v="viaje"]');
+  assert.match(await page.textContent('.vj-vacio'), /vacía/);
+  for (const [t, g] of [['Revisar pasaporte', 'Documentos'], ['Reservar hotel', 'Reservas'], ['Cambiar reales', 'Dinero']]) {
+    await page.selectOption('#vjForm select', g);
+    await page.fill('#vjForm input[name=t]', t);
+    await page.press('#vjForm input[name=t]', 'Enter');
+  }
+  assert.equal(await page.locator('.vj .sitem').count(), 3);
+  await page.click('[aria-label="Marcar como hecho: Revisar pasaporte"]');
+  assert.match(await page.textContent('.vj-res'), /1 de 3/);
+  await page.click('[aria-label="Editar: Reservar hotel"]');
+  await page.fill('#vjEd input', 'Reservar hotel en Paulista');
+  await page.press('#vjEd input', 'Enter');
+  await page.click('[aria-label="Borrar: Cambiar reales"]');
+  await page.click('.vj details summary');
+  await page.fill('#vjAj input[type=date]', '2099-01-01');
+  await page.click('#vjAj button[type=submit]');
+  await page.reload();
+  await page.click('nav.main button[data-v="viaje"]');
+  const txt = await page.textContent('.vj');
+  assert.match(txt, /Reservar hotel en Paulista/);
+  assert.doesNotMatch(txt, /Cambiar reales/);
+  assert.match(txt, /días para salir/);
+  assert.match(await page.textContent('.vj-res'), /1 de 2/);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  assert.deepEqual(errores, []);
+  await ctx.close();
+});
+
+test('viaje: la fusión entre dispositivos conserva lo de ambos y no revive lo borrado', () => {
+  const html = readFileSync(fileURLToPath(new URL('../index.html', import.meta.url)), 'utf8');
+  const fuente = html.match(/var VJ_GRUPOS = [^\n]*\n/)[0] + html.match(/function vjNormalizar[\s\S]*?\nfunction vjIgual[^\n]*\n/)[0];
+  const { vjFusionar } = new Function(fuente + 'return {vjFusionar};')();
+  const it = (id, t, ts, h = false) => ({ id, t, g: 'Otros', h, c: '2026-10-01T00:00:00Z', ts });
+  const a = { items: [it('1', 'Pasaporte', '2026-10-02T10:00:00Z', true), it('2', 'Hotel', '2026-10-01T00:00:00Z')], x: { '3': '2026-10-02T09:00:00Z' } };
+  const b = { items: [it('1', 'Pasaporte', '2026-10-01T00:00:00Z'), it('2', 'Hotel', '2026-10-01T00:00:00Z'), it('3', 'Seguro', '2026-10-01T00:00:00Z'), it('4', 'Reales', '2026-10-02T11:00:00Z')], x: {} };
+  const f = vjFusionar(a, b);
+  assert.deepEqual(f.items.map((i) => i.id).sort(), ['1', '2', '4']);
+  assert.equal(f.items.find((i) => i.id === '1').h, true, 'gana la marca más reciente');
+  assert.deepEqual(vjFusionar(b, a).items.map((i) => i.id).sort(), ['1', '2', '4'], 'el orden de los lados no importa');
 });

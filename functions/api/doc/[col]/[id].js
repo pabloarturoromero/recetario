@@ -1,11 +1,11 @@
 // Documentos en Cloudflare KV (enlace DATOS), bajo la clave u:<usuario>:<ruta>.
-// Existen tres: menu/actual (el plan de la semana), salud/actual (agua, peso, exámenes y ejercicio) y
-// ruso/progreso (el avance de la app Ruso para Recepciones, que usa esta misma nube desde su propio sitio).
+// Existen cuatro: menu/actual (el plan de la semana), salud/actual (agua, peso, exámenes y ejercicio),
+// viaje/actual (la lista de pendientes del viaje) y ruso/progreso (el avance de la app Ruso para Recepciones, que usa esta misma nube desde su propio sitio).
 // Cada escritura trae la versión que el dispositivo leyó; si otro dispositivo guardó antes,
 // responde 409 con lo guardado para que el dispositivo se ponga al día en vez de pisarlo.
 import { respuesta } from '../../_middleware.js';
 
-const RUTAS = new Set(['menu/actual', 'salud/actual', 'ruso/progreso']);
+const RUTAS = new Set(['menu/actual', 'salud/actual', 'viaje/actual', 'ruso/progreso']);
 const MAX_BYTES = 1000000;
 // KV guarda copias en cada región hasta 60 s por defecto; 30 s es el mínimo que admite.
 const CACHE_KV = 30;

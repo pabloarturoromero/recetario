@@ -73,6 +73,8 @@ test('documentos con versión y conflicto; rutas y cuerpos inválidos rechazados
   assert.equal((await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: { base: null, data: [1] } })).status, 400);
   assert.equal((await llamar(env, 'PUT', '/api/doc/menu/actual', { clave, cuerpo: '{roto' })).status, 400);
   assert.deepEqual([...env.DATOS.m.keys()], ['u:principal:salud/actual']);
+  r = await llamar(env, 'PUT', '/api/doc/viaje/actual', { clave, cuerpo: { base: null, data: { v: 1, items: [] } } });
+  assert.equal(r.status, 200, 'la lista del viaje también se guarda en la nube');
 });
 
 test('una copia de KV atrasada en otra región no rechaza al dispositivo que ya vio una versión más nueva', async () => {

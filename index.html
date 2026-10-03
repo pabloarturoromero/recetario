@@ -140,6 +140,12 @@ nav.main .sep{flex:1}
     width:22px; height:3px; margin-left:-11px; border-radius:0 0 3px 3px; background:var(--brand); display:none}
   body{padding-bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px))}
 }
+/* Ocho pestañas en la barra inferior: en teléfonos estrechos se reduce la letra para que no se junten. */
+@media (max-width:380px){
+  nav.main{padding-left:2px; padding-right:2px}
+  nav.main button{padding:6px 0; font-size:9.5px; letter-spacing:-.01em}
+}
+@media (max-width:340px){ nav.main button{font-size:8.8px} nav.main button svg.i{width:20px; height:20px} }
 main{max-width:var(--maxw); margin:0 auto; padding:var(--s4) var(--s5) var(--s8)}
 @media (max-width:760px){ main{padding:var(--s2) var(--s4) var(--s7)} }
 .page-h{margin-bottom:var(--s5)}
@@ -1108,6 +1114,35 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
   font:inherit; font-size:16px; background:var(--surface); color:var(--ink)}
 .chat-f input:focus{outline:2px solid var(--brand); outline-offset:1px}
 @media (max-width:620px){ .chat-d{height:92vh; height:92dvh} }
+
+/* ============ VIAJE ============ */
+.vj-res{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3) var(--s5); margin-bottom:var(--s4)}
+.vj-res .pr{flex:1 1 220px; min-width:0}
+.vj-res .pr .lab{display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-2); margin-bottom:6px}
+.vj-res .pr .lab b{font-variant-numeric:tabular-nums; color:var(--ink)}
+.vj-cuenta{font-size:13px; color:var(--ink-2)}
+.vj-cuenta b{font-size:22px; font-weight:700; color:var(--brand); font-variant-numeric:tabular-nums; margin-right:4px}
+.vj-add{display:flex; flex-wrap:wrap; gap:var(--s2); margin-bottom:var(--s4)}
+.vj-add input, .vj-ed input, .vj-aj input{flex:1 1 220px; min-width:0; padding:11px 16px; border-radius:99px; border:0;
+  background:var(--surface); box-shadow:var(--sh1); font-size:16px}
+.vj-add select{flex:0 1 160px; min-width:0; padding:10px 12px; border-radius:99px; border:0; background:var(--surface);
+  box-shadow:var(--sh1); font-size:13.5px}
+.vj-cols{columns:2; column-gap:var(--s4)}
+@media (max-width:820px){ .vj-cols{columns:1} }
+.vj .sitem .n{padding-top:2px; overflow-wrap:anywhere}
+.vj .sitem .acc{grid-column:3; grid-row:1 / span 2; display:flex; gap:2px; align-self:start}
+.vj .sitem .acc button{width:32px; height:32px; border-radius:8px; display:grid; place-items:center; color:var(--ink-3)}
+.vj .sitem .acc button:hover{background:var(--surface-2); color:var(--ink)}
+.vj .sitem .acc svg.i{width:16px; height:16px}
+.vj .sitem.done .n{color:var(--ink-3); text-decoration:line-through}
+.vj-ed{grid-column:2 / span 2; grid-row:1 / span 2; display:flex; flex-wrap:wrap; gap:6px}
+.vj-ed input{padding:8px 12px; box-shadow:none; background:var(--surface-2); border-radius:var(--r2)}
+.vj-aj{display:flex; flex-wrap:wrap; gap:var(--s2); align-items:center; margin-top:var(--s3)}
+.vj-aj label{display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--ink-3); flex:1 1 200px; min-width:0}
+.vj-aj input{flex:none; width:100%}
+.vj-vacio{text-align:center; padding:var(--s6) var(--s4); color:var(--ink-3); background:var(--surface);
+  border-radius:var(--r4); box-shadow:var(--sh1)}
+.vj-vacio b{display:block; font-size:16px; color:var(--ink-2); margin-bottom:4px}
 </style>
 
 <style>
@@ -1160,6 +1195,7 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
     <button role="tab" data-v="compras" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span>Compras</span></button>
     <button role="tab" data-v="prep" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v2a7 7 0 0 1-7 7h-2a7 7 0 0 1-7-7z"/><path d="M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/></svg><span>Preparar</span></button>
     <button role="tab" data-v="salud" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2s-6.5 7.1-6.5 11.6a6.5 6.5 0 0 0 13 0C18.5 10.3 12 3.2 12 3.2z"/><path d="M9 15a3 3 0 0 0 3 3"/></svg><span>Salud</span></button>
+    <button role="tab" data-v="viaje" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 13.8 6 18l-2.5-.5L3 16l4.2-4.2L3.5 9 5 7.5l6.3 1.1L15 5c1-1 2.8-1.6 3.6-.8.8.8.2 2.6-.8 3.6l-3.6 3.7 1.1 6.3L13.8 19l-2.8-3.7"/></svg><span>Viaje</span></button>
     <span class="sep"></span>
     <button role="tab" data-v="reglas" aria-selected="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M9 12h6M9 16h6M9 8h3"/></svg><span>Reglas</span></button>
   </nav>
@@ -1172,8 +1208,8 @@ ul.pv-al li em{font-style:normal; font-size:11px; background:var(--warn-bg); col
 <script type="application/json" id="datos">{
   "meta": {
     "titulo": "Amor de Mamá, plan nutricional 4 semanas",
-    "version": "2.19.1",
-    "fecha": "2026-09-29",
+    "version": "2.20.0",
+    "fecha": "2026-10-03",
     "porciones_por_receta": 1,
     "nota_porciones": "Todas las cantidades son para una porción. Multiplicar todos los gramajes por el número de comensales.",
     "nota_kcal": "Las kcal son estimación de tabla de composición con margen de más menos 10 por ciento. No son medición.",
@@ -25443,7 +25479,8 @@ var S = {
   galScroll:0,
   pushed:false,
   fichaTab:'ing',
-  salud:{fm:'', rango:30, ex:null, msg:'', borrador:null, pdf:'', ejDia:''}   /* estado de pantalla de Salud, no se guarda */
+  salud:{fm:'', rango:30, ex:null, msg:'', borrador:null, pdf:'', ejDia:''},   /* estado de pantalla de Salud, no se guarda */
+  viaje:{ver:'pend', g:'Documentos', edit:'', ultimo:''}   /* estado de pantalla de Viaje, no se guarda */
 };
 
 /* ---------- persistencia ---------- */
@@ -25593,6 +25630,70 @@ function conectarSalud(db){
     if(cambio && (S.vista === 'salud' || S.vista === 'inicio')) render();
   }, function(){ marcaSync('error'); });
 }
+/* ---------- persistencia de Viaje ---------- */
+/* Lista de pendientes del viaje, en su propia clave (recetario.viaje) y en el documento viaje/actual.
+   Cada pendiente lleva ts (última modificación); los borrados quedan en x {id: ts}. Entre dispositivos
+   se fusiona pendiente por pendiente y gana el cambio más reciente, así nada se pisa ni revive. */
+var VJ_GRUPOS = ['Documentos', 'Reservas', 'Dinero', 'Salud', 'Equipaje', 'Trabajo', 'Otros'];
+var VJ = vjNormalizar(null), dbViaje = null, tmrViaje = null, subiendoViaje = false;
+function vjNormalizar(o){
+  o = o && typeof o === 'object' ? o : {};
+  var it = Array.isArray(o.items) ? o.items.filter(function(i){ return i && i.id && typeof i.t === 'string'; }) : [];
+  return {v:1, nombre: typeof o.nombre === 'string' && o.nombre ? o.nombre : 'Viaje a São Paulo',
+    salida: typeof o.salida === 'string' ? o.salida : '', mts: o.mts || '',
+    items: it.map(function(i){ return {id:String(i.id), t:i.t, g: VJ_GRUPOS.indexOf(i.g) >= 0 ? i.g : 'Otros', h:!!i.h, c:i.c || '', ts:i.ts || ''}; }),
+    x: o.x && typeof o.x === 'object' && !Array.isArray(o.x) ? o.x : {}};
+}
+function vjFusionar(a, b){
+  a = vjNormalizar(a); b = vjNormalizar(b);
+  var x = {}, k;
+  for(k in a.x) x[k] = a.x[k];
+  for(k in b.x) if(!x[k] || b.x[k] > x[k]) x[k] = b.x[k];
+  var por = {};
+  a.items.concat(b.items).forEach(function(i){ if(!por[i.id] || i.ts > por[i.id].ts) por[i.id] = i; });
+  var items = Object.keys(por).map(function(id){ return por[id]; })
+    .filter(function(i){ return !(x[i.id] && x[i.id] >= i.ts); })
+    .sort(function(p, q){ return p.c < q.c ? -1 : p.c > q.c ? 1 : (p.id < q.id ? -1 : 1); });
+  var m = b.mts > a.mts ? b : a;
+  return {v:1, nombre:m.nombre, salida:m.salida, mts:m.mts, items:items, x:x};
+}
+function vjIgual(a, b){ return JSON.stringify(vjNormalizar(a)) === JSON.stringify(vjNormalizar(b)); }
+function vjAhora(){ return new Date().toISOString(); }
+try{ var rawV = localStorage.getItem('recetario.viaje'); if(rawV) VJ = vjNormalizar(JSON.parse(rawV)); }catch(e){}
+function subirViaje(){
+  if(!dbViaje) return;
+  clearTimeout(tmrViaje); tmrViaje = null;
+  subiendoViaje = true;
+  marcaSync('sincronizando');
+  dbViaje.set(JSON.parse(JSON.stringify(VJ))).then(function(r){
+    subiendoViaje = false;
+    if(r && r.conflicto) return;   /* la nube respondió con lo suyo: onSnapshot ya fusionó y vuelve a subir */
+    if(!tmrViaje) marcaSync('sincronizado');
+  }).catch(function(){ subiendoViaje = false; marcaSync('error'); });
+}
+function guardarViaje(){
+  try{ localStorage.setItem('recetario.viaje', JSON.stringify(VJ)); localOk = true; }catch(e){ localOk = false; }
+  if(!dbViaje){ pintarSync(); return; }
+  marcaSync('pendiente');
+  clearTimeout(tmrViaje);
+  tmrViaje = setTimeout(subirViaje, 500);
+}
+function conectarViaje(db){
+  dbViaje = db.doc('viaje/actual');
+  dbViaje.fusiona = true;
+  dbViaje.onSnapshot(function(sn){
+    if(sn.metadata && sn.metadata.hasPendingWrites) return;
+    if(!sn.exists){ if(VJ.items.length || VJ.salida) subirViaje(); return; }
+    var d2 = sn.data();
+    if(!d2) return;
+    var nuevo = vjFusionar(VJ, d2), cambio = !vjIgual(nuevo, VJ);
+    VJ = nuevo;
+    try{ localStorage.setItem('recetario.viaje', JSON.stringify(VJ)); }catch(e){}
+    if(!vjIgual(VJ, d2)){ marcaSync('pendiente'); clearTimeout(tmrViaje); tmrViaje = setTimeout(subirViaje, 50); }
+    else if(!tmrViaje && !subiendoViaje) marcaSync('sincronizado');
+    if(cambio && S.vista === 'viaje') render();
+  }, function(){ marcaSync('error'); });
+}
 /* ---------- nube propia (Cloudflare Pages Functions + KV, con clave personal) ---------- */
 /* Fuera de Claude, si el sitio tiene la nube configurada, los mismos documentos menu/actual y salud/actual
    se guardan en /api/doc/... con la misma interfaz que la base del artifact (doc, set, onSnapshot).
@@ -25713,6 +25814,7 @@ if(fuenteDb){
     dbRef = db.doc('menu/actual');
     dbRef.fusiona = true;
     conectarSalud(db);
+    conectarViaje(db);
     if(db === NUBE.db) render();   /* muestra «Conectada» y el correo en cuanto la nube responde */
     var primera = true;
     dbRef.onSnapshot(function(sn){
@@ -28073,6 +28175,116 @@ function avisoBorrador(b){
 }
 
 /* ================= RENDER ================= */
+/* ---------- Viaje: lista de pendientes ---------- */
+var IC_EDIT = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>';
+var IC_DEL = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+function vjDias(){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(VJ.salida)) return null;
+  var a = Date.UTC.apply(null, SA.hoyISO().split('-').map(function(n, i){ return +n - (i === 1 ? 1 : 0); }));
+  var b = Date.UTC.apply(null, VJ.salida.split('-').map(function(n, i){ return +n - (i === 1 ? 1 : 0); }));
+  return Math.round((b - a) / 86400000);
+}
+function vjFechaLarga(iso){
+  var p = iso.split('-');
+  return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('es-EC', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+}
+function vViaje(){
+  var U = S.viaje, it = VJ.items, hechos = it.filter(function(i){ return i.h; }).length, d = vjDias();
+  var h = '<div class="vj"><div class="page-h"><h1>' + esc(VJ.nombre) + '</h1><div class="sub">' +
+    (VJ.salida ? 'Salida el ' + esc(vjFechaLarga(VJ.salida)) + '. ' : '') + 'Tu lista de pendientes' +
+    (dbViaje ? (NUBE.db ? ', sincronizada con tu nube' : ', sincronizada con la copia compartida') : ', guardada en este dispositivo') + '.</div></div>';
+  h += '<div class="panel vj-res">';
+  if(d !== null) h += '<div class="vj-cuenta">' + (d > 0 ? '<b>' + d + '</b>' + (d === 1 ? 'día para salir' : 'días para salir') :
+    d === 0 ? '<b>Hoy</b>sales de viaje' : 'El viaje empezó hace ' + (-d) + (d === -1 ? ' día' : ' días')) + '</div>';
+  h += '<div class="pr"><div class="lab"><span>Listos</span><b>' + hechos + ' de ' + it.length + '</b></div>' +
+    '<div class="track"><div class="fill' + (it.length && hechos === it.length ? ' ok' : '') + '" style="width:' +
+    (it.length ? Math.round(100 * hechos / it.length) : 0) + '%"></div></div></div></div>';
+  h += '<form class="vj-add" id="vjForm"><input name="t" maxlength="200" placeholder="Nuevo pendiente" aria-label="Nuevo pendiente" autocomplete="off" required>' +
+    '<select name="g" aria-label="Grupo">' + VJ_GRUPOS.map(function(g){ return '<option' + (g === U.g ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select>' +
+    '<button class="btn pri" type="submit">Añadir</button></form>';
+  h += '<div class="seg" role="group" aria-label="Mostrar">' +
+    '<button data-vj="ver|pend" aria-pressed="' + (U.ver === 'pend') + '">Pendientes (' + (it.length - hechos) + ')</button>' +
+    '<button data-vj="ver|todo" aria-pressed="' + (U.ver === 'todo') + '">Todos (' + it.length + ')</button></div>';
+  var vis = it.filter(function(i){ return U.ver === 'todo' || !i.h || i.id === U.ultimo; });
+  if(!it.length) h += '<div class="vj-vacio"><b>La lista está vacía</b>Escribe arriba tu primer pendiente.</div>';
+  else if(!vis.length) h += '<div class="vj-vacio"><b>Todo listo</b>No quedan pendientes. Buen viaje.</div>';
+  else {
+    h += '<div class="vj-cols">';
+    VJ_GRUPOS.forEach(function(g){
+      var gi = vis.filter(function(i){ return i.g === g; });
+      if(!gi.length) return;
+      var tot = it.filter(function(i){ return i.g === g; }), ok = tot.filter(function(i){ return i.h; }).length;
+      h += '<section class="shopcat"><h3>' + g + '<span>' + ok + '/' + tot.length + '</span></h3>';
+      gi.forEach(function(i){
+        h += '<div class="sitem' + (i.h ? ' done' : '') + '">' +
+          '<button class="chk" data-vj="h|' + esc(i.id) + '" aria-pressed="' + i.h + '" aria-label="' + esc((i.h ? 'Desmarcar: ' : 'Marcar como hecho: ') + i.t) + '"></button>';
+        if(U.edit === i.id) h += '<form class="vj-ed" id="vjEd" data-id="' + esc(i.id) + '"><input name="t" maxlength="200" value="' + esc(i.t) + '" aria-label="Editar pendiente" required>' +
+          '<button class="btn pri sm" type="submit">Guardar</button><button class="btn gh sm" type="button" data-vj="cancelar">Cancelar</button></form>';
+        else h += '<div class="n">' + esc(i.t) + '</div><div class="acc">' +
+          '<button data-vj="edit|' + esc(i.id) + '" aria-label="' + esc('Editar: ' + i.t) + '">' + IC_EDIT + '</button>' +
+          '<button data-vj="del|' + esc(i.id) + '" aria-label="' + esc('Borrar: ' + i.t) + '">' + IC_DEL + '</button></div>';
+        h += '</div>';
+      });
+      h += '</section>';
+    });
+    h += '</div>';
+  }
+  h += '<details class="disc"><summary>Nombre y fecha del viaje</summary><form class="vj-aj" id="vjAj">' +
+    '<label>Nombre<input name="nombre" maxlength="80" value="' + esc(VJ.nombre) + '"></label>' +
+    '<label>Fecha de salida<input type="date" name="salida" value="' + esc(VJ.salida) + '"></label>' +
+    '<button class="btn sec" type="submit">Guardar</button>' +
+    (hechos ? '<button class="btn gh" type="button" data-vj="limpiar">Quitar los ' + hechos + ' hechos</button>' : '') + '</form></details>';
+  return h + '</div>';
+}
+function vjId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function vjBuscar(id){ for(var i = 0; i < VJ.items.length; i++) if(VJ.items[i].id === id) return VJ.items[i]; return null; }
+function enviarViaje(f){
+  var ahora = vjAhora();
+  if(f.id === 'vjForm'){
+    var t = f.t.value.trim();
+    if(!t) return;
+    S.viaje.g = f.g.value;
+    VJ.items.push({id:vjId(), t:t, g:f.g.value, h:false, c:ahora, ts:ahora});
+    guardarViaje(); render();
+    var n = document.querySelector('#vjForm input[name="t"]');
+    if(n) n.focus({preventScroll:true});
+  } else if(f.id === 'vjEd'){
+    var i = vjBuscar(f.dataset.id), t2 = f.t.value.trim();
+    if(i && t2){ i.t = t2; i.ts = ahora; guardarViaje(); }
+    S.viaje.edit = ''; render();
+  } else if(f.id === 'vjAj'){
+    VJ.nombre = f.nombre.value.trim() || 'Viaje a São Paulo';
+    VJ.salida = f.salida.value || '';
+    VJ.mts = ahora;
+    guardarViaje(); render();
+  }
+}
+function accionViaje(b){
+  var p = b.dataset.vj.split('|'), U = S.viaje, i, ahora = vjAhora();
+  if(p[0] === 'ver'){ U.ver = p[1]; U.ultimo = ''; render(); return; }
+  if(p[0] === 'cancelar'){ U.edit = ''; render(); return; }
+  if(p[0] === 'edit'){ U.edit = p[1]; render(); var e = document.querySelector('#vjEd input'); if(e){ e.focus(); e.select(); } return; }
+  if(p[0] === 'h' && (i = vjBuscar(p[1]))){
+    i.h = !i.h; i.ts = ahora;
+    U.ultimo = i.h ? i.id : '';   /* lo recién marcado sigue a la vista, tachado, hasta el siguiente cambio de filtro */
+    guardarViaje(); render();
+    var c = document.querySelector('[data-vj="h|' + p[1] + '"]'); if(c) c.focus({preventScroll:true});
+    return;
+  }
+  if(p[0] === 'del' && (i = vjBuscar(p[1]))){
+    if(!confirm('¿Borrar «' + i.t + '»?')) return;
+    VJ.items = VJ.items.filter(function(x){ return x.id !== i.id; });
+    VJ.x[i.id] = ahora;
+    guardarViaje(); render(); return;
+  }
+  if(p[0] === 'limpiar'){
+    var n = VJ.items.filter(function(x){ return x.h; }).length;
+    if(!n || !confirm('¿Quitar de la lista los ' + n + ' pendientes ya hechos?')) return;
+    VJ.items.forEach(function(x){ if(x.h) VJ.x[x.id] = ahora; });
+    VJ.items = VJ.items.filter(function(x){ return !x.h; });
+    guardarViaje(); render();
+  }
+}
 function render(){
   var coc = {};
   R.forEach(function(x){ coc[x.cocina] = 1; });
@@ -28085,6 +28297,7 @@ function render(){
   else if(S.vista === 'compras') m.innerHTML = vCompras();
   else if(S.vista === 'prep') m.innerHTML = vPrep();
   else if(S.vista === 'salud') m.innerHTML = vSalud();
+  else if(S.vista === 'viaje') m.innerHTML = vViaje();
   else m.innerHTML = vReglas();
   FG.iniciar();
   Array.prototype.forEach.call(document.querySelectorAll('nav.main button'), function(b){
@@ -28231,9 +28444,11 @@ document.getElementById('main').addEventListener('submit', function(e){
   var f = e.target;
   if(f.id === 'aguaLibre' || f.id === 'medForm' || f.id === 'exForm' || f.id === 'ejForm'){ e.preventDefault(); enviarSalud(f); }
   if(f.id === 'nubeForm'){ e.preventDefault(); conectarConClave(f.clave.value); }
+  if(f.id === 'vjForm' || f.id === 'vjEd' || f.id === 'vjAj'){ e.preventDefault(); enviarViaje(f); }
 });
 document.getElementById('main').addEventListener('click', function(e){
   var t;
+  if((t = e.target.closest('[data-vj]'))){ accionViaje(t); return; }
   if((t = e.target.closest('[data-sa^="ejvideo|"]'))){ abrirVideoEj(t, t.dataset.sa.split('|')[1]); return; }
   if((t = e.target.closest('[data-sa]'))){ accionSalud(t); return; }
   if((t = e.target.closest('[data-nube]'))){ accionNube(t); return; }
