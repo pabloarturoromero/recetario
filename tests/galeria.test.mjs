@@ -134,7 +134,8 @@ await prueba('volver conserva búsqueda, filtros y scroll', async () => {
   await p.fill('#q', 'lenteja');
   const n = await tarjetas(p).count();
   const ult = tarjetas(p).last();
-  await ult.scrollIntoViewIfNeeded();
+  // Centrada, para que el clic no vuelva a desplazar la página (la barra inferior tapa el borde de abajo).
+  await ult.evaluate((e) => e.scrollIntoView({ block: 'center' }));
   const y = await p.evaluate(() => scrollY);
   const id = await ult.getAttribute('data-id');
   await ult.locator('.gopen').click();

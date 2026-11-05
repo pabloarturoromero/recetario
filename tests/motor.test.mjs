@@ -444,3 +444,9 @@ test('garbanzo solo en hummus y recetas retiradas fuera del menú guardado', () 
   assert.equal(st.semana.lun.cena, '');
   assert.equal(st.semana.lun.almuerzo, 'L13');
 });
+
+test('arveja partida fuera del recetario', () => {
+  for (const r of D.recetas) {
+    assert.ok(!r.ingredientes.some((i) => /arveja partida/i.test(i.item)), r.id + ' lleva arveja partida');
+  }
+});
