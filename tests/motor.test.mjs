@@ -194,17 +194,19 @@ test('legumbre: tope semanal por tipo, con un solo aviso por día', () => {
   const s = SEM();
   const O = M.objetivos(1);
   assert.equal(O.legMax, 2);
-  const conGarbanzo = D.recetas.filter((r) => r.categoria === 'cena' && M.legumbres(r).includes('garbanzo'));
-  assert.ok(conGarbanzo.length >= 3);
+  const conGarbanzo = D.recetas.filter((r) => M.legumbres(r).includes('garbanzo')).map((r) => r.id).sort();
+  assert.deepEqual(conGarbanzo, ['C93', 'D16', 'L86'], 'el garbanzo va solo en las recetas de hummus');
   assert.ok(M.legumbres(M.byId.D2).includes('lenteja'), 'la base de lenteja P3 cuenta como lenteja');
+  assert.equal(M.usosLegumbre(s).garbanzo, 1, 'la semana base lleva hummus una vez (C93 el martes)');
   const s2 = M.copia(s);
-  ['lun', 'mar', 'mie'].forEach((k, n) => { s2[k].cena = conGarbanzo[n].id; });
+  s2.lun.desayuno = 'D16';
+  s2.mie.almuerzo = 'L86';
   assert.equal(M.usosLegumbre(s2).garbanzo, 3);
   const avisos = M.problemasDia(s2, 'lun', 1).filter((p) => p.tag === 'Legumbre');
   assert.equal(avisos.length, 1);
   assert.equal(avisos[0].t, 'warn');
   assert.match(avisos[0].m, /Garbanzo aparece en 3 comidas/);
-  s2.mie.cena = s.mie.cena;
+  s2.mie.almuerzo = s.mie.almuerzo;
   assert.ok(!M.problemasDia(s2, 'lun', 1).some((p) => p.tag === 'Legumbre'), 'con dos veces no hay aviso');
   assert.ok(!M.problemasSemana(s, 1).some((p) => /aparece en \d+ comidas/.test(p.m)), 'la semana de ejemplo respeta el tope');
 });
@@ -403,7 +405,7 @@ test('v4: el desayuno por defecto es D7 y la migración respeta los elegidos', (
   assert.ok(M.DIAS.every((d) => semilla()[d.k].desayuno === 'D7'), 'la semana base desayuna D7');
   const st = M.migrarEstado({ v: 3, semana: {
     lun: { desayuno: 'D2', almuerzo: 'L13', cena: 'C24', guarnicion: '', fuera: false },
-    mar: { desayuno: 'D5', almuerzo: '', cena: 'C50', guarnicion: '', fuera: true },
+    mar: { desayuno: 'D5', almuerzo: '', cena: 'C93', guarnicion: '', fuera: true },
     jue: { desayuno: 'D1', almuerzo: '', cena: 'C27', guarnicion: '', fuera: true }
   } });
   assert.equal(st.v, 4);
@@ -417,16 +419,28 @@ test('v4: el desayuno por defecto es D7 y la migración respeta los elegidos', (
 
 test('menú entre dispositivos: la fusión a tres bandas conserva los cambios de ambos lados', () => {
   const dia = (d, a) => ({ desayuno: d, almuerzo: a, cena: '', guarnicion: '', fuera: false });
-  const base = { v: 4, comensales: 1, fase: 1, semana: { lun: dia('D7', 'L1'), mar: dia('D7', 'L2') }, compras: { x: { s: 'c', q: null } } };
-  const local = { v: 4, comensales: 1, fase: 2, semana: { lun: dia('D7', 'L3'), mar: dia('D7', 'L2') }, compras: { x: { s: 'c', q: null }, y: { s: 't', q: 2 } } };
-  const remoto = { v: 4, comensales: 2, fase: 1, semana: { lun: dia('D7', 'L1'), mar: dia('D1', 'L2') }, compras: {} };
+  const base = { v: 4, comensales: 1, fase: 1, semana: { lun: dia('D7', 'L13'), mar: dia('D7', 'L14') }, compras: { x: { s: 'c', q: null } } };
+  const local = { v: 4, comensales: 1, fase: 2, semana: { lun: dia('D7', 'L7'), mar: dia('D7', 'L14') }, compras: { x: { s: 'c', q: null }, y: { s: 't', q: 2 } } };
+  const remoto = { v: 4, comensales: 2, fase: 1, semana: { lun: dia('D7', 'L13'), mar: dia('D1', 'L14') }, compras: {} };
   const f = M.fusionarEstado(base, local, remoto);
   assert.equal(f.comensales, 2, 'lo del otro dispositivo');
   assert.equal(f.fase, 2, 'lo de este dispositivo');
-  assert.equal(f.semana.lun.almuerzo, 'L3');
+  assert.equal(f.semana.lun.almuerzo, 'L7');
   assert.equal(f.semana.mar.desayuno, 'D1');
   assert.deepEqual(Object.keys(f.compras), ['y'], 'la marca quitada en el otro se quita; la nueva de aquí queda');
   assert.ok(M.igualEstado(M.fusionarEstado(base, base, remoto), remoto), 'sin cambios propios queda lo de la nube');
   assert.ok(M.igualEstado({ ...local, actualizado: 'otro' }, local), 'la fecha de guardado no cuenta como cambio');
   assert.ok(M.igualEstado(M.fusionarEstado(null, local, remoto), remoto), 'sin base, manda la nube');
+});
+
+test('garbanzo solo en hummus y recetas retiradas fuera del menú guardado', () => {
+  for (const r of D.recetas) {
+    const lleva = r.ingredientes.some((i) => /garbanzo/i.test(i.item));
+    if (lleva) assert.match(r.nombre, /hummus/i, r.id + ' lleva garbanzo sin ser hummus');
+  }
+  for (const id of ['D6', 'C22', 'C50', 'C59']) assert.ok(!M.byId[id], 'receta retirada sigue en el recetario: ' + id);
+  const st = M.migrarEstado({ v: 4, semana: { lun: { desayuno: 'D6', almuerzo: 'L13', cena: 'C59', guarnicion: '', fuera: false } } });
+  assert.equal(st.semana.lun.desayuno, '', 'un id retirado deja la comida vacía');
+  assert.equal(st.semana.lun.cena, '');
+  assert.equal(st.semana.lun.almuerzo, 'L13');
 });

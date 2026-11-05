@@ -11,7 +11,7 @@ El usuario pidió que las recetas nuevas se publiquen directamente, sin pedir co
 
 **Legumbres**
 - La legumbre va solo donde el plato original la lleva. No se añade para subir la fibra.
-- Garbanzo, lenteja y frejol: como máximo 2 veces cada uno por semana (`meta.reglas_de_armado.legumbre_por_semana`). Hay demasiado garbanzo: evitarlo en recetas nuevas salvo que sea el corazón del plato.
+- Garbanzo, lenteja y frejol: como máximo 2 veces cada uno por semana (`meta.reglas_de_armado.legumbre_por_semana`). El garbanzo va solo en hummus (D16, L86, C93); ninguna otra receta lo lleva, y `tests/motor.test.mjs` falla si aparece fuera de un plato de hummus. En la v2.21.0 se retiraron D6, C22, C50 y C59, que dependían enteramente del garbanzo: no reutilizar esos ids.
 - Nunca: arveja tierna, haba tierna, arveja partida, chocho ni edamame (no le gustan).
 - El tofu sí le gusta, sobre todo donde es propio del plato (cocina china, japonesa, coreana, del sudeste asiático).
 - Si una receta nueva lleva garbanzo, lenteja o frejol en una forma nueva, añadirla a `meta.tipos_legumbre`.
