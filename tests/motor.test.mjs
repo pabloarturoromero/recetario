@@ -437,6 +437,7 @@ test('garbanzo solo en hummus y recetas retiradas fuera del menú guardado', () 
   for (const r of D.recetas) {
     const lleva = r.ingredientes.some((i) => /garbanzo/i.test(i.item));
     if (lleva) assert.match(r.nombre, /hummus/i, r.id + ' lleva garbanzo sin ser hummus');
+    if (!/hummus/i.test(r.nombre)) assert.ok(!/garbanzo/i.test(JSON.stringify(r)), r.id + ' menciona garbanzo sin ser hummus');
   }
   for (const id of ['D6', 'C22', 'C50', 'C59']) assert.ok(!M.byId[id], 'receta retirada sigue en el recetario: ' + id);
   const st = M.migrarEstado({ v: 4, semana: { lun: { desayuno: 'D6', almuerzo: 'L13', cena: 'C59', guarnicion: '', fuera: false } } });
